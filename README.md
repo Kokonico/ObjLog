@@ -114,6 +114,11 @@ log.dump_messages_to_console()  # this will print the messages to the console, b
 
 output:
 ```shell
+[Buffered Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
+[Buffered Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
+[Buffered Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
+[Buffered Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
+[Buffered Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
 ```
 
 example.log:
