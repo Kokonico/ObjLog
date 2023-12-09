@@ -35,12 +35,13 @@ class LogMessage:
 class LogNode:
     """the ObjLogger"""
 
-    def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False, print_filter: list | None = None, max_messages_in_memory: int = 500):
+    def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False, print_filter: list | None = None, max_messages_in_memory: int = 500, max_file_size: int = 200):
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
         self.messages = []
         self.max = max_messages_in_memory
+        self.maxinf = max_file_size
         self.print_filter = print_filter
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
@@ -56,11 +57,36 @@ class LogNode:
                 self.messages.pop(0)
                 self.messages.append(message)  # remove the first message and add the new one
 
+
         if isinstance(self.log_file, str) or isinstance(override_log_file, str):
             message_str = f"[{self.name}] {str(message)}"
+            
             # log it
-            with open(self.log_file, "a") as f:
+            with open(self.log_file, "a+") if override_log_file is None else open(override_log_file, "a") as f:
+                # move the file pointer to the beginning of the file
+                f.seek(0)
+                
+                # check if the amount of messages in the file is bigger than/equal to the max
+                lines = f.readlines()
+                if len(lines) >= self.maxinf:
+                    # get the first line
+                    lines.pop(0)
+                    # move the file pointer to the beginning of the file before writing
+                    f.seek(0)
+                    # truncate the file to remove its content
+                    f.truncate()
+                    # remove the last line (it's empty)
+                    lines.pop()
+                    # write the lines back
+                    f.writelines(lines)
+                
+                # write the message
                 f.write(message_str + '\n')
+
+
+
+
+
 
         if (self.print or force_print[0]) and (
                 self.print_filter is None or isinstance(message, tuple(self.print_filter))):
@@ -119,6 +145,10 @@ class LogNode:
     def set_max_messages_in_memory(self, max_messages: int):
         """set the maximum amount of messages to be saved in memory"""
         self.max = max_messages
+    
+    def set_max_file_size(self, max_file_size: int):
+        """set the maximum size of the log file"""
+        self.maxinf = max_file_size
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
