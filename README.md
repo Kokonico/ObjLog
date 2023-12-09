@@ -234,7 +234,7 @@ example2.log:
 ### I have a very limited amount of RAM, and I want to limit the amount of messages that are stored in memory!
 
 ```python
-from objlog import LogNode, LogMessage
+from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 log = LogNode(name="Limited Example", max_messages_in_memory=5, log_file="limited.log")  # only store 5 messages in memory
@@ -246,6 +246,48 @@ log.log(Error("this is an error message 1"))
 log.log(Fatal("this is a fatal message 1"))
 
 log.log(Debug("this is a debug message 2"))  # this message will be stored in memory, and the oldest message will be removed from memory
+```
+
+limited.log:
+```shell
+[Limited Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 1
+[Limited Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 1
+[Limited Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 1
+[Limited Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 1
+[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
+```
+
+### I have a limited amount of SSD space, and I want to limit the amount of messages that are stored in the log file!
+
+```python
+from objlog import LogNode
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+
+log = LogNode(name="Limited Example", max_log_messages=5, log_file="limited.log")  # only store 5 messages in the log file, but unlimited messages in memory
+
+log.log(Debug("this is a debug message 1"))
+log.log(Info("this is an info message 1"))
+log.log(Warn("this is a warning message 1"))
+log.log(Error("this is an error message 1"))
+log.log(Fatal("this is a fatal message 1"))
+
+log.log(Debug("this is a debug message 2"))  # this message will be stored in the log, and the oldest message will be removed from the log
+
+log.dump_messages_to_console()  # this will print all messages in memory to the console (including ones not saved to the log), but not save them to the log file
+
+# to limit both the amount of messages in memory and the amount of messages in the log file, you can do this:
+
+log = LogNode(name="Limited Example", max_messages_in_memory=5, max_log_messages=5, log_file="limited.log")  # only store 5 messages in the log file, and only store 5 messages in memory
+```
+
+output:
+```shell
+[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 1
+[Limited Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 1
+[Limited Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 1
+[Limited Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 1
+[Limited Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 1
+[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
 ```
 
 limited.log:
@@ -277,6 +319,10 @@ log.log(Fatal("this is a fatal message"))
 output:
 ```shell
 ```
+
+## I want more examples!
+
+check out the [example's](examples) folder within this project, plenty of examples there!
 
 ## I want to use this in a project!
 Feel free to! This project is licensed under the Zlib license, so you can use it in any project, commercial or not, as long as you give credit to the original author (me) and don't claim it as your own.
