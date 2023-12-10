@@ -141,9 +141,18 @@ class LogNode:
         """set the maximum amount of messages to be saved in memory"""
         self.max = max_messages
 
-    def set_max_file_size(self, max_file_size: int):
+    def set_max_messages_in_log(self, max_file_size: int):
         """set the maximum size of the log file"""
         self.maxinf = max_file_size
+        # crop the file if it's too big
+        if isinstance(self.log_file, str):
+            with open(self.log_file, "r+") as f:
+                lines = f.readlines()
+                if len(lines) > self.maxinf:
+                    lines = lines[-self.maxinf:]
+                    f.seek(0)
+                    f.truncate()
+                    f.writelines(lines)
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
