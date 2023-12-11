@@ -1,6 +1,7 @@
 """the juicy internals of ObjLog"""
 from datetime import datetime
 from time import time_ns
+from .LogMessages import Debug
 
 
 class LogMessage:
@@ -17,6 +18,8 @@ class LogMessage:
         self.message = message
         self.timestamp = datetime.now()
         self.unix_timestamp = time_ns() // 1_000_000
+        # create uuid
+        self.uuid = f"{self.unix_timestamp}-{self.message}"
 
     def __str__(self):
         return f"[{self.timestamp}] {self.level}: {self.message}"
@@ -25,9 +28,9 @@ class LogMessage:
         return f"{self.level}: {self.message}"
 
     def __eq__(self, other):
-        return self.level == other.level and self.message == other.message and self.timestamp == other.timestamp
+        return self.uuid == other.uuid
 
-    def colored(self):
+    def colored(self) -> str:
         """return a colored version of the message"""
         return f"{self.color}[{self.timestamp}] {self.level}: {self.message}\033[0m"
 
@@ -36,7 +39,8 @@ class LogNode:
     """the ObjLogger"""
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
-                 print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000):
+                 print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
+                 log_when_closed: bool = True):
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
@@ -44,9 +48,10 @@ class LogNode:
         self.max = max_messages_in_memory
         self.maxinf = max_log_messages
         self.print_filter = print_filter
+        self.log_closure_message = log_when_closed
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True):
+            preserve_message_in_memory: bool = True) -> None:
         """log a message"""
         # make sure it's a LogMessage or its subclass
         if not isinstance(message, LogMessage):
@@ -90,7 +95,7 @@ class LogNode:
             elif force_print[0] is False and self.print:
                 print(f"[{self.name}] {message.colored()}")
 
-    def set_output_file(self, file: str | None, preserve_old_messages: bool = False):
+    def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
         """set log output file."""
         if self.log_file == file:
             return  # if the file is the same, do nothing
@@ -100,7 +105,7 @@ class LogNode:
             for i in self.messages:
                 self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
-    def dump_messages(self, file: str, elementfilter: list | None = None, wipe_messages_from_memory: bool = False):
+    def dump_messages(self, file: str, elementfilter: list | None = None, wipe_messages_from_memory: bool = False) -> None:
         """dump all logged messages to a file, also filtering them if needed"""
         with open(file, "a") as f:
             for i in self.messages:
@@ -109,7 +114,7 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list, filter_logfiles: bool = False):
+    def filter(self, typefilter: list, filter_logfiles: bool = False) -> None:
         """filter messages saved in memory, optionally the logfiles too"""
         self.messages = list(filter(lambda x: isinstance(x, tuple(typefilter)), self.messages))
         if filter_logfiles:
@@ -118,31 +123,31 @@ class LogNode:
                     for i in self.messages:
                         f.write(str(i) + '\n')
 
-    def dump_messages_to_console(self, elementfilter: list | None = None):
+    def dump_messages_to_console(self, elementfilter: list | None = None) -> None:
         """dump all logged messages to the console, also filtering them if needed"""
         for i in self.messages:
             if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
                 self.log(i, force_print=(True, True), preserve_message_in_memory=False)
 
-    def wipe_messages(self, wipe_logfiles: bool = False):
+    def wipe_messages(self, wipe_logfiles: bool = False) -> None:
         """wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
          but you won't be able to dump the previous messages to a file"""
         self.messages = []
         if wipe_logfiles:
             self.clear_log()
 
-    def clear_log(self):
+    def clear_log(self) -> None:
         """clear the log file"""
         if isinstance(self.log_file, str):
             with open(self.log_file, "w") as f:
                 f.write("")
 
-    def set_max_messages_in_memory(self, max_messages: int):
+    def set_max_messages_in_memory(self, max_messages: int) -> None:
         """set the maximum amount of messages to be saved in memory"""
         self.max = max_messages
 
-    def set_max_messages_in_log(self, max_file_size: int):
-        """set the maximum size of the log file"""
+    def set_max_messages_in_log(self, max_file_size: int) -> None:
+        """set the maximum message limit of the log file"""
         self.maxinf = max_file_size
         # crop the file if it's too big
         if isinstance(self.log_file, str):
@@ -154,5 +159,22 @@ class LogNode:
                     f.truncate()
                     f.writelines(lines)
 
+    def get(self, element_filter: list | None) -> list:
+        """get all messages saved in memory, optionally filtered"""
+        if element_filter is None:
+            return self.messages
+        else:
+            return list(filter(lambda x: isinstance(x, tuple(element_filter)), self.messages))
+
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
+
+    def __len__(self):
+        return len(self.messages)
+
+    def __del__(self):
+        # log the deletion
+        if self.log_closure_message:
+            self.log(Debug("LogNode closed."))
+        # do the actual deletion
+        del self
