@@ -15,9 +15,10 @@ class LogMessage:
     """
 
     def __init__(self, message):
-        self.message = message
+        self.message = str(message)
         self.timestamp = datetime.now()
-        self.unix_timestamp = time_ns() // 1_000_000
+        self.unix_timestamp = time_ns() // 1_000_000  # deprecated, use self.unix instead
+        self.unix = time_ns() // 1_000_000
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
 
