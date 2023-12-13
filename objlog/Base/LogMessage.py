@@ -31,6 +31,9 @@ class LogMessage:
     def __eq__(self, other):
         return self.uuid == other.uuid
 
+    def __ne__(self, other):
+        return self.uuid != other.uuid
+
     def colored(self) -> str:
         """return a colored version of the message"""
         return f"{self.color}[{self.timestamp}] {self.level}: {self.message}\033[0m"
