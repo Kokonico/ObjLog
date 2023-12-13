@@ -1,4 +1,4 @@
 """
-ObjLogger, a simple, object-oriented logger for Python
+ObjLogger, because logging should be easy.
 """
 from .Base import LogMessage, LogNode

@@ -1,9 +1,12 @@
+"""The LogNode class, the main class of the ObjLogger"""
 from objlog.LogMessages import Debug
 from .LogMessage import LogMessage
 
 
 class LogNode:
     """the ObjLogger"""
+
+    del_open = open  # for the __del__ method
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
@@ -18,7 +21,7 @@ class LogNode:
         self.log_closure_message = log_when_closed
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True) -> None:
+            preserve_message_in_memory: bool = True, _use_del_open_bypass: bool = False) -> None:
         """log a message"""
         # make sure it's a LogMessage or its subclass
         if not isinstance(message, LogMessage):
@@ -34,7 +37,7 @@ class LogNode:
             message_str = f"[{self.name}] {str(message)}"
 
             # log it
-            with open(self.log_file, "a+") if override_log_file is None else open(override_log_file, "a") as f:
+            with open(self.log_file, "a+") if not _use_del_open_bypass else self.del_open(self.log_file, "a+") as f:
                 # move the file pointer to the beginning of the file
                 f.seek(0)
 
@@ -72,7 +75,8 @@ class LogNode:
             for i in self.messages:
                 self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
-    def dump_messages(self, file: str, elementfilter: list | None = None, wipe_messages_from_memory: bool = False) -> None:
+    def dump_messages(self, file: str, elementfilter: list | None = None,
+                      wipe_messages_from_memory: bool = False) -> None:
         """dump all logged messages to a file, also filtering them if needed"""
         with open(file, "a") as f:
             for i in self.messages:
@@ -145,6 +149,6 @@ class LogNode:
     def __del__(self):
         # log the deletion
         if self.log_closure_message:
-            self.log(Debug("LogNode closed."))
+            self.log(Debug("LogNode closed."), _use_del_open_bypass=True)
         # do the actual deletion
         del self
