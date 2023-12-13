@@ -150,7 +150,6 @@ class LogNode:
                 for i in self.messages:
                     f.write(str(i) + '\n')
 
-
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
 

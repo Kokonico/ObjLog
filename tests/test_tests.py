@@ -8,9 +8,11 @@ from objlog import LogNode, LogMessage
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 
-def gen_random_messages(amount: int, extra_classes: list = []):
+def gen_random_messages(amount: int, extra_classes: list | None = None):
     """generate random messages"""
     messages = []
+    if extra_classes is None:
+        extra_classes = []
     for i in range(amount):
         messages.append(random.choice([Debug, Info, Warn, Error, Fatal] + extra_classes)("This is a random message"))
     return messages
@@ -21,9 +23,10 @@ class TestFilter(unittest.TestCase):
 
     # new log node
 
-    log = LogNode(name="Test", log_file="test.log", log_when_closed=False)  # so it doesn't log when closed, making it easier to test.
+    log = LogNode(name="Test", log_file="test.log", log_when_closed=False)  # so it doesn't log when closed, making
+    # it easier to test.
 
-    class custom_message(LogMessage):
+    class CustomMessage(LogMessage):
         level = "CUSTOM"
         color = "\033[1;35m"  # purple
 
@@ -31,7 +34,7 @@ class TestFilter(unittest.TestCase):
 
         # log 20 messages, all of them random
 
-        for i in gen_random_messages(20, extra_classes=[self.custom_message]):
+        for i in gen_random_messages(20, extra_classes=[self.CustomMessage]):
             self.log.log(i)
 
         self.log.filter([Debug])
@@ -39,12 +42,13 @@ class TestFilter(unittest.TestCase):
         # use for loop to test the filter
 
         for message in self.log.get(element_filter=[Debug, Info, Warn, Error, Fatal,
-                                                    self.custom_message]):  # get all the messages (to avoid double-dipping)
+                                                    self.CustomMessage]):  # get all the messages (to avoid
+            # double-dipping)
             self.assertEqual(message.level, "DEBUG")
 
     def test_get_filter(self):
         """test the get() function's filter argument"""
-        for i in gen_random_messages(20, extra_classes=[self.custom_message]):
+        for i in gen_random_messages(20, extra_classes=[self.CustomMessage]):
             self.log.log(i)
 
         for message in self.log.get(element_filter=[Debug]):
@@ -62,12 +66,12 @@ class TestFilter(unittest.TestCase):
         for message in self.log.get(element_filter=[Fatal]):
             self.assertEqual(message.level, "FATAL")
 
-        for message in self.log.get(element_filter=[self.custom_message]):
+        for message in self.log.get(element_filter=[self.CustomMessage]):
             self.assertEqual(message.level, "CUSTOM")
 
     def test_filter_logfiles(self):
         """test the filter_logfiles argument"""
-        for i in gen_random_messages(20, extra_classes=[self.custom_message]):
+        for i in gen_random_messages(20, extra_classes=[self.CustomMessage]):
             self.log.log(i)
         self.log.filter([Debug], filter_logfiles=True)
         with open("test.log") as f:
@@ -75,6 +79,7 @@ class TestFilter(unittest.TestCase):
                 self.assertEqual(line.split(" ")[2], "DEBUG:")
 
 
+# noinspection SpellCheckingInspection
 class TestLogNode(unittest.TestCase):
     """test the LogNode class"""
 
@@ -107,8 +112,9 @@ class TestLogNode(unittest.TestCase):
         log.log(fatal)
 
         self.assertEqual(len(log), 5)
-        self.assertListEqual(log.get(element_filter=
-                                     [Debug, Info, Warn, Error, Fatal]), [debug, info, warn, error, fatal]
+        self.assertListEqual(log.get(
+            element_filter=[Debug, Info, Warn, Error, Fatal]),
+            [debug, info, warn, error, fatal]
                              )
 
     def test_lognode_limiter_init(self):
@@ -165,6 +171,7 @@ class TestLogNode(unittest.TestCase):
         with open("limiter2.log") as f:
             self.assertEqual(len(f.readlines()), 20)
 
+    # noinspection SpellCheckingInspection
     def test_logfile_methods(self):
         log = LogNode(name="Test", log_file="testx.log")
 
@@ -206,7 +213,7 @@ class TestLogNode(unittest.TestCase):
 
         # dump the messages to a file
 
-        log.dump_messages("dump2.log", elementfilter=[Debug, Info, Warn, Error, Fatal], wipe_messages_from_memory=False)
+        log.dump_messages("dump2.log", elementfilter=[Debug, Info, Warn, Error, Fatal])
 
         # check if the messages are in the file
 
@@ -333,13 +340,13 @@ class TestLogMessage(unittest.TestCase):
     """Test the LogMessage class"""
 
     def test_sub_LogMessage_creation(self):
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for i in messages:
             self.assertTrue(isinstance(i, LogMessage))
 
     def test_sub_LogMessage_str(self):
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for i in messages:
             try:
@@ -348,7 +355,7 @@ class TestLogMessage(unittest.TestCase):
                 self.fail(e)
 
     def test_sub_LogMessage_colored(self):
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for i in messages:
             try:
@@ -358,7 +365,7 @@ class TestLogMessage(unittest.TestCase):
 
     def test_sub_LogMessage_repr(self):
 
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for i in messages:
             try:
@@ -367,7 +374,7 @@ class TestLogMessage(unittest.TestCase):
                 self.fail(e)
 
     def test_sub_LogMessage_eq(self):
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for index, i in enumerate(messages):
             x = i
@@ -376,7 +383,7 @@ class TestLogMessage(unittest.TestCase):
             self.assertFalse(i == y)
 
     def test_sub_LogMessage_ne(self):
-        messages = gen_random_messages(50, extra_classes=[TestFilter.custom_message])
+        messages = gen_random_messages(50, extra_classes=[TestFilter.CustomMessage])
 
         for index, i in enumerate(messages):
             x = i
@@ -385,7 +392,7 @@ class TestLogMessage(unittest.TestCase):
             self.assertTrue(i != y)
 
 
-class test_cleanup(unittest.TestCase):
+class TestCleanup(unittest.TestCase):
     """cleanup the chaos created by the tests"""
 
     def test_cleanup(self):

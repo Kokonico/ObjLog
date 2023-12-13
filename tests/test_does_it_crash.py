@@ -37,12 +37,12 @@ try:
     log.filter([Debug, Info], filter_logfiles=True)
 
 
-    class custom_message(LogMessage):
+    class CustomMessage(LogMessage):
         level = "CUSTOM"
         color = "\033[1;35m"  # purple
 
 
-    log.log(custom_message("This is a custom message"))
+    log.log(CustomMessage("This is a custom message"))
 
     log.get(element_filter=[Debug, Info, Warn, Error, Fatal])
 
