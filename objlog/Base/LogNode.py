@@ -140,11 +140,25 @@ class LogNode:
         else:
             return list(filter(lambda x: isinstance(x, tuple(element_filter)), self.messages))
 
+    def combine(self, other: 'LogNode', merge_log_files: bool = True) -> None:
+        """combine two LogNodes."""
+        self.messages.extend(other.messages)
+
+        if merge_log_files:
+            self.clear_log()
+            with open(self.log_file, "w") as f:
+                for i in self.messages:
+                    f.write(str(i) + '\n')
+
+
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
 
     def __len__(self):
         return len(self.messages)
+
+    def __contains__(self, item: LogMessage):
+        return item in self.messages
 
     def __del__(self):
         # log the deletion

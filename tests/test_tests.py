@@ -2,17 +2,10 @@
 
 import unittest
 import random
+import os
 
 from objlog import LogNode, LogMessage
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
-
-# delete all .logs
-
-import os
-
-for i in os.listdir():
-    if i.endswith(".log"):
-        os.remove(i)
 
 
 def gen_random_messages(amount: int, extra_classes: list = []):
@@ -28,7 +21,7 @@ class TestFilter(unittest.TestCase):
 
     # new log node
 
-    log = LogNode(name="Test", log_file="test.log")
+    log = LogNode(name="Test", log_file="test.log", log_when_closed=False)  # so it doesn't log when closed, making it easier to test.
 
     class custom_message(LogMessage):
         level = "CUSTOM"
@@ -272,6 +265,69 @@ class TestLogNode(unittest.TestCase):
         with open("test2.log") as f:
             self.assertEqual(len(f.readlines()), 21)
 
+    def test_lognode_combine(self):
+        log = LogNode(name="Test", log_file="blagh.log")
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        log2 = LogNode(name="Test2")
+
+        # log 20 messages
+
+        for i in range(20):
+            log2.log(Debug("This is a debug message"))
+
+        log.combine(log2)
+
+        self.assertEqual(len(log), 40)  # check if the messages are combined
+
+        # check if blagh.log has 40 lines
+
+        with open("blagh.log") as f:
+            self.assertEqual(len(f.readlines()), 40)
+
+    def test_lognode_combine_no_log_join(self):
+        log = LogNode(name="Test", log_file="blagh2.log")
+        log2 = LogNode(name="Test2", log_file="blagh3.log")
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        # log 20 messages
+
+        for i in range(20):
+            log2.log(Debug("This is a debug message"))
+
+        log.combine(log2, merge_log_files=False)
+
+        self.assertEqual(len(log), 40)  # check if the messages are combined
+
+        # check if blagh2.log has 20 lines
+
+        with open("blagh2.log") as f:
+            self.assertEqual(len(f.readlines()), 20)
+
+    def test_LogNode_contains(self):
+        """test the __contains__ method"""
+        log = LogNode(name="Test", log_file="blagh4.log")
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        message = Debug("This is a special debug message")
+
+        log.log(message)
+
+        self.assertTrue(message in log)
+        self.assertFalse(Debug("This is a special debug message") in log)  # different object, same message.
+
 
 class TestLogMessage(unittest.TestCase):
     """Test the LogMessage class"""
@@ -327,3 +383,12 @@ class TestLogMessage(unittest.TestCase):
             y = messages[index + 1 if index + 1 < len(messages) else 0]
             self.assertFalse(i != x)
             self.assertTrue(i != y)
+
+
+class test_cleanup(unittest.TestCase):
+    """cleanup the chaos created by the tests"""
+
+    def test_cleanup(self):
+        for i in os.listdir():
+            if i.endswith(".log"):
+                os.remove(i)
