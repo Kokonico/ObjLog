@@ -1,6 +1,11 @@
 # ObjLog
 > logging, Objectified
 
+## Notice
+
+this repo is a living repository, and the master branch is not guaranteed to be stable. If you want to use this library in a project, please use a release version, or a tagged commit.
+it is always in the works, and new features are being added all the time!
+
 ## what is this?
 This is a logging library for python. It is designed to be simple to use, and easy to understand.
 
