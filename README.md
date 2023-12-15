@@ -309,7 +309,7 @@ limited.log:
 1, that's useless why? and 2, you can do that!
 
 ```python
-from objlog import LogNode, LogMessage
+from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 log = LogNode(name="Buffered Example", max_messages_in_memory=0)

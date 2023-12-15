@@ -21,6 +21,8 @@ class LogMessage:
         self.unix = time_ns() // 1_000_000
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
+        if not self.color and not self.level:
+            raise ValueError("color and level cannot be empty, are you using the base class?")
 
     def __str__(self):
         return f"[{self.timestamp}] {self.level}: {self.message}"
