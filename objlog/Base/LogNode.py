@@ -6,7 +6,7 @@ from objlog.Base.LogMessage import LogMessage  # "no parent package" my ass
 class LogNode:
     """the ObjLogger"""
 
-    del_open = open  # for the __del__ method
+    open = open  # for the __del__ method
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
@@ -26,7 +26,7 @@ class LogNode:
                 f.write("")
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True, _use_del_open_bypass: bool = False) -> None:
+            preserve_message_in_memory: bool = True) -> None:
         """log a message"""
         # make sure it's a LogMessage or its subclass
         if not isinstance(message, LogMessage):
@@ -42,7 +42,7 @@ class LogNode:
             message_str = f"[{self.name}] {str(message)}"
 
             # log it
-            with open(self.log_file, "a+") if not _use_del_open_bypass else self.del_open(self.log_file, "a+") as f:
+            with open(self.log_file, "a+") as f:
                 # move the file pointer to the beginning of the file
                 f.seek(0)
 
@@ -167,6 +167,6 @@ class LogNode:
     def __del__(self):
         # log the deletion
         if self.log_closure_message:
-            self.log(Debug("LogNode closed."), _use_del_open_bypass=True)
+            self.log(Debug("LogNode closed."))
         # do the actual deletion
         del self
