@@ -1,12 +1,15 @@
 """The LogNode class, the main class of the ObjLogger"""
 from objlog.LogMessages import Debug
-from objlog.Base.LogMessage import LogMessage  # "no parent package" my ass
+from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when i don't specify the package,
+# IDK why
+
+from collections import deque
 
 
 class LogNode:
-    """the ObjLogger"""
+    """A LogNode, the main class of the ObjLogger. It can log messages to a file, to the console, or both."""
 
-    open = open  # for the __del__ method
+    open = open  # for the __del__ method, because it's weird.
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
@@ -14,7 +17,7 @@ class LogNode:
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
-        self.messages = []
+        self.messages = deque(maxlen=max_messages_in_memory)
         self.max = max_messages_in_memory
         self.maxinf = max_log_messages
         self.print_filter = print_filter
@@ -22,7 +25,7 @@ class LogNode:
 
         # check if log exists (in file system), and if so, clear it
         if isinstance(log_file, str):
-            with open(log_file, "w") as f:
+            with open(log_file, "w+") as f:
                 f.write("")
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
@@ -32,11 +35,7 @@ class LogNode:
         if not isinstance(message, LogMessage):
             raise TypeError("message must be a LogMessage or its subclass")
         if preserve_message_in_memory:
-            if len(self.messages) < self.max:
-                self.messages.append(message)
-            else:
-                self.messages.pop(0)
-                self.messages.append(message)  # remove the first message and add the new one
+            self.messages.append(message)
 
         if isinstance(self.log_file, str) or isinstance(override_log_file, str):
             message_str = f"[{self.name}] {str(message)}"
@@ -121,9 +120,7 @@ class LogNode:
     def set_max_messages_in_memory(self, max_messages: int) -> None:
         """set the maximum amount of messages to be saved in memory"""
         self.max = max_messages
-        # crop the list if it's too big
-        if len(self.messages) > self.max:
-            self.messages = self.messages[-self.max:]
+        self.messages = deque(self.messages, maxlen=self.max)
 
     def set_max_messages_in_log(self, max_file_size: int) -> None:
         """set the maximum message limit of the log file"""
@@ -141,7 +138,7 @@ class LogNode:
     def get(self, element_filter: list | None) -> list:
         """get all messages saved in memory, optionally filtered"""
         if element_filter is None:
-            return self.messages
+            return list(self.messages)
         else:
             return list(filter(lambda x: isinstance(x, tuple(element_filter)), self.messages))
 
@@ -168,5 +165,4 @@ class LogNode:
         # log the deletion
         if self.log_closure_message:
             self.log(Debug("LogNode closed."))
-        # do the actual deletion
-        del self
+        # python will delete self automatically (thanks python)
