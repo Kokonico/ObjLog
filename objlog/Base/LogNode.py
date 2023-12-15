@@ -1,6 +1,6 @@
 """The LogNode class, the main class of the ObjLogger"""
 from objlog.LogMessages import Debug
-from .LogMessage import LogMessage
+from objlog.Base.LogMessage import LogMessage  # "no parent package" my ass
 
 
 class LogNode:
@@ -19,6 +19,11 @@ class LogNode:
         self.maxinf = max_log_messages
         self.print_filter = print_filter
         self.log_closure_message = log_when_closed
+
+        # check if log exists (in file system), and if so, clear it
+        if isinstance(log_file, str):
+            with open(log_file, "w") as f:
+                f.write("")
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True, _use_del_open_bypass: bool = False) -> None:
