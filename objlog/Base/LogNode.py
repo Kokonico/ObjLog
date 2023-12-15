@@ -1,6 +1,6 @@
 """The LogNode class, the main class of the ObjLogger"""
 from objlog.LogMessages import Debug
-from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when i don't specify the package,
+from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
 
 from collections import deque
@@ -82,10 +82,14 @@ class LogNode:
     def dump_messages(self, file: str, elementfilter: list | None = None,
                       wipe_messages_from_memory: bool = False) -> None:
         """dump all logged messages to a file, also filtering them if needed"""
-        with open(file, "a") as f:
-            for i in self.messages:
-                if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
-                    f.write(str(i) + '\n')
+        if elementfilter is not None:
+            with open(file, "a") as f:
+                for i in self.messages:
+                    if isinstance(i, tuple(elementfilter)):
+                        f.write(str(i) + '\n')
+        else:
+            with open(file, "a") as f:
+                f.write('\n'.join(map(str, self.messages)))
         if wipe_messages_from_memory:
             self.wipe_messages()
 
