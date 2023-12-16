@@ -24,6 +24,7 @@ class TestFilter(unittest.TestCase):
     # new log node
 
     log = LogNode(name="Test", log_file="test.log", log_when_closed=False)  # so it doesn't log when closed, making
+
     # it easier to test.
 
     class CustomMessage(LogMessage):
@@ -115,7 +116,7 @@ class TestLogNode(unittest.TestCase):
         self.assertListEqual(log.get(
             element_filter=[Debug, Info, Warn, Error, Fatal]),
             [debug, info, warn, error, fatal]
-                             )
+        )
 
     def test_lognode_limiter_init(self):
         log = LogNode(name="Test", max_log_messages=10, max_messages_in_memory=5, log_file="limiter.log")
@@ -335,6 +336,52 @@ class TestLogNode(unittest.TestCase):
         self.assertTrue(message in log)
         self.assertFalse(Debug("This is a special debug message") in log)  # different object, same message.
 
+    def test_LogNode_squash(self):
+        """test the squash method"""
+        log = LogNode(name="Test", log_file="blagh5.log")
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        message = Debug("This is a special debug message")
+
+        log.squash(message)
+
+        self.assertEqual(len(log), 1)
+        self.assertTrue(message in log)
+
+    def test_LogNode_log_closure_message(self):
+        """test the log_closure_message argument"""
+        log = LogNode(name="Test", log_file="blagh6.log")
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        del log
+
+        with open("blagh6.log") as f:
+            self.assertEqual(len(f.readlines()), 21)
+
+    def test_logNode_no_log_when_closed(self):
+        """test the log_when_closed argument"""
+        log = LogNode(name="Test", log_file="blagh7.log", log_when_closed=False)
+
+        # log 20 messages
+
+        for i in range(20):
+            log.log(Debug("This is a debug message"))
+
+        del log
+
+        with open("blagh7.log") as f:
+            self.assertEqual(len(f.readlines()), 20)
+
+
+
 
 class TestLogMessage(unittest.TestCase):
     """Test the LogMessage class"""
@@ -396,6 +443,7 @@ class TestCleanup(unittest.TestCase):
     """cleanup the chaos created by the tests"""
 
     def test_cleanup(self):
+        # delete all the *.log.* files
         for i in os.listdir():
             if i.endswith(".log"):
                 os.remove(i)

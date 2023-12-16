@@ -11,6 +11,7 @@ log.log(Warn("warn message"))
 log.log(Error("error message"))
 log.log(Fatal("fatal message"))
 
+
 # custom message classes can be used to add additional information to the log messages in ObjLog
 # the only requirement is that the message class inherits from LogMessage, and has the following attributes:
 

@@ -9,7 +9,16 @@ from collections import deque
 class LogNode:
     """A LogNode, the main class of the ObjLogger. It can log messages to a file, to the console, or both."""
 
-    open = open  # for the __del__ method, because it's weird.
+    open = open  # this code is probably the reason why my dad left me
+
+    # this is clearly not a good way to do this, but I don't know how to do it better
+
+    # if anyone can prevent doing this, and fix the exception caused when deleting a LogNode, please do it
+
+    # else please increment this number by 1
+    # thank you
+
+    # total_failed_attempts_to_fix_this = 1
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
@@ -155,6 +164,11 @@ class LogNode:
             with open(self.log_file, "w") as f:
                 for i in self.messages:
                     f.write(str(i) + '\n')
+
+    def squash(self, message: LogMessage) -> None:
+        """squash the lognode, i.e. replace all messages with a single message"""
+        self.messages.clear()
+        self.messages.append(message)
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}"
