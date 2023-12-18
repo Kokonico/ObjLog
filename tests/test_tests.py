@@ -380,7 +380,16 @@ class TestLogNode(unittest.TestCase):
         with open("blagh7.log") as f:
             self.assertEqual(len(f.readlines()), 20)
 
-
+    def test_logNode_repr_dunder(self):
+        """test the __repr__ dunder"""
+        log = LogNode(name="Test", log_file="blagh8.log", log_when_closed=False)
+        self.assertEqual(repr(log), "LogNode Test at output blagh8.log")
+        log = LogNode(name="Test", log_file="blagh8.log", log_when_closed=False, print_to_console=True)
+        self.assertEqual(repr(log), "LogNode Test at output blagh8.log")
+        log = LogNode(name="Test", log_when_closed=False, print_to_console=True)
+        self.assertEqual(repr(log), "LogNode Test at output console")
+        log = LogNode(name="Test", log_when_closed=False)
+        self.assertEqual(repr(log), "LogNode Test at output None")
 
 
 class TestLogMessage(unittest.TestCase):

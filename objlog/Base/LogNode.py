@@ -22,7 +22,7 @@ class LogNode:
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
-                 log_when_closed: bool = True):
+                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False):
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
@@ -31,9 +31,10 @@ class LogNode:
         self.maxinf = max_log_messages
         self.print_filter = print_filter
         self.log_closure_message = log_when_closed
+        self.log_len = 0
 
         # check if log exists (in file system), and if so, clear it
-        if isinstance(log_file, str):
+        if isinstance(log_file, str) and wipe_log_file_on_init:
             with open(log_file, "w+") as f:
                 f.write("")
 
@@ -55,21 +56,17 @@ class LogNode:
                 f.seek(0)
 
                 # check if the amount of messages in the file is bigger than/equal to the max
-                lines = f.readlines()
-                if len(lines) >= self.maxinf:
-                    # get the first line
-                    lines.pop(0)
-                    # move the file pointer to the beginning of the file before writing
-                    f.seek(0)
-                    # truncate the file to remove its content
-                    f.truncate()
-                    # remove the last line (it's empty)
-                    lines.pop()
-                    # write the lines back
-                    f.writelines(lines)
+                if self.log_len > self.maxinf:
+                    # if so, crop the file's oldest messages recursively until it's smaller than (or equal to) the max
+                    lines = f.readlines()
+                    lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
+                    with open(self.log_file, "w") as f2:
+                        f2.writelines(lines)
+                    self.log_len = len(lines)
 
                 # write the message
                 f.write(message_str + '\n')
+                self.log_len += 1
 
         if (self.print or force_print[0]) and (
                 self.print_filter is None or isinstance(message, tuple(self.print_filter))):
@@ -129,6 +126,7 @@ class LogNode:
         if isinstance(self.log_file, str):
             with open(self.log_file, "w") as f:
                 f.write("")
+                self.log_len = 0
 
     def set_max_messages_in_memory(self, max_messages: int) -> None:
         """set the maximum amount of messages to be saved in memory"""
@@ -141,12 +139,13 @@ class LogNode:
         # crop the file if it's too big
         if isinstance(self.log_file, str):
             with open(self.log_file, "r+") as f:
-                lines = f.readlines()
-                if len(lines) > self.maxinf:
+                if self.log_len >= self.maxinf:
+                    lines = f.readlines()
                     lines = lines[-self.maxinf:]
                     f.seek(0)
                     f.truncate()
                     f.writelines(lines)
+                    self.log_len = len(lines)
 
     def get(self, element_filter: list | None) -> list:
         """get all messages saved in memory, optionally filtered"""
@@ -171,7 +170,8 @@ class LogNode:
         self.messages.append(message)
 
     def __repr__(self):
-        return f"LogNode {self.name} at output {self.log_file}"
+        return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
+            f"LogNode {self.name} at output console" if self.print else f"LogNode {self.name} at output None"
 
     def __len__(self):
         return len(self.messages)
