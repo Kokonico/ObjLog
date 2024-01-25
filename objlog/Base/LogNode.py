@@ -184,3 +184,20 @@ class LogNode:
         if self.log_closure_message:
             self.log(Debug("LogNode closed."))
         # python will delete self automatically (thanks python)
+
+    def __getitem__(self, item):
+        # gets an item from the messages
+        try:
+            return self.messages[item]
+        except IndexError:
+            # if the item doesn't exist, attempt to get it from the log file
+            if isinstance(self.log_file, str):
+                with open(self.log_file) as f:
+                    # there is 1 line per message, so we can just get the line.
+                    return f.readlines()[item]
+            else:
+                raise IndexError("item not found in memory or log file")
+
+    def __iter__(self):
+        # iterate over the messages
+        return iter(self.messages)
