@@ -5,7 +5,7 @@ description = "Logging, Objectified."
 authors = ["Kokonico <kokonico@duck.com>"]
 readme = "README.md"
 license = "Zlib"
-repository = "https://github.com/Kokonico/ObjLog.git"
+repository = "https://github.com/Kokonico/ObjLog"
 keywords = ["logging", "object", "objectified", "log", "logger", "loggers", "OOP", "python", "python3", "python3.9", "python3.10", "python3.11", "python3.12"]
 
 [tool.poetry.dependencies]
