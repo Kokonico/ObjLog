@@ -50,10 +50,10 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.wipe_messages()
-        self.assertEqual(len(self.log), 0)
+        self.assertEqual(0, len(self.log))
         # make sure log file is still there with all messages.
         with open(self.log.log_file) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
         self.tearDown()
 
     def test_lognode_clear_logfile(self):
@@ -62,10 +62,10 @@ class TestLogNode(unittest.TestCase):
             self.log.log(message)
         self.log.clear_log()
         # make sure messages are still there in memory
-        self.assertEqual(len(self.log), 100)
+        self.assertEqual(100, len(self.log))
         # make sure log file is still there with no messages.
         with open(self.log.log_file) as f:
-            self.assertEqual(len(f.readlines()), 0)
+            self.assertEqual(0, len(f.readlines()))
         self.tearDown()
 
     def test_lognode_wipe_messages_and_logfiles(self):
@@ -74,10 +74,10 @@ class TestLogNode(unittest.TestCase):
             self.log.log(message)
         self.log.wipe_messages(wipe_logfiles=True)
         # make sure messages are not there in memory
-        self.assertEqual(len(self.log), 0)
+        self.assertEqual(0, len(self.log))
         # make sure log file is still there with no messages.
         with open(self.log.log_file) as f:
-            self.assertEqual(len(f.readlines()), 0)
+            self.assertEqual(0, len(f.readlines()))
         self.tearDown()
 
     # dunder methods
@@ -86,14 +86,14 @@ class TestLogNode(unittest.TestCase):
         messages = gen_random_messages(100)
         for message in messages:
             self.log.log(message)
-        self.assertEqual(len(self.log), 100)
+        self.assertEqual(100, len(self.log))
         self.tearDown()
 
     def test_lognode_getitem(self):
         messages = gen_random_messages(100)
         for message in messages:
             self.log.log(message)
-        self.assertEqual(self.log[0], messages[0])
+        self.assertEqual(messages[0], self.log[0])
         self.tearDown()
 
     # no setitem dunder, because that's not how logs work!
@@ -115,9 +115,9 @@ class TestLogNode(unittest.TestCase):
 
     def test_lognode_repr(self):
         # just for this, we're going to create some lognodes with different parameters
-        self.assertEqual(repr(self.log), f"LogNode Test at output {os.path.join(LOG_FOLDER, 'LogNodeTest.log')}")
-        self.assertEqual(repr(self.log_at_console), "LogNode Test at output console")
-        self.assertEqual(repr(self.log_at_none), "LogNode Test at output None")
+        self.assertEqual(f"LogNode Test at output {os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", repr(self.log))
+        self.assertEqual("LogNode Test at output console", repr(self.log_at_console))
+        self.assertEqual("LogNode Test at output None", repr(self.log_at_none))
         self.tearDown()
 
     # no more dunder methods
@@ -140,7 +140,7 @@ class TestLogNode(unittest.TestCase):
         self.log.log(error)
         self.log.log(fatal)
 
-        self.assertEqual(len(self.log), 5)
+        self.assertEqual(5, len(self.log))
         self.assertListEqual(self.log.get(
             element_filter=[Debug, Info, Warn, Error, Fatal]),
             [debug, info, warn, error, fatal]
@@ -167,7 +167,7 @@ class TestLogNode(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.log.log(message)
-        self.assertEqual(len(self.log), 100)
+        self.assertEqual(100, len(self.log))
         self.assertListEqual(self.log.get(), messages)
         self.tearDown()
 
@@ -177,7 +177,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.squash(squash_message)
-        self.assertEqual(self.log[0], squash_message)  # check that the first message is the squash message
+        self.assertEqual(squash_message, self.log[0])  # check that the first message is the squash message
         self.tearDown()
 
     def test_lognode_combine(self):
@@ -185,7 +185,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log2.combine(self.log)
-        self.assertEqual(len(self.log2), 100)
+        self.assertEqual(100, len(self.log2))
         self.assertListEqual(self.log2.get(), messages)
         self.tearDown()
         # now test with messages in both lognodes
@@ -198,13 +198,13 @@ class TestLogNode(unittest.TestCase):
 
         self.log2.combine(self.log)
 
-        self.assertEqual(len(self.log2), 200)
+        self.assertEqual(200, len(self.log2))
         self.tearDown()
 
     def test_lognode_init_max_messages(self):
         log = LogNode(name="Test", max_messages_in_memory=10)
-        self.assertEqual(log.max, 10)
-        self.assertEqual(log.messages.maxlen, 10)
+        self.assertEqual(10, log.max)
+        self.assertEqual(10, log.messages.maxlen)
         self.tearDown()
         del log
 
@@ -216,7 +216,7 @@ class TestLogNode(unittest.TestCase):
             log.log(message)
         # check that the log file has 10 messages
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 10)
+            self.assertEqual(10, len(f.readlines()))
         del log
         self.tearDown()
 
@@ -227,19 +227,19 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             log.log(message)
         # check that the log has 10 messages
-        self.assertEqual(len(log), 10)
+        self.assertEqual(10, len(log))
         log.set_max_messages_in_memory(20)
-        self.assertEqual(len(log), 10)
+        self.assertEqual(10, len(log))
         # log 100 messages
         messages = gen_random_messages(100)
         for message in messages:
             log.log(message)
-        self.assertEqual(len(log), 20)
+        self.assertEqual(20, len(log))
 
         # now truncate the log to 10 messages
 
         log.set_max_messages_in_memory(10)
-        self.assertEqual(len(log), 10)
+        self.assertEqual(10, len(log))
 
         self.tearDown()
         del log
@@ -252,25 +252,25 @@ class TestLogNode(unittest.TestCase):
             log.log(message)
         # check that the log file has 10 messages
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 10)
+            self.assertEqual(10, len(f.readlines()))
 
         # now set the max log size to 20
         log.set_max_messages_in_log(20)
 
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 10)
+            self.assertEqual(10, len(f.readlines()))
         # log 100 messages
         messages = gen_random_messages(100)
         for message in messages:
             log.log(message)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 20)
+            self.assertEqual(20, len(f.readlines()))
 
         # now truncate the log to 10 messages
 
         log.set_max_messages_in_log(10)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 10)
+            self.assertEqual(10, len(f.readlines()))
 
         del log
         self.tearDown()
@@ -304,7 +304,7 @@ class TestLogNode(unittest.TestCase):
         self.log.clear_log()  # very important, otherwise the log file will be appended to
         self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}")
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
         self.tearDown()
 
     def test_lognode_dump_memory(self):
@@ -314,8 +314,8 @@ class TestLogNode(unittest.TestCase):
         self.log.clear_log()
         self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", wipe_messages_from_memory=True)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
-        self.assertEqual(len(self.log), 0)
+            self.assertEqual(100, len(f.readlines()))
+        self.assertEqual(0, len(self.log))
         self.tearDown()
 
     def test_lognode_dump_filtered(self):
@@ -326,7 +326,7 @@ class TestLogNode(unittest.TestCase):
         self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", [CustomMessage])
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             for line in f.readlines():
-                self.assertEqual(line.split(" ")[2], "CUSTOM:")
+                self.assertEqual("CUSTOM:", line.split(" ")[2])
         self.tearDown()
 
     def test_lognode_dump_filtered_multiple(self):
@@ -346,13 +346,13 @@ class TestLogNode(unittest.TestCase):
             self.log.log(message)
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest2.log"))
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 0)
+            self.assertEqual(0, len(f.readlines()))
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
 
         self.log.log(messages[0])
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 1)
+            self.assertEqual(1, len(f.readlines()))
         # set the log file back to the original
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest.log"))
         self.tearDown()
@@ -363,13 +363,13 @@ class TestLogNode(unittest.TestCase):
             self.log.log(message)
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest2.log"), preserve_old_messages=True)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
 
         self.log.log(messages[0])
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 101)
+            self.assertEqual(101, len(f.readlines()))
         # set the log file back to the original
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest.log"))
         self.tearDown()
@@ -380,13 +380,13 @@ class TestLogNode(unittest.TestCase):
             self.log.log(message)
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest2.log"), preserve_old_messages=True)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
-            self.assertEqual(len(f.readlines()), 100)
+            self.assertEqual(100, len(f.readlines()))
 
         self.log.log(messages[0])
         with open(os.path.join(LOG_FOLDER, "LogNodeTest2.log")) as f:
-            self.assertEqual(len(f.readlines()), 101)
+            self.assertEqual(101, len(f.readlines()))
         # set the log file back to the original
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest.log"), preserve_old_messages=True)
         self.tearDown()
@@ -415,19 +415,22 @@ class TestLogMessage(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(message.colored(), str))
-            self.assertEqual(message.colored(), f"{message.color}[{message.timestamp}] {message.level}: {message.message}\033[0m")
+            self.assertEqual(
+                f"{message.color}[{message.timestamp}] {message.level}: {message.message}\033[0m",
+                message.colored()
+            )
 
     def test_logmessage_str(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(str(message), str))
-            self.assertEqual(str(message), f"[{message.timestamp}] {message.level}: {message.message}")
+            self.assertEqual(f"[{message.timestamp}] {message.level}: {message.message}", str(message))
 
     def test_logmessage_repr(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(repr(message), str))
-            self.assertEqual(repr(message), f"{message.level}: {message.message}")
+            self.assertEqual(f"{message.level}: {message.message}", repr(message))
 
     def test_logmessage_individuality(self):
         message_A = gen_random_messages(1, extra_classes=[CustomMessage])[0]
@@ -448,4 +451,4 @@ class TestLogMessage(unittest.TestCase):
 
         message_A = CustomMessage("test")
         message_B = message_A
-        self.assertEqual(message_A, message_B)
+        self.assertEqual(message_B, message_A)
