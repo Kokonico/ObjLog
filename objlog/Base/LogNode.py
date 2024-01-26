@@ -9,16 +9,7 @@ from collections import deque
 class LogNode:
     """A LogNode, the main class of the ObjLogger. It can log messages to a file, to the console, or both."""
 
-    open = open  # this code is probably the reason why my dad left me
-
-    # this is clearly not a good way to do this, but I don't know how to do it better
-
-    # if anyone can prevent doing this, and fix the exception caused when deleting a LogNode, please do it
-
-    # else please increment this number by 1
-    # thank you
-
-    # total_failed_attempts_to_fix_this = 1
+    open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
@@ -33,7 +24,7 @@ class LogNode:
         self.log_closure_message = log_when_closed
         self.log_len = 0
 
-        # check if log exists (in file system), and if so, clear it
+        # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
             with open(log_file, "w+") as f:
                 f.write("")
@@ -55,7 +46,7 @@ class LogNode:
                 # move the file pointer to the beginning of the file
                 f.seek(0)
 
-                # check if the amount of messages in the file is bigger than/equal to the max
+                # check if the number of messages in the file is bigger than/equal to the max
                 if self.log_len > self.maxinf:
                     # if so, crop the file's oldest messages recursively until it's smaller than (or equal to) the max
                     lines = f.readlines()
@@ -129,7 +120,7 @@ class LogNode:
                 self.log_len = 0
 
     def set_max_messages_in_memory(self, max_messages: int) -> None:
-        """set the maximum amount of messages to be saved in memory"""
+        """set the maximum number of messages to be saved in memory"""
         self.max = max_messages
         self.messages = deque(self.messages, maxlen=self.max)
 
@@ -165,7 +156,7 @@ class LogNode:
                     f.write(str(i) + '\n')
 
     def squash(self, message: LogMessage) -> None:
-        """squash the lognode, i.e. replace all messages with a single message"""
+        """squash the lognode, i.e., replace all messages with a single message"""
         self.messages.clear()
         self.messages.append(message)
 
