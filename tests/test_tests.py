@@ -391,6 +391,30 @@ class TestLogNode(unittest.TestCase):
         log = LogNode(name="Test", log_when_closed=False)
         self.assertEqual(repr(log), "LogNode Test at output None")
 
+    def test_logNode_getitem_dunder(self):
+        """test the __getitem__ dunder"""
+        log = LogNode(name="Test", log_file="blagh9.log", log_when_closed=False)
+        # log 20 messages
+        specific_message = Debug("This is a debug message")
+        for i in range(20):
+            log.log(specific_message)
+        self.assertEqual(log[0], specific_message)
+        self.assertEqual(log[19], specific_message)
+        self.assertRaises(IndexError, lambda: log[20])
+
+        # assert two different objects with the same message are NOT equal
+        self.assertFalse(log[0] == Debug("This is a debug message"))  # should be False
+
+    def test_logNode_iter_dunder(self):
+        """test the __iter__ dunder"""
+        log = LogNode(name="Test", log_file="blagh10.log", log_when_closed=False)
+        # log 20 messages
+        specific_messages = [Debug("This is a debug message") for i in range(20)]
+        for i in range(20):
+            log.log(specific_messages[i])
+        for index, i in enumerate(log):
+            self.assertEqual(i, specific_messages[index])
+
 
 class TestLogMessage(unittest.TestCase):
     """Test the LogMessage class"""
@@ -456,3 +480,4 @@ class TestCleanup(unittest.TestCase):
         for i in os.listdir():
             if i.endswith(".log"):
                 os.remove(i)
+        self.assertTrue(True)
