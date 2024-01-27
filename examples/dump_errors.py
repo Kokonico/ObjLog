@@ -20,7 +20,7 @@ log.dump_messages("messages.log")
 
 log.dump_messages_to_console()
 
-# you can filter the messages by element type for both dump_messages and dump_messages_to_console
+# you can filter the messages by element type for both dump_messages and dump_messages_to_console,
 # for example, to dump only warnings and fatal errors to the console:
 
 log.dump_messages_to_console(elementfilter=[Warn, Fatal])
