@@ -38,6 +38,4 @@ jobs:
 
     - name: Run tests
       run: |
-        ls
-        cd tests
-        python -m poetry run python -m unittest test_tests.py
+        python -m poetry run python -m unittest tests/test_tests.py
