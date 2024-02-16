@@ -2,7 +2,7 @@
 
 ## Changes
 
-please select the type of change you made (select all that apply):
+Please select the type of change you made (select all that apply):
 
 - [ ] Bug fix (minor non-breaking change to fix unintended issue.)
 - [ ] New feature (non breaking addition)
@@ -11,9 +11,9 @@ please select the type of change you made (select all that apply):
 
 Please describe the changes here:
 
-## verify
+## Verify
 
-please verify your PR by checking the boxes below
+Please verify your PR by checking the boxes below
 
 - [ ] I have commented my code and made it easy to understand.
 - [ ] My changes generate no new warnings
