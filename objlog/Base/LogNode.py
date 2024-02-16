@@ -2,6 +2,11 @@
 from objlog.LogMessages import Debug
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+
+from typing import TypeVar, Type
+
+LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 from collections import deque
 
@@ -159,6 +164,14 @@ class LogNode:
         """squash the lognode, i.e., replace all messages with a single message"""
         self.messages.clear()
         self.messages.append(message)
+
+    def has_errors(self) -> bool:
+        """check if the log node has any errors"""
+        return len(self.get([Error, Fatal])) > 0
+
+    def has(self, *args: Type[LogMessageType]) -> bool:
+        """check if the log node has any of the specified LogMessage types"""
+        return len(self.get(list(args))) > 0
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
