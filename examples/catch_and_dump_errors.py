@@ -29,6 +29,7 @@ log.log(Debug("this is a debug message"))
 
 # custom error
 
+
 class CustomError(LogMessage):
     level = "CUSTOM ERROR"
     color = "\033[1;35m"
