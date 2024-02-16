@@ -470,10 +470,18 @@ class TestRunExamples(unittest.TestCase):
             # check again
             if not os.path.exists("examples"):
                 self.fail("examples folder does not exist")
-        for file in os.listdir("examples"):
+        # enter the examples folder (if not already there)
+        if os.getcwd().split(os.path.sep)[-1] != "examples":
+            os.chdir("examples")
+        # check if the log folder exists
+        if not os.path.exists(LOG_FOLDER):
+            os.mkdir(LOG_FOLDER)
+        # move to the log folder
+        os.chdir(LOG_FOLDER)
+        for file in os.listdir():
             if file.endswith(".py"):
                 try:
-                    subprocess.run(["python", os.path.join("examples", file)])
+                    subprocess.run(["python", os.path.join("..", file)])
                 except Exception as e:
                     self.fail(f"failed to run {file} with error: {e}")
         # if no errors are raised, the tests pass
