@@ -394,6 +394,28 @@ class TestLogNode(unittest.TestCase):
         self.log.set_output_file(os.path.join(LOG_FOLDER, "LogNodeTest.log"), preserve_old_messages=True)
         self.tearDown()
 
+    def test_has_errors_method(self):
+        self.log.log(Info("this is an info message"))
+        self.log.log(Error("this is an error message"))
+        self.assertTrue(self.log.has_errors())
+        self.tearDown()
+        self.log.log(Info("this is an info message"))
+        self.log.log(Warn("this is a warning message"))
+        self.assertFalse(self.log.has_errors())
+        self.tearDown()
+        self.assertFalse(self.log.has_errors())
+
+    def test_has_method(self):
+        self.log.log(Info("this is an info message"))
+        self.log.log(Warn("this is a warning message"))
+        self.assertTrue(self.log.has(Warn))
+        self.tearDown()
+        self.log.log(Info("this is an info message"))
+        self.log.log(Warn("this is a warning message"))
+        self.assertFalse(self.log.has(Error))
+        self.tearDown()
+        self.assertFalse(self.log.has(Fatal))
+
 
 class TestLogMessage(unittest.TestCase):
     """
