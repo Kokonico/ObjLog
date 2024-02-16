@@ -3,6 +3,9 @@
 import unittest
 import random
 import os
+import datetime
+import os
+import subprocess
 
 from objlog import LogNode, LogMessage
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
@@ -415,8 +418,10 @@ class TestLogMessage(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(message.colored(), str))
+            dt = datetime.datetime.fromtimestamp(message.unix / 1000)
+            dt = dt.strftime("%Y-%m-%d %H:%M:%S")
             self.assertEqual(
-                f"{message.color}[{message.timestamp}] {message.level}: {message.message}\033[0m",
+                f"{message.color}[{dt}] {message.level}: {message.message}\033[0m",
                 message.colored()
             )
 
@@ -424,7 +429,8 @@ class TestLogMessage(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(str(message), str))
-            self.assertEqual(f"[{message.timestamp}] {message.level}: {message.message}", str(message))
+            dt = datetime.datetime.fromtimestamp(message.unix / 1000)
+            self.assertEqual(f"[{dt}] {message.level}: {message.message}", str(message))
 
     def test_logmessage_repr(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
@@ -451,4 +457,24 @@ class TestLogMessage(unittest.TestCase):
 
         message_A = CustomMessage("test")
         message_B = message_A
-        self.assertEqual(message_B, message_A)
+        self.assertEqual(message_A, message_B)
+
+
+class TestRunExamples(unittest.TestCase):
+    # run all files in the examples folder
+    def test_run_examples(self):
+        # check if the examples folder exists
+        if not os.path.exists("examples"):
+            # cd ..
+            os.chdir("..")
+            # check again
+            if not os.path.exists("examples"):
+                self.fail("examples folder does not exist")
+        for file in os.listdir("examples"):
+            if file.endswith(".py"):
+                try:
+                    subprocess.run(["python", os.path.join("examples", file)])
+                except Exception as e:
+                    self.fail(f"failed to run {file} with error: {e}")
+        # if no errors are raised, the tests pass
+        self.assertTrue(True)
