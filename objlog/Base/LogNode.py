@@ -1,14 +1,17 @@
 """The LogNode class, the main class of the ObjLogger"""
-from objlog.LogMessages import Debug
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, _PythonExceptionMessage
+import objlog
 
 from typing import TypeVar, Type
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 from collections import deque
+
+# TODO: putting any python exceptions in filter lists will not filter them (any function with one), pls fix before 2.0
+# TODO: same with get() and has(), putting any python exceptions in the filter list will not detect/return them.
 
 
 class LogNode:
@@ -38,8 +41,11 @@ class LogNode:
             preserve_message_in_memory: bool = True) -> None:
         """log a message"""
         # make sure it's a LogMessage or its subclass
-        if not isinstance(message, LogMessage):
+        if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message, BaseException):
             raise TypeError("message must be a LogMessage or its subclass")
+        else:
+            if isinstance(message, Exception):
+                message = _PythonExceptionMessage(message)
         if preserve_message_in_memory:
             self.messages.append(message)
 

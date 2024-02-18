@@ -1,5 +1,5 @@
 """the default log messages"""
-from .Base import LogMessage
+from .Base import LogMessage, _in
 
 
 class Debug(LogMessage):
@@ -30,3 +30,20 @@ class Fatal(LogMessage):
     """the default fatal message, with pink color"""
     level = "FATAL"
     color = "\033[95m"
+
+
+class _PythonExceptionMessage(LogMessage):
+    """A custom message class for exceptions"""
+    exception = _in.NoExeptionSpecified
+    level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
+    color = "\033[91m"  # red color
+    message = "N/A"
+
+    def __init__(self, exception: Exception):
+        # Use traceback to get a string representation of the exception
+        self.exception = exception
+        # get the exception's message (reason)
+        # ex: Division by zero
+        self.message = str(exception)
+        self.level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
+        super().__init__(self.message)

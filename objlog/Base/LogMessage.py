@@ -20,8 +20,8 @@ class LogMessage:
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
         try:
-            t1 = self.color
-            t2 = self.level
+            self.color
+            self.level
         except AttributeError:
             raise TypeError("this class should not be used directly, use a subclass instead")
 

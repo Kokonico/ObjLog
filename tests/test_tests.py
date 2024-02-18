@@ -416,6 +416,19 @@ class TestLogNode(unittest.TestCase):
         self.tearDown()
         self.assertFalse(self.log.has(Fatal))
 
+    def test_logging_default_python_exceptions(self):
+        self.log.log(ImportError("this is an ImportError"))
+        self.log.log(ZeroDivisionError("this is a ZeroDivisionError"))
+        self.log.log(NotImplementedError("this is a NotImplementedError"))
+        self.log.log(RecursionError("this is a RecursionError"))
+        self.log.log(KeyboardInterrupt("this is a KeyboardInterrupt"))
+        self.log.log(EOFError("this is an EOFError"))
+        self.log.log(StopIteration("this is a StopIteration"))
+        self.log.log(GeneratorExit("this is a GeneratorExit"))
+        self.log.log(SystemExit("this is a SystemExit"))
+        self.log.log(SystemError("this is a SystemError"))
+        self.log.log(Warning("this is a Warning"))
+
 
 class TestLogMessage(unittest.TestCase):
     """
