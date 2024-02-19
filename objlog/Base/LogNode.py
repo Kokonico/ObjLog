@@ -36,7 +36,7 @@ class LogNode:
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
-            with open(log_file, "w+") as f:
+            with self.open(log_file, "w+") as f:
                 f.write("")
 
     def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
@@ -55,7 +55,7 @@ class LogNode:
             message_str = f"[{self.name}] {str(message)}"
 
             # log it
-            with open(self.log_file, "a+") as f:
+            with self.open(self.log_file, "a+") as f:
                 # move the file pointer to the beginning of the file
                 f.seek(0)
 
@@ -64,7 +64,7 @@ class LogNode:
                     # if so, crop the file's oldest messages recursively until it's smaller than (or equal to) the max
                     lines = f.readlines()
                     lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
-                    with open(self.log_file, "w") as f2:
+                    with self.open(self.log_file, "w") as f2:
                         f2.writelines(lines)
                     self.log_len = len(lines)
 
@@ -93,12 +93,12 @@ class LogNode:
                       wipe_messages_from_memory: bool = False) -> None:
         """dump all logged messages to a file, also filtering them if needed"""
         if elementfilter is not None:
-            with open(file, "a") as f:
+            with self.open(file, "a") as f:
                 for i in self.messages:
                     if isinstance(i, tuple(elementfilter)):
                         f.write(str(i) + '\n')
         else:
-            with open(file, "a") as f:
+            with self.open(file, "a") as f:
                 f.write('\n'.join(map(str, self.messages)))
         if wipe_messages_from_memory:
             self.wipe_messages()
@@ -108,7 +108,7 @@ class LogNode:
         self.messages = list(filter(lambda x: isinstance(x, tuple(typefilter)), self.messages))
         if filter_logfiles:
             if isinstance(self.log_file, str):
-                with open(self.log_file, "w") as f:
+                with self.open(self.log_file, "w") as f:
                     for i in self.messages:
                         f.write(str(i) + '\n')
 
@@ -128,7 +128,7 @@ class LogNode:
     def clear_log(self) -> None:
         """clear the log file"""
         if isinstance(self.log_file, str):
-            with open(self.log_file, "w") as f:
+            with self.open(self.log_file, "w") as f:
                 f.write("")
                 self.log_len = 0
 
@@ -142,7 +142,7 @@ class LogNode:
         self.maxinf = max_file_size
         # crop the file if it's too big
         if isinstance(self.log_file, str):
-            with open(self.log_file, "r+") as f:
+            with self.open(self.log_file, "r+") as f:
                 if self.log_len >= self.maxinf:
                     lines = f.readlines()
                     lines = lines[-self.maxinf:]
@@ -164,7 +164,7 @@ class LogNode:
 
         if merge_log_files:
             self.clear_log()
-            with open(self.log_file, "w") as f:
+            with self.open(self.log_file, "w") as f:
                 for i in self.messages:
                     f.write(str(i) + '\n')
 

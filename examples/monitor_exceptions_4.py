@@ -7,7 +7,7 @@ from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 log = LogNode(name="Error Catching Example", log_file="error.log")
 
-# this log node will not print to the console and save to a file
+# this log node will not print to the console and save its log messages to a file
 
 # by default, the log node will not print to the console, and will not save it to a file
 
