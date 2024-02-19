@@ -175,7 +175,7 @@ class LogNode:
 
     def has_errors(self) -> bool:
         """check if the log node has any errors"""
-        return len(self.get([Error, Fatal])) > 0
+        return len(self.get([Error, Fatal, _PythonExceptionMessage])) > 0
 
     def has(self, *args: Type[LogMessageType]) -> bool:
         """check if the log node has any of the specified LogMessage types"""

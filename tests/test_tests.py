@@ -7,10 +7,12 @@ import datetime
 import os
 import subprocess
 
-from objlog import LogNode, LogMessage
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog import LogNode, LogMessage, utils
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, _PythonExceptionMessage
 
 LOG_FOLDER = "logs"
+
+# TODO: fix TIME ERROR on lognode closure.
 
 
 class CustomMessage(LogMessage):
@@ -429,6 +431,38 @@ class TestLogNode(unittest.TestCase):
         self.log.log(SystemError("this is a SystemError"))
         self.log.log(Warning("this is a Warning"))
 
+    def test_logging_custom_python_exceptions(self):
+        class CustomException(Exception):
+            pass
+        self.log.log(CustomException("this is a CustomException"))
+
+    def test_logging_real_exception(self):
+        try:
+            raise Exception("this is a real exception")
+        except Exception as e:
+            self.log.log(e)
+
+    def test_monitor_decorator(self):
+        @utils.monitor(self.log)
+        def test_function():
+            raise Exception("this is a real exception")
+        test_function()
+        self.assertTrue(self.log.has_errors())
+
+    def test_monitor_decorator_raise_on_exception(self):
+        @utils.monitor(self.log, raise_exceptions=True)
+        def test_function():
+            raise Exception("this is a real exception")
+        with self.assertRaises(Exception):
+            test_function()
+
+    def test_monitor_decorator_exit_on_exception(self):
+        @utils.monitor(self.log, exit_on_exception=True)
+        def test_function():
+            raise Exception("this is a real exception")
+        with self.assertRaises(SystemExit):
+            test_function()
+
 
 class TestLogMessage(unittest.TestCase):
     """
@@ -443,6 +477,7 @@ class TestLogMessage(unittest.TestCase):
         self.assertTrue(isinstance(Warn("test"), LogMessage))
         self.assertTrue(isinstance(Error("test"), LogMessage))
         self.assertTrue(isinstance(Fatal("test"), LogMessage))
+        self.assertTrue(isinstance(_PythonExceptionMessage(Exception("test")), LogMessage))
         self.tearDown()
 
     def test_custom_class_is_logmessage(self):
