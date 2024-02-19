@@ -10,6 +10,8 @@ LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 from collections import deque
 
+import sys, traceback
+
 # TODO: putting any python exceptions in filter lists will not filter them (any function with one), pls fix before 2.0
 # TODO: same with get() and has(), putting any python exceptions in the filter list will not detect/return them.
 
@@ -42,7 +44,7 @@ class LogNode:
         """log a message"""
         # make sure it's a LogMessage or its subclass
         if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message, BaseException):
-            raise TypeError("message must be a LogMessage or its subclass")
+            raise TypeError("message must be a LogMessage/Exception or its subclass")
         else:
             if isinstance(message, Exception):
                 message = _PythonExceptionMessage(message)

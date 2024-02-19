@@ -42,8 +42,15 @@ class _PythonExceptionMessage(LogMessage):
     def __init__(self, exception: Exception):
         # Use traceback to get a string representation of the exception
         self.exception = exception
+        # get the location of the exception (if possible)
+        # ex: foo.py, line 3, in divide_by_zero
+        try:
+            self.location = f"{self.exception.__traceback__.tb_frame.f_code.co_filename}, line {self.exception.__traceback__.tb_lineno}, in {self.exception.__traceback__.tb_frame.f_code.co_name}"
+        except AttributeError:
+            # if the location can't be found, set it to "N/A"
+            self.location = "N/A"
+        self.level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
         # get the exception's message (reason)
         # ex: Division by zero
-        self.message = str(exception)
-        self.level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
+        self.message = str(exception) + f" ({self.location})"
         super().__init__(self.message)
