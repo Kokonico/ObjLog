@@ -33,9 +33,10 @@ class Fatal(LogMessage):
 
 
 class _PythonExceptionMessage(LogMessage):
-    """A custom message class for exceptions"""
-    exception = _in.NoExeptionSpecified
-    level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
+    """A custom message class for exceptions, not for general use.
+    It's used to allow python exceptions to be logged with objlog."""
+    exception = _in.NoExceptionSpecified
+    level = f"UNKNOWNEXCEPTION"
     color = "\033[91m"  # red color
     message = "N/A"
 
@@ -49,7 +50,7 @@ class _PythonExceptionMessage(LogMessage):
         except AttributeError:
             # if the location can't be found, set it to "N/A"
             self.location = "N/A"
-        self.level = f"PYTHON EXCEPTION ({exception.__class__.__name__})"
+        self.level = exception.__class__.__name__.upper()
         # get the exception's message (reason)
         # ex: Division by zero
         self.message = str(exception) + f" ({self.location})"

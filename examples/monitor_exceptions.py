@@ -14,6 +14,7 @@ log.log(Info("this is an info message"))
 log.log(Warn("this is a warning message"))
 log.log(Error("this is an error message"))
 
+
 # use the monitor decorator to log any exceptions that occur
 
 # it will log the exception and fail silently
@@ -21,8 +22,10 @@ log.log(Error("this is an error message"))
 def divide_by_zero():
     return 1 / 0
 
+
 # run the function
 divide_by_zero()
+
 
 # to not fail silently, set raise_exceptions to True
 
@@ -31,6 +34,7 @@ divide_by_zero()
 @monitor(log, raise_exceptions=True)
 def syntax_error():
     return eval("1 +")
+
 
 # run the function
 syntax_error()
