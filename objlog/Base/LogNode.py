@@ -113,7 +113,7 @@ class LogNode:
                     for i in self.messages:
                         f.write(str(i) + '\n')
 
-    def dump_messages_to_console(self, elementfilter: list | None = None) -> None:
+    def dump_messages_to_console(self, *elementfilter: Union[Type[LogMessageType], Type[Exception], Type[BaseException], Type[None]]) -> None:
         """dump all logged messages to the console, also filtering them if needed"""
         for i in self.messages:
             if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
