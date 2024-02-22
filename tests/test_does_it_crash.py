@@ -44,7 +44,7 @@ try:
 
     log.log(CustomMessage("This is a custom message"))
 
-    log.get(element_filter=[Debug, Info, Warn, Error, Fatal])
+    log.get(Debug, Info, Warn, Error, Fatal)
 
     len(log)
 

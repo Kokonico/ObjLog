@@ -147,7 +147,7 @@ class TestLogNode(unittest.TestCase):
 
         self.assertEqual(5, len(self.log))
         self.assertListEqual(self.log.get(
-            element_filter=[Debug, Info, Warn, Error, Fatal]),
+            Debug, Info, Warn, Error, Fatal),
             [debug, info, warn, error, fatal]
         )
         self.tearDown()  # NOTE: this is necessary because the log file is not cleared after each test,
@@ -164,7 +164,7 @@ class TestLogNode(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.log.log(message)
-        for message in self.log.get(element_filter=[CustomMessage]):
+        for message in self.log.get(CustomMessage):
             self.assertTrue(isinstance(message, CustomMessage))
         self.tearDown()
 
@@ -430,17 +430,38 @@ class TestLogNode(unittest.TestCase):
         self.log.log(SystemExit("this is a SystemExit"))
         self.log.log(SystemError("this is a SystemError"))
         self.log.log(Warning("this is a Warning"))
+        self.tearDown()
 
     def test_logging_custom_python_exceptions(self):
         class CustomException(Exception):
             pass
         self.log.log(CustomException("this is a CustomException"))
+        self.tearDown()
 
     def test_logging_real_exception(self):
         try:
             raise Exception("this is a real exception")
         except Exception as e:
             self.log.log(e)
+        self.tearDown()
+
+    def test_has_errors_on_real_exception(self):
+        try:
+            raise Exception("this is a real exception")
+        except Exception as e:
+            self.log.log(e)
+        self.assertTrue(self.log.has_errors())
+        self.tearDown()
+
+    def test_has_on_python_exception(self):
+        self.log.log(ImportError("this is an ImportError"))
+        self.assertTrue(self.log.has(ImportError))
+        self.tearDown()
+
+    def test_get_on_python_exception(self):
+        self.log.log(ImportError("this is an ImportError"))
+        self.assertTrue(isinstance(self.log.get(ImportError)[0], ImportError))
+        self.tearDown()
 
     def test_monitor_decorator(self):
         @utils.monitor(self.log)
@@ -448,6 +469,7 @@ class TestLogNode(unittest.TestCase):
             raise Exception("this is a real exception")
         test_function()
         self.assertTrue(self.log.has_errors())
+        self.tearDown()
 
     def test_monitor_decorator_raise_on_exception(self):
         @utils.monitor(self.log, raise_exceptions=True)
@@ -455,6 +477,7 @@ class TestLogNode(unittest.TestCase):
             raise Exception("this is a real exception")
         with self.assertRaises(Exception):
             test_function()
+        self.tearDown()
 
     def test_monitor_decorator_exit_on_exception(self):
         @utils.monitor(self.log, exit_on_exception=True)
@@ -462,6 +485,7 @@ class TestLogNode(unittest.TestCase):
             raise Exception("this is a real exception")
         with self.assertRaises(SystemExit):
             test_function()
+        self.tearDown()
 
 
 class TestLogMessage(unittest.TestCase):

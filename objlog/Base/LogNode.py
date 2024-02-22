@@ -4,13 +4,14 @@ from objlog.Base.LogMessage import LogMessage  # "no parent package" error happe
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, _PythonExceptionMessage
 import objlog
 
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Union
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
+# exceptions
+# ExceptionType = TypeVar('ExceptionType', bound=Exception)
+# BaseExceptionType = TypeVar('BaseExceptionType', bound=BaseException)
 
 from collections import deque
-
-import sys, traceback
 
 # TODO: putting any python exceptions in filter lists will not filter them (any function with one), pls fix before 2.0
 # TODO: same with get() and has(), putting any python exceptions in the filter list will not detect/return them.
@@ -151,12 +152,12 @@ class LogNode:
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, element_filter: list | None = None) -> list:
+    def get(self, *element_filter: Union[Type[LogMessageType], Type[Exception], Type[BaseException]]) -> list:
         """get all messages saved in memory, optionally filtered"""
-        if element_filter is None:
+        if len(element_filter) == 0:
             return list(self.messages)
         else:
-            return list(filter(lambda x: isinstance(x, tuple(element_filter)), self.messages))
+            return list(filter(lambda x: isinstance(x, element_filter), self.messages))
 
     def combine(self, other: 'LogNode', merge_log_files: bool = True) -> None:
         """combine two LogNodes."""
@@ -175,11 +176,11 @@ class LogNode:
 
     def has_errors(self) -> bool:
         """check if the log node has any errors"""
-        return len(self.get([Error, Fatal, _PythonExceptionMessage])) > 0
+        return len(self.get(Error, Fatal, _PythonExceptionMessage)) > 0
 
-    def has(self, *args: Type[LogMessageType]) -> bool:
+    def has(self, *args: Union[Type[LogMessageType], Type[Exception], Type[BaseException]]) -> bool:
         """check if the log node has any of the specified LogMessage types"""
-        return len(self.get(list(args))) > 0
+        return len(self.get(args)) > 0
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
