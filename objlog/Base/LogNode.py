@@ -1,8 +1,7 @@
 """The LogNode class, the main class of the ObjLogger"""
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
-import objlog
+from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 
 from typing import TypeVar, Type, Union
 
@@ -12,7 +11,19 @@ from collections import deque
 
 
 class LogNode:
-    """A LogNode, the main class of the ObjLogger. It can log messages to a file, to the console, or both."""
+    """
+    A LogNode, the main class of the ObjLogger.
+    It can log messages to a file, to the console, or both.
+
+    :param name: The name of the LogNode.
+    :param log_file: The file to log to, if None, the LogNode will not log to a file.
+    :param print_to_console: Whether to print messages to the console, if False, the LogNode will not print messages.
+    :param print_filter: A list of LogMessage types to filter the messages to be printed to the console.
+    :param max_messages_in_memory: The maximum number of messages to be saved in memory, defaults to 500.
+    :param max_log_messages: The maximum number of messages to be saved in the log file, defaults to 1000.
+    :param log_when_closed: Whether to log a message when the LogNode is deleted.
+    :param wipe_log_file_on_init: Whether to clear the log file specified (if any) when the LogNode is created.
+    """
 
     open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
 
@@ -34,9 +45,19 @@ class LogNode:
             with self.open(log_file, "w+") as f:
                 f.write("")
 
-    def log(self, message, override_log_file: str | None = None, force_print: tuple[bool, bool] = (False, False),
+    # noinspection PyUnresolvedReferences
+    def log(self, message: LogMessage | Exception | BaseException, override_log_file: str | None = None,
+            force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True) -> None:
-        """log a message"""
+        """
+        Logs a message to the LogNode.
+
+        :param message: The message to log
+        :param override_log_file:  overrides the log file to log to set in the LogNode.
+        :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
+        :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
+        :return: None
+        """
         # make sure it's a LogMessage or its subclass
         if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
                                                                                                          BaseException):
@@ -76,7 +97,14 @@ class LogNode:
                 print(f"[{self.name}] {message.colored()}")
 
     def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
-        """set log output file."""
+        """
+        Set log output file.
+        If preserve_old_messages is True, the old messages will be logged to the new file.
+
+        :param file: The file to log to.
+        :param preserve_old_messages: Whether to bring already logged messages to the new file.
+        :return: None
+        """
         if self.log_file == file:
             return  # if the file is the same, do nothing
 
@@ -87,7 +115,14 @@ class LogNode:
 
     def dump_messages(self, file: str, elementfilter: list | None = None,
                       wipe_messages_from_memory: bool = False) -> None:
-        """dump all logged messages to a file, also filtering them if needed"""
+        """
+        Dump all logged messages to a file, also filtering them if needed.
+
+        :param file: The file to dump the messages to.
+        :param elementfilter: A list of LogMessage types to filter the messages to be dumped.
+        :param wipe_messages_from_memory: Whether to wipe the messages from the LogNode's memory after dumping them.
+        :return: None
+        """
         if elementfilter is not None:
             with self.open(file, "a") as f:
                 for i in self.messages:
@@ -100,7 +135,13 @@ class LogNode:
             self.wipe_messages()
 
     def filter(self, typefilter: list, filter_logfiles: bool = False) -> None:
-        """filter messages saved in memory, optionally the logfiles too"""
+        """
+        Filter messages saved in memory, optionally the logfiles too.
+
+        :param typefilter: A list of LogMessage types to filter the messages saved in memory.
+        :param filter_logfiles: Whether to filter the log files too.
+        :return: None
+        """
         self.messages = list(filter(lambda x: isinstance(x, tuple(typefilter)), self.messages))
         if filter_logfiles:
             if isinstance(self.log_file, str):
@@ -109,33 +150,62 @@ class LogNode:
                         f.write(str(i) + '\n')
 
     def dump_messages_to_console(self, *elementfilter: Union[
-        Type[LogMessageType], Type[Exception], Type[BaseException], Type[None]]) -> None:
-        """dump all logged messages to the console, also filtering them if needed"""
+        Type[LogMessage], Type[Exception], Type[BaseException], Type[None]]
+                                 ) -> None:
+        """
+        Dump all logged messages to the console, also filtering them if needed.
+
+        :param elementfilter: A list of LogMessage types to filter the messages to be dumped to the console.
+        :return: None
+        """
+
         for i in self.messages:
             if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
                 self.log(i, force_print=(True, True), preserve_message_in_memory=False)
 
     def wipe_messages(self, wipe_logfiles: bool = False) -> None:
-        """wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
-         but you won't be able to dump the previous messages to a file"""
+        """
+        Wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
+         but you won't be able to dump the previous messages to a file.
+
+        :param wipe_logfiles: Whether to wipe the log files too.
+        :return: None
+         """
         self.messages = []
         if wipe_logfiles:
             self.clear_log()
 
     def clear_log(self) -> None:
-        """clear the log file"""
+        """
+        Clear the log file.
+        WARNING: this will delete all messages saved in the log file.
+
+        :return: None
+        """
         if isinstance(self.log_file, str):
             with self.open(self.log_file, "w") as f:
                 f.write("")
                 self.log_len = 0
 
     def set_max_messages_in_memory(self, max_messages: int) -> None:
-        """set the maximum number of messages to be saved in memory"""
+        """
+        Set the maximum number of messages to be saved in memory.
+        WARNING: this will delete the oldest messages if the new maximum is smaller than the current number of messages.
+
+        :param max_messages: The maximum number of messages to be saved in memory.
+        :return: None
+        """
         self.max = max_messages
         self.messages = deque(self.messages, maxlen=self.max)
 
     def set_max_messages_in_log(self, max_file_size: int) -> None:
-        """set the maximum message limit of the log file"""
+        """
+        Set the maximum message limit of the log file.
+        WARNING: this will delete the oldest messages if the new maximum is smaller than the current number of messages.
+
+        :param max_file_size: The maximum number of messages to be saved in the log file.
+        :return: None
+        """
         self.maxinf = max_file_size
         # crop the file if it's too big
         if isinstance(self.log_file, str):
@@ -148,23 +218,36 @@ class LogNode:
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> list:
-        """get all messages saved in memory, optionally filtered"""
+    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]] | tuple) -> list:
+        """
+        Get all messages saved in memory, optionally filtered.
+
+        :param element_filter: A list of LogMessage types to filter the messages to be returned.
+        :return: A list of messages saved in memory, optionally filtered.
+        """
         if len(element_filter) == 0:
             return list(self.messages)
         else:
             # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
-            l = []
+            filtered_messages = []
             for msg in self.messages:
                 if isinstance(msg, PythonExceptionMessage):
                     if isinstance(msg.exception, element_filter) or isinstance(msg, element_filter):
-                        l.append(msg)
+                        filtered_messages.append(msg)
                 elif isinstance(msg, element_filter):
-                    l.append(msg)
-            return l
+                    filtered_messages.append(msg)
+            return filtered_messages
 
     def combine(self, other: 'LogNode', merge_log_files: bool = True) -> None:
-        """combine two LogNodes."""
+        """
+        Combine two LogNodes, optionally merging their log files.
+        Both LogNodes logged messages will be saved in the first LogNode.
+        It will modify the first LogNode in place.
+
+        :param other: The other LogNode to combine with.
+        :param merge_log_files: Whether to merge the log files of the LogNodes.
+        :return: None
+        """
         self.messages.extend(other.messages)
 
         if merge_log_files:
@@ -174,16 +257,30 @@ class LogNode:
                     f.write(str(i) + '\n')
 
     def squash(self, message: LogMessage) -> None:
-        """squash the lognode, i.e., replace all messages with a single message"""
+        """
+        Squash the lognode, i.e., replace all messages with a single message.
+
+        :param message: The message to replace all messages with.
+        """
         self.messages.clear()
         self.messages.append(message)
 
     def has_errors(self) -> bool:
-        """check if the log node has any errors"""
+        """
+        Check if the log node has any errors (Error, Fatal, PythonExceptionMessage).
+
+        :return: True if the log node has any errors, False otherwise
+        """
         return len(self.get(Error, Fatal, PythonExceptionMessage)) > 0
 
     def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
-        """check if the log node has any of the specified LogMessage types"""
+        """
+        Check if the log node has any of the specified LogMessage types
+
+        :param args: The LogMessage types to check for
+        :return: True if the log node has any of the specified LogMessage types, False otherwise
+        """
+        # ignore the warning, it's a false positive
         return len(self.get(args)) > 0
 
     def __repr__(self):
