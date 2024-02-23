@@ -152,7 +152,7 @@ class LogNode:
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, *element_filter: Union[Type[LogMessageType], Type[Exception], Type[BaseException]]) -> list:
+    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> list:
         """get all messages saved in memory, optionally filtered"""
         if len(element_filter) == 0:
             return list(self.messages)
@@ -178,7 +178,7 @@ class LogNode:
         """check if the log node has any errors"""
         return len(self.get(Error, Fatal, _PythonExceptionMessage)) > 0
 
-    def has(self, *args: Union[Type[LogMessageType], Type[Exception], Type[BaseException]]) -> bool:
+    def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
         """check if the log node has any of the specified LogMessage types"""
         return len(self.get(args)) > 0
 
