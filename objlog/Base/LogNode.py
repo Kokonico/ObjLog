@@ -1,20 +1,14 @@
 """The LogNode class, the main class of the ObjLogger"""
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, _PythonExceptionMessage
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
 import objlog
 
 from typing import TypeVar, Type, Union
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
-# exceptions
-# ExceptionType = TypeVar('ExceptionType', bound=Exception)
-# BaseExceptionType = TypeVar('BaseExceptionType', bound=BaseException)
 
 from collections import deque
-
-# TODO: putting any python exceptions in filter lists will not filter them (any function with one), pls fix before 2.0
-# TODO: same with get() and has(), putting any python exceptions in the filter list will not detect/return them.
 
 
 class LogNode:
@@ -44,11 +38,12 @@ class LogNode:
             preserve_message_in_memory: bool = True) -> None:
         """log a message"""
         # make sure it's a LogMessage or its subclass
-        if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message, BaseException):
+        if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
+                                                                                                         BaseException):
             raise TypeError("message must be a LogMessage/Exception or its subclass")
         else:
             if isinstance(message, Exception):
-                message = _PythonExceptionMessage(message)
+                message = PythonExceptionMessage(message)
         if preserve_message_in_memory:
             self.messages.append(message)
 
@@ -113,7 +108,8 @@ class LogNode:
                     for i in self.messages:
                         f.write(str(i) + '\n')
 
-    def dump_messages_to_console(self, *elementfilter: Union[Type[LogMessageType], Type[Exception], Type[BaseException], Type[None]]) -> None:
+    def dump_messages_to_console(self, *elementfilter: Union[
+        Type[LogMessageType], Type[Exception], Type[BaseException], Type[None]]) -> None:
         """dump all logged messages to the console, also filtering them if needed"""
         for i in self.messages:
             if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
@@ -157,7 +153,15 @@ class LogNode:
         if len(element_filter) == 0:
             return list(self.messages)
         else:
-            return list(filter(lambda x: isinstance(x, element_filter), self.messages))
+            # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
+            l = []
+            for msg in self.messages:
+                if isinstance(msg, PythonExceptionMessage):
+                    if isinstance(msg.exception, element_filter) or isinstance(msg, element_filter):
+                        l.append(msg)
+                elif isinstance(msg, element_filter):
+                    l.append(msg)
+            return l
 
     def combine(self, other: 'LogNode', merge_log_files: bool = True) -> None:
         """combine two LogNodes."""
@@ -176,7 +180,7 @@ class LogNode:
 
     def has_errors(self) -> bool:
         """check if the log node has any errors"""
-        return len(self.get(Error, Fatal, _PythonExceptionMessage)) > 0
+        return len(self.get(Error, Fatal, PythonExceptionMessage)) > 0
 
     def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
         """check if the log node has any of the specified LogMessage types"""

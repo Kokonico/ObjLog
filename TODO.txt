@@ -1,4 +1,1 @@
 TODO: fix TIME ERROR when lognode closes
-TODO: fix type hinting for new get() syntax
-TODO: fix type hinting for new has() syntax
-TODO: fix get() and has() with python errors (does not return unlike LogMessages)

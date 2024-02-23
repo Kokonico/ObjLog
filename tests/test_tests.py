@@ -8,7 +8,7 @@ import os
 import subprocess
 
 from objlog import LogNode, LogMessage, utils
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, _PythonExceptionMessage
+from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
 
 LOG_FOLDER = "logs"
 
@@ -460,7 +460,8 @@ class TestLogNode(unittest.TestCase):
 
     def test_get_on_python_exception(self):
         self.log.log(ImportError("this is an ImportError"))
-        self.assertTrue(isinstance(self.log.get(ImportError)[0], ImportError))
+        self.assertTrue(isinstance(self.log.get(ImportError)[0], PythonExceptionMessage))
+        self.assertTrue(isinstance(self.log.get(ImportError)[0].exception, ImportError))
         self.tearDown()
 
     def test_monitor_decorator(self):
@@ -501,7 +502,7 @@ class TestLogMessage(unittest.TestCase):
         self.assertTrue(isinstance(Warn("test"), LogMessage))
         self.assertTrue(isinstance(Error("test"), LogMessage))
         self.assertTrue(isinstance(Fatal("test"), LogMessage))
-        self.assertTrue(isinstance(_PythonExceptionMessage(Exception("test")), LogMessage))
+        self.assertTrue(isinstance(PythonExceptionMessage(Exception("test")), LogMessage))
         self.tearDown()
 
     def test_custom_class_is_logmessage(self):
