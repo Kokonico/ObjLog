@@ -4,13 +4,29 @@ import traceback
 
 
 def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):
-    """a decorator to monitor a function and log any python exceptions that occur"""
+    """
+    A decorator to monitor a function and log any python exceptions that occur.
+
+    :param log_node: The log node to log exceptions to.
+    :param exit_on_exception: If True, the program will exit if an exception occurs.
+    """
+
     def decorator(func):
         """
-        :param func:
-        :return:
+        The actual decorator function.
+
+        :param func: The function to monitor
+        :return: The wrapped function
         """
+
         def wrapper(*args, **kwargs):
+            """
+            The wrapper function that will be called instead of the original function.
+
+            :param args:
+            :param kwargs:
+            :return:
+            """
             try:
                 return func(*args, **kwargs)
             except Exception as e:
@@ -34,4 +50,5 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
                     raise e
 
         return wrapper
+
     return decorator

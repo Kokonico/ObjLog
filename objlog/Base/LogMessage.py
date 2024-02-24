@@ -5,13 +5,12 @@ import random
 
 
 class LogMessage:
-    """a base message to be logged
-    Attributes:
-        color
-        level (name)
+    """
+    A base message to be logged.
 
-    WARNING: this class should not be used directly, use a subclass instead
-    it is designed to be used as a base class for other classes, and will not work properly if used directly.
+    WARNING: this class should not be used directly, use a subclass instead.
+
+    :param message: The message to log.
     """
 
     def __init__(self, message):
@@ -23,6 +22,9 @@ class LogMessage:
             self.color
             self.level
         except AttributeError:
+            # because you cannot trust people (like myself) to read the docs
+            # RTFM PEOPLE!!!
+            # >:(((((( <- me rn, having to write this
             raise TypeError("this class should not be used directly, use a subclass instead")
 
     def __str__(self):
@@ -39,7 +41,11 @@ class LogMessage:
         return self.uuid != other.uuid
 
     def colored(self) -> str:
-        """return a colored version of the message"""
+        """
+        Returns a colored version of the message as a string.
+
+        :return: The colored message.
+        """
         # convert unix to datetime
         # and shave ms
         dt = datetime.fromtimestamp(self.unix / 1000)
