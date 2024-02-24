@@ -10,6 +10,7 @@ keywords = ["logging", "object", "objectified", "log", "logger", "loggers", "OOP
 
 [tool.poetry.dependencies]
 python = ">=3.10, <4.0"
+sphinx = "^7.2.6"
 
 
 [build-system]
