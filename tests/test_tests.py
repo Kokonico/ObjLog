@@ -302,6 +302,13 @@ class TestLogNode(unittest.TestCase):
             self.assertTrue(isinstance(message, CustomMessage) or isinstance(message, Debug))
         self.tearDown()
 
+    def test_lognode_filter_python_exceptions(self):
+        self.log.log(ImportError("this is an ImportError"))
+        self.log.log(ZeroDivisionError("this is a ZeroDivisionError"))
+        self.log.log(NotImplementedError("this is a NotImplementedError"))
+
+        self.log.filter([ImportError, ZeroDivisionError])
+
     def test_lognode_dump(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
@@ -468,6 +475,7 @@ class TestLogNode(unittest.TestCase):
         @utils.monitor(self.log)
         def test_function():
             raise Exception("this is a real exception")
+
         test_function()
         self.assertTrue(self.log.has_errors())
         self.tearDown()
@@ -476,6 +484,7 @@ class TestLogNode(unittest.TestCase):
         @utils.monitor(self.log, raise_exceptions=True)
         def test_function():
             raise Exception("this is a real exception")
+
         with self.assertRaises(Exception):
             test_function()
         self.tearDown()
@@ -484,6 +493,7 @@ class TestLogNode(unittest.TestCase):
         @utils.monitor(self.log, exit_on_exception=True)
         def test_function():
             raise Exception("this is a real exception")
+
         with self.assertRaises(SystemExit):
             test_function()
         self.tearDown()

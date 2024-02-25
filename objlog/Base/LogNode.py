@@ -134,7 +134,7 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list, filter_logfiles: bool = False) -> None:
+    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]], filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
 
@@ -142,7 +142,7 @@ class LogNode:
         :param filter_logfiles: Whether to filter the log files too.
         :return: None
         """
-        self.messages = list(filter(lambda x: isinstance(x, tuple(typefilter)), self.messages))
+        self.messages = self.get(*typefilter)
         if filter_logfiles:
             if isinstance(self.log_file, str):
                 with self.open(self.log_file, "w") as f:
