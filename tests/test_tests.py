@@ -168,6 +168,27 @@ class TestLogNode(unittest.TestCase):
             self.assertTrue(isinstance(message, CustomMessage))
         self.tearDown()
 
+    def test_lognode_get_filtered_python_exceptions(self):
+        self.log.log(ImportError("this is an ImportError"))
+        self.log.log(ZeroDivisionError("this is a ZeroDivisionError"))
+        self.log.log(NotImplementedError("this is a NotImplementedError"))
+        self.log.log(RecursionError("this is a RecursionError"))
+        self.log.log(KeyboardInterrupt("this is a KeyboardInterrupt"))
+        self.log.log(EOFError("this is an EOFError"))
+        self.log.log(StopIteration("this is a StopIteration"))
+        self.log.log(GeneratorExit("this is a GeneratorExit"))
+        self.log.log(SystemExit("this is a SystemExit"))
+        self.log.log(SystemError("this is a SystemError"))
+        self.log.log(Warning("this is a Warning"))
+        self.log.log(CustomMessage("this is a CustomMessage"))
+        self.log.log(Debug("this is a Debug message"))
+        self.log.log(Info("this is an Info message"))
+        self.log.log(Warn("this is a Warn message"))
+        self.log.log(Error("this is an Error message"))
+        self.log.log(Fatal("this is a Fatal message"))
+        self.assertEqual(3, len(self.log.get(ImportError, ZeroDivisionError, CustomMessage)))
+        self.tearDown()
+
     def test_lognode_log_multiple(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
