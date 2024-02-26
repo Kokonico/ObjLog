@@ -42,6 +42,8 @@ class LogNode:
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
+            # your IDE might say that this code is broken, but it's not.
+            # i'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
             with self.open(log_file, "w+") as f:
                 f.write("")
 
@@ -88,7 +90,9 @@ class LogNode:
                 # write the message
                 f.write(message_str + '\n')
                 self.log_len += 1
-
+        
+        # TODO: fix the force_print thing when passing in an Exception or BaseException
+        # we don't need to do this for now, but it's a good idea to do it in the future
         if (self.print or force_print[0]) and (
                 self.print_filter is None or isinstance(message, tuple(self.print_filter))):
             if force_print[1] and force_print[0]:
@@ -178,7 +182,7 @@ class LogNode:
     def clear_log(self) -> None:
         """
         Clear the log file.
-        WARNING: this will delete all messages saved in the log file.
+        WARNING: This will delete all messages saved in the log file.
 
         :return: None
         """
@@ -190,7 +194,7 @@ class LogNode:
     def set_max_messages_in_memory(self, max_messages: int) -> None:
         """
         Set the maximum number of messages to be saved in memory.
-        WARNING: this will delete the oldest messages if the new maximum is smaller than the current number of messages.
+        WARNING: This will delete the oldest messages if the new maximum is smaller than the current number of messages.
 
         :param max_messages: The maximum number of messages to be saved in memory.
         :return: None
@@ -201,7 +205,7 @@ class LogNode:
     def set_max_messages_in_log(self, max_file_size: int) -> None:
         """
         Set the maximum message limit of the log file.
-        WARNING: this will delete the oldest messages if the new maximum is smaller than the current number of messages.
+        WARNING: This will delete the oldest messages if the new maximum is smaller than the current number of messages.
 
         :param max_file_size: The maximum number of messages to be saved in the log file.
         :return: None
@@ -256,14 +260,19 @@ class LogNode:
                 for i in self.messages:
                     f.write(str(i) + '\n')
 
-    def squash(self, message: LogMessage) -> None:
+    def squash(self, message: LogMessage, squash_logfile: bool = True) -> None:
         """
         Squash the lognode, i.e., replace all messages with a single message.
 
         :param message: The message to replace all messages with.
+        :param squash_logfile: Whether to squash the log file too.
         """
         self.messages.clear()
         self.messages.append(message)
+        if squash_logfile:
+            self.clear_log()
+            with self.open(self.log_file, "w") as f:
+                f.write(str(message) + '\n')
 
     def has_errors(self) -> bool:
         """

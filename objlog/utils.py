@@ -8,7 +8,9 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
     A decorator to monitor a function and log any python exceptions that occur.
 
     :param log_node: The log node to log exceptions to.
+    :param raise_exceptions: If True, the exception will be raised after being logged.
     :param exit_on_exception: If True, the program will exit if an exception occurs.
+    This overrides raise_exceptions.
     """
 
     def decorator(func):
