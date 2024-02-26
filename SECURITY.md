@@ -16,5 +16,6 @@ Issues that can take place due to poor setup of the project will not be fixed, a
 
 | Version | Supported |
 |---------|-----------|
+| 2.x.x   | ✅         |
 | 1.x.x   | ✅         |
 | <1.x.x  | ❌         |
