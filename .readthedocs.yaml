@@ -8,7 +8,7 @@ build:
 python:
   install:
     - method: pip
-      requirements: pyproject.toml
+      path: ./objlog
     - requirements: pyproject.toml
       method: poetry
 
