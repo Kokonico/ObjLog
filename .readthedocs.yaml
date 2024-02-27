@@ -9,7 +9,7 @@ python:
   install:
     - method: pip
       path: .
-    - requirements: pyproject.toml
+    - requirements: requirements.txt
 
 sphinx:
   configuration: docs/conf.py
