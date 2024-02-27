@@ -164,7 +164,7 @@ log.filter([Info, Debug], filter_logfiles=True)
 
 print(log.get()) # prints: [Info("Hello, world!"), Debug("Hello, world!")]
 ```
-# Logging Python Exceptions
+## Logging Python Exceptions
 
 You can log Python exceptions by using the `log` method with an exception instead of a LogMessage.
 
@@ -180,7 +180,7 @@ log.get() # returns: [PythonExceptionMessage("Hello, world!")]
 log.get()[0].exception # returns: ImportError("Hello, world!")
 ```
 
-# Catching Real python exceptions
+## Catching Real python exceptions
 
 logging python exceptions is great, but what if you want to catch them when they happen?
 
