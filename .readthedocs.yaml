@@ -9,8 +9,8 @@ python:
   install:
     - method: pip
       path: .
-    - requirements: requirements.txt
-      method: pip
+    - requirements: pyproject.toml
+      method: poetry
 
 sphinx:
   configuration: docs/conf.py
