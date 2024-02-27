@@ -7,7 +7,7 @@ build:
 
 python:
   install:
-    - method: pip
+    - method: poetry
       path: .
     - requirements: pyproject.toml
       method: poetry
