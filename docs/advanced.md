@@ -259,7 +259,7 @@ it will always raise the exception after logging it.
 
 it won't do anything extra, it will just raise the exception.
 
-# Conclusion
+## Conclusion
 
 That's it for the advanced guide. You should now have a good understanding of how to use ObjLog in more advanced ways.
 
