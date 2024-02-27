@@ -2,6 +2,8 @@
 
 pushd %~dp0
 
+:: windows support 🤮🤮🤮 👎👎👎 🤢🤢🤢
+
 REM Command file for Sphinx documentation
 
 if "%SPHINXBUILD%" == "" (
