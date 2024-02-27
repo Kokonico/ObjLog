@@ -10,7 +10,6 @@ python:
     - method: pip
       path: .
     - requirements: pyproject.toml
-      method: poetry
 
 sphinx:
   configuration: docs/conf.py
