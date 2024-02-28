@@ -1,4 +1,5 @@
 """a base message to be logged, WARNING: this class should not be used directly, use a subclass instead"""
+import sys
 from datetime import datetime
 from time import time_ns
 import random
@@ -13,19 +14,16 @@ class LogMessage:
     :param message: The message to log.
     """
 
+    color = None
+    level = None
+
     def __init__(self, message):
         self.message = str(message)
         self.unix = time_ns() // 1_000_000
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
-        try:
-            self.color
-            self.level
-        except AttributeError:
-            # because you cannot trust people (like myself) to read the docs
-            # RTFM PEOPLE!!!
-            # >:(((((( <- me rn, having to write this
-            raise TypeError("this class should not be used directly, use a subclass instead")
+        if self.color is None or self.level is None:
+            raise TypeError("The color and level attributes must be set in the subclass.")
 
     def __str__(self):
         dt = datetime.fromtimestamp(self.unix / 1000)
@@ -48,10 +46,10 @@ class LogMessage:
         """
         # convert unix to datetime
         # and shave ms
-        dt = datetime.fromtimestamp(self.unix / 1000)
         try:
-            dt = dt.strftime("%Y-%m-%d %H:%M:%S")
-        except ImportError:
-            # python is likely shutting down
-            dt = "TIME ERROR"
+            dt = datetime.fromtimestamp(self.unix / 1000)
+            dt = str(dt).split(".")[0]  # not using strfime because it doesn't work when python is shutting down
+        except Exception as e:
+            dt = f"TIME ERROR ({e.__class__.__name__})"
+
         return f"{self.color}[{dt}] {self.level}: {self.message}\033[0m"
