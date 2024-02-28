@@ -3,8 +3,8 @@
 
 ## Notice
 
-this repo is a living repository, and the master branch is not guaranteed to be stable. If you want to use this library in a project, please use a release version, or a tagged commit.
-it is always in the works, and new features are being added all the time!
+This repo is a living repository, and the master branch is not guaranteed to be stable. If you want to use this library in a project, please use a release version, or a tagged commit.
+It is always in the works, and new features are being added all the time!
 
 ## what is this?
 This is a logging library for python. It is designed to be simple to use, and easy to understand.
@@ -333,7 +333,9 @@ check out the [example's](examples) folder within this project, plenty of exampl
 Feel free to! This project is licensed under the Zlib license, so you can use it in any project, commercial or not, as long as you give credit to the original author (me) and don't claim it as your own.
 
 ## I want to contribute!
-Feel free to! Just fork the repo, make your changes, and submit a pull request! I'll review it, and if it's good, I'll merge it!
+Feel free to!
+Fork the repo, make your changes, and submit a pull request!
+I'll review it, and if it's good, I'll merge it!
 
 (for more information, see [CONTRIBUTING](CONTRIBUTING.md))
 

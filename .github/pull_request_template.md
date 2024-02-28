@@ -5,7 +5,7 @@
 Please select the type of change you made (select all that apply):
 
 - [ ] Bug fix (minor non-breaking change to fix unintended issue.)
-- [ ] New feature (non breaking addition)
+- [ ] New feature (non-breaking addition)
 - [ ] Major change (fix/feature that breaks existing code)
 - [ ] Documentation must be changed.
 

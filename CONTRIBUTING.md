@@ -8,7 +8,8 @@ $ git clone YOUR_FORK_URL
 ```
 
 ## Building
-This is a [Python](https://www.python.org/) project, so you will need to have Python installed. This project is developed on python 3.12.0, but it should work on most versions of Python 3.
+This is a [Python](https://www.python.org/) project, so you will need to have Python installed.
+This project is developed on python 3.12.x, but it will work on any version of python 3.10 or higher.
 
 To build the project, you will need to install the dependencies. This can be done by running the following command in the root directory of the project.
 

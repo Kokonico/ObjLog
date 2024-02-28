@@ -8,8 +8,10 @@ Please do not disclose security-related issues publicly until they have been add
 
 ## before you report
 
-please make sure that the version of the project that you are reporting the issue on is supported, as we will only fix it there.
-Issues that can take place due to poor setup of the project will not be fixed, as they are not the responsibility of the project maintainers.
+Please make sure that the version of the project that you are reporting the issue on is supported,
+as we will only fix it there.
+Issues that can take place due to poor setup of the project will not be fixed,
+as they are not the responsibility of the project maintainers.
 (unless the setup is the default setup or a "secure" setup, in which case it will be fixed)
 
 ## supported versions
