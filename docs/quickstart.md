@@ -52,6 +52,8 @@ ObjLog comes with a few built-in subclasses of `LogMessage`:
 - `Error`
 - `Fatal`
 
+(Note): to learn more about the built-in LogMessages, you can check the [Default LogMessages page](API/DefaultLogMessages.md)
+
 You can use these to log messages to the LogNode:
 
 ```python
