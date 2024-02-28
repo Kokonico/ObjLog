@@ -20,6 +20,4 @@ Welcome to the ObjLog documentation!
    :caption: Contents:
 
 
-Can't find what you're looking for?
-====================================
-* :ref:`search`
+:ref:`search`

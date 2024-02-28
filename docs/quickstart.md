@@ -4,7 +4,7 @@
 This is a quick start guide to get you up and running with ObjLog. This guide will cover the basics of setting up a
 LogNode, logging messages, and configuring the logger.
 
-# Installation
+## Installation
 
 ObjLog can be installed via pip:
 ```bash
