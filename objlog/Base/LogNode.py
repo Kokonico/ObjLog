@@ -147,7 +147,7 @@ class LogNode:
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, element_filter: list | None) -> list:
+    def get(self, element_filter: list | None = None) -> list:
         """get all messages saved in memory, optionally filtered"""
         if element_filter is None:
             return list(self.messages)

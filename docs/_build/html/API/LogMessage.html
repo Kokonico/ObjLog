@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LogMessage API Reference &#8212; ObjLog 1.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=ca842793"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="logmessage-api-reference">
+<h1>LogMessage API Reference<a class="headerlink" href="#logmessage-api-reference" title="Link to this heading">¶</a></h1>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<section id="message">
+<h3><code class="docutils literal notranslate"><span class="pre">message</span></code><a class="headerlink" href="#message" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The message to log.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">Hello,</span> <span class="pre">World!</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Link to this heading">¶</a></h2>
+<section id="unix-timestamp">
+<h3><code class="docutils literal notranslate"><span class="pre">unix_timestamp</span></code><a class="headerlink" href="#unix-timestamp" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: `integer</p></li>
+<li><p><strong>Default</strong>: <em><strong>SET AUTOMATICALLY</strong></em></p></li>
+<li><p><strong>Description</strong>: The unix timestamp that the LogMessage was created.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">1617225013</span></code></p></li>
+<li><p><em><strong>WARNING</strong></em>: this is a deprecated variable and will be removed in a future release (2.0.0), please use <code class="docutils literal notranslate"><span class="pre">unix</span></code> instead.</p></li>
+</ul>
+</section>
+<section id="unix">
+<h3><code class="docutils literal notranslate"><span class="pre">unix</span></code><a class="headerlink" href="#unix" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: `integer</p></li>
+<li><p><strong>Default</strong>: <em><strong>SET AUTOMATICALLY</strong></em></p></li>
+<li><p><strong>Description</strong>: The unix timestamp that the LogMessage was created.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">1617225013</span></code></p></li>
+<li><p><strong>Note</strong>: this is identical to <code class="docutils literal notranslate"><span class="pre">unix_timestamp</span></code> and is the recommended variable to use.</p></li>
+</ul>
+</section>
+<section id="uuid">
+<h3><code class="docutils literal notranslate"><span class="pre">uuid</span></code><a class="headerlink" href="#uuid" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>SET AUTOMATICALLY</strong></em></p></li>
+<li><p><strong>Description</strong>: The unique identifier for the LogMessage.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">1617225013-123</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
+<section id="colored">
+<h3><code class="docutils literal notranslate"><span class="pre">colored</span></code><a class="headerlink" href="#colored" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Description</strong>: Returns the message as a string with ANSI color codes.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+</ul>
+</section>
+<section id="dunders">
+<h3>Dunders<a class="headerlink" href="#dunders" title="Link to this heading">¶</a></h3>
+<ul>
+<li><h4 class="rubric" id="str"><code class="docutils literal notranslate"><span class="pre">__str__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Returns the message as a string (without ANSI color coding)</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="repr"><code class="docutils literal notranslate"><span class="pre">__repr__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Nearly indentical to <code class="docutils literal notranslate"><span class="pre">__str__</span></code> but does not include the timestamp.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="eq"><code class="docutils literal notranslate"><span class="pre">__eq__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Compares the <code class="docutils literal notranslate"><span class="pre">uuid</span></code> of two LogMessages, if they are the same, returns <code class="docutils literal notranslate"><span class="pre">True</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="ne"><code class="docutils literal notranslate"><span class="pre">__ne__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Compares the <code class="docutils literal notranslate"><span class="pre">uuid</span></code> of two LogMessages, if they are different, returns <code class="docutils literal notranslate"><span class="pre">True</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ObjLog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced guide.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Kokonico.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/API/LogMessage.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

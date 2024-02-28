@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Advanced guide. &#8212; ObjLog 1.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=ca842793"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Quick Start" href="quickstart.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="advanced-guide">
+<h1>Advanced guide.<a class="headerlink" href="#advanced-guide" title="Link to this heading">¶</a></h1>
+<p>In this guide, we will cover more advanced uses of ObjLog, such as custom LogMessage types,
+Logging Python Exceptions, and catching logged errors.</p>
+<section id="custom-logmessage-types">
+<h2>Custom LogMessage types.<a class="headerlink" href="#custom-logmessage-types" title="Link to this heading">¶</a></h2>
+<p>You can create custom LogMessage types by subclassing the <code class="docutils literal notranslate"><span class="pre">LogMessage</span></code> class.</p>
+<p>they have two attributes that must be defined for them to work properly:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">level</span></code>: The level of the message. This is a string, and can be any value you want.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">color</span></code>: The color of the message. This is prefixed before the message, and is supposed to be an ansi color code.</p></li>
+</ul>
+<p>Here is an example of a custom LogMessage type:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">objlog</span> <span class="kn">import</span> <span class="n">LogMessage</span>
+
+<span class="k">class</span> <span class="nc">CustomLogMessage</span><span class="p">(</span><span class="n">LogMessage</span><span class="p">):</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;custom&quot;</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[35m&quot;</span>
+</pre></div>
+</div>
+<p>it’s exactly the same as the built-in LogMessage types, but with a different level and color.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># extends the code from above.</span>
+
+<span class="kn">from</span> <span class="nn">objlog</span> <span class="kn">import</span> <span class="n">LogNode</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">LogNode</span><span class="p">(</span><span class="s2">&quot;my logger&quot;</span><span class="p">)</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">CustomLogMessage</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="interacting-with-the-lognode">
+<h2>Interacting with the LogNode<a class="headerlink" href="#interacting-with-the-lognode" title="Link to this heading">¶</a></h2>
+<p>You can interact with the LogNode in a few ways.</p>
+<section id="getting-logged-messages">
+<h3>Getting logged messages<a class="headerlink" href="#getting-logged-messages" title="Link to this heading">¶</a></h3>
+<p>You can get the messages that have been logged to the LogNode by using the <code class="docutils literal notranslate"><span class="pre">get</span></code> method.</p>
+<p><em>Note: if you are using below 1.2.2, you will need to put <code class="docutils literal notranslate"><span class="pre">None</span></code> in the <code class="docutils literal notranslate"><span class="pre">get</span></code> method, as the <code class="docutils literal notranslate"><span class="pre">get</span></code> method did not automatically select all before then.</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">objlog</span> <span class="kn">import</span> <span class="n">LogNode</span>
+<span class="kn">from</span> <span class="nn">objlog.LogMessages</span> <span class="kn">import</span> <span class="n">Info</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">LogNode</span><span class="p">(</span><span class="s2">&quot;my logger&quot;</span><span class="p">)</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;)]</span>
+</pre></div>
+</div>
+<p>you can also filter what types of messages you want to get by passing the specified types to the <code class="docutils literal notranslate"><span class="pre">get</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Warn</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Info</span><span class="p">,</span> <span class="n">Debug</span><span class="p">))</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;), Debug(&quot;Hello, world!&quot;)]</span>
+</pre></div>
+</div>
+</section>
+<section id="clearing-logged-messages">
+<h3>Clearing logged messages<a class="headerlink" href="#clearing-logged-messages" title="Link to this heading">¶</a></h3>
+<p>You can clear the messages that have been logged to the LogNode by using the <code class="docutils literal notranslate"><span class="pre">wipe_messages</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;)]</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">wipe_messages</span><span class="p">()</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: []</span>
+</pre></div>
+</div>
+<p>keep in mind this will not clear any log files that are being logged to, to do that you can either set the parameter <code class="docutils literal notranslate"><span class="pre">wipe_logfiles</span></code> to True when calling the <code class="docutils literal notranslate"><span class="pre">wipe_messages</span></code> method, or you can call the <code class="docutils literal notranslate"><span class="pre">clear_log</span></code> method if you do not want to wipe the memory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;)]</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">wipe_messages</span><span class="p">(</span><span class="n">wipe_logfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="mi">0</span> <span class="c1"># prints: []</span>
+
+<span class="c1"># or</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;)]</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">clear_log</span><span class="p">()</span>
+
+<span class="n">prints</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;)] as it did not wipe memory.</span>
+</pre></div>
+</div>
+</section>
+<section id="checking-for-types-of-messages">
+<h3>checking for types of messages<a class="headerlink" href="#checking-for-types-of-messages" title="Link to this heading">¶</a></h3>
+<p>You can check if a certain type of message has been logged to the LogNode by using the <code class="docutils literal notranslate"><span class="pre">has</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">Info</span><span class="p">))</span> <span class="c1"># prints: True</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">Debug</span><span class="p">))</span> <span class="c1"># prints: False</span>
+</pre></div>
+</div>
+</section>
+<section id="filtering-messages-in-place">
+<h3>filtering messages (in place)<a class="headerlink" href="#filtering-messages-in-place" title="Link to this heading">¶</a></h3>
+<p>You can filter the messages that have been logged to the LogNode by using the <code class="docutils literal notranslate"><span class="pre">filter</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Warn</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="n">Info</span><span class="p">,</span> <span class="n">Debug</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;), Debug(&quot;Hello, world!&quot;)]</span>
+</pre></div>
+</div>
+<p>optionally, you can filter logfiles as well by setting the <code class="docutils literal notranslate"><span class="pre">filter_logfiles</span></code> parameter to True.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Info</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Debug</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+<span class="n">log</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Warn</span><span class="p">(</span><span class="s2">&quot;Hello, world!&quot;</span><span class="p">))</span>
+
+<span class="n">log</span><span class="o">.</span><span class="n">filter</span><span class="p">([</span><span class="n">Info</span><span class="p">,</span> <span class="n">Debug</span><span class="p">],</span> <span class="n">filter_logfiles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="c1"># prints: [Info(&quot;Hello, world!&quot;), Debug(&quot;Hello, world!&quot;)]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>That’s it for the advanced guide. You should now have a good understanding of how to use ObjLog in more advanced ways.</p>
+<p>for the complete API reference, see the <a class="reference internal" href="api.html"><span class="std std-doc">API reference</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">ObjLog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced guide.</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#custom-logmessage-types">Custom LogMessage types.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interacting-with-the-lognode">Interacting with the LogNode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quick Start</a></li>
+      <li>Next: <a href="api.html" title="next chapter">API Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Kokonico.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/advanced.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

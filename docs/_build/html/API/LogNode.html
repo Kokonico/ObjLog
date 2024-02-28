@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LogNode API reference &#8212; ObjLog 1.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=ca842793"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="lognode-api-reference">
+<h1>LogNode API reference<a class="headerlink" href="#lognode-api-reference" title="Link to this heading">¶</a></h1>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h2>
+<p>Defined when creating a new LogNode.</p>
+<section id="name">
+<h3><code class="docutils literal notranslate"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+<li><p><strong>default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The name of the log node.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">'my</span> <span class="pre">log</span> <span class="pre">node'</span></code></p></li>
+<li><p><strong>Note</strong>: There are no restrictions on the name, you can add any spaces, special characters, etc.</p></li>
+</ul>
+</section>
+<section id="log-file">
+<h3><code class="docutils literal notranslate"><span class="pre">log_file</span></code><a class="headerlink" href="#log-file" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: The path to the log file</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">'my_log_file.log'</span></code></p></li>
+<li><p><strong>Note</strong>: Supports relative and absolute paths. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, no log file will be created.</p></li>
+</ul>
+</section>
+<section id="print-to-console">
+<h3><code class="docutils literal notranslate"><span class="pre">print_to_console</span></code><a class="headerlink" href="#print-to-console" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to print the log to the console.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+</ul>
+</section>
+<section id="print-filter">
+<h3><code class="docutils literal notranslate"><span class="pre">print_filter</span></code><a class="headerlink" href="#print-filter" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: A filter for which types of messages to print to the console.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">[Error,</span> <span class="pre">Warn]</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all messages will be printed.</p></li>
+</ul>
+</section>
+<section id="max-messages-in-memory">
+<h3><code class="docutils literal notranslate"><span class="pre">max_messages_in_memory</span></code><a class="headerlink" href="#max-messages-in-memory" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">500</span></code></p></li>
+<li><p><strong>Description</strong>: The maximum number of messages to keep in memory. Used to prevent memory leaks.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">1000</span></code></p></li>
+<li><p><strong>Note</strong>: If the number of messages in memory exceeds this number, the oldest messages will be removed.</p></li>
+</ul>
+</section>
+<section id="max-log-messages">
+<h3><code class="docutils literal notranslate"><span class="pre">max_log_messages</span></code><a class="headerlink" href="#max-log-messages" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">1000</span></code></p></li>
+<li><p><strong>Description</strong>: The maximum number of messages to keep in the log file. Used to prevent log files from growing too
+large.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">10000</span></code></p></li>
+<li><p><strong>Note</strong>: If the number of messages in the log file exceeds this number, the oldest messages will be removed.</p></li>
+</ul>
+</section>
+<section id="log-when-closed">
+<h3><code class="docutils literal notranslate"><span class="pre">log_when_closed</span></code><a class="headerlink" href="#log-when-closed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to log a message indicating that the log node was closed.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+</ul>
+</section>
+<section id="wipe-log-file-on-init">
+<h3><code class="docutils literal notranslate"><span class="pre">wipe_log_file_on_init</span></code><a class="headerlink" href="#wipe-log-file-on-init" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to wipe the log file when the log node is initialized.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the log file will be appended to, if true, the log file will be overwritten, than appended to.</p></li>
+</ul>
+</section>
+</section>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
+<section id="log">
+<h3><code class="docutils literal notranslate"><span class="pre">log</span></code><a class="headerlink" href="#log" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Logs a message to the log node.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="message"><code class="docutils literal notranslate"><span class="pre">message</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">LogMessage,</span> <span class="pre">Exception,</span> <span class="pre">BaseException</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The message to log.</p></li>
+<li><p><strong>Example</strong>: `’Info(“Hello, world!”)’</p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="override-log-file"><code class="docutils literal notranslate"><span class="pre">override_log_file</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: The path to the log file to use for this message. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the log file defined in the log node
+will be used.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">'my_log_file.log'</span></code></p></li>
+<li><p><strong>Note</strong>: Supports relative and absolute paths.</p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="force-print"><code class="docutils literal notranslate"><span class="pre">force_print</span></code></h4>
+<ul>
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">tuple(bool,</span> <span class="pre">bool)</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">(False,</span> <span class="pre">False)</span></code></p></li>
+<li><p><strong>Description</strong>: A tuple of two booleans. The first boolean is whether to force print to the console, the second
+boolean is the to print or not.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">(True,</span> <span class="pre">False)</span></code> (force don’t print to console)</p></li>
+<li><h4 class="rubric" id="preserve-message-in-memory"><code class="docutils literal notranslate"><span class="pre">preserve_message_in_memory</span></code></h4>
+</li>
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to preserve the message in memory. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the message will not be stored in memory.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Note</strong>: Mostly used for internal purposes. If you are not sure, leave it as <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="set-output-file">
+<h3><code class="docutils literal notranslate"><span class="pre">set_output_file</span></code><a class="headerlink" href="#set-output-file" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Sets the log file for the entire log node.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="file"><code class="docutils literal notranslate"><span class="pre">file</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The path to the log file to use for this message. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the log file is removed.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">'my_log_file.log'</span></code></p></li>
+<li><p><strong>Note</strong>: Supports relative and absolute paths.</p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="preserve-old-messages"><code class="docutils literal notranslate"><span class="pre">preserve_old_messages</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to bring previously logged messages to the new log file.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">False</span></code>, any messages logged before this method is called will not be in the new log file.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="dump-messages">
+<h3><code class="docutils literal notranslate"><span class="pre">dump_messages</span></code><a class="headerlink" href="#dump-messages" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Dumps all messages in memory to a file.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="id1"><code class="docutils literal notranslate"><span class="pre">file</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The path to the file to dump the messages to.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">'my_log_file.log'</span></code></p></li>
+<li><p><strong>Note</strong>: Supports relative and absolute paths.</p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="elementfilter"><code class="docutils literal notranslate"><span class="pre">elementfilter</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: A filter for which types of messages to dump to the file.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">[Error,</span> <span class="pre">Warn]</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all messages will be dumped.</p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="wipe-messages-from-memory"><code class="docutils literal notranslate"><span class="pre">wipe_messages_from_memory</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to remove the messages from memory after dumping them to the file.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the messages will be removed from memory after dumping them to the file.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="filter">
+<h3><code class="docutils literal notranslate"><span class="pre">filter</span></code><a class="headerlink" href="#filter" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Filters the messages within the log node to specific types.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="typefilter"><code class="docutils literal notranslate"><span class="pre">typefilter</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: A function to filter the messages within the log node, it will keep only the messages that are in the list.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">[Error,</span> <span class="pre">Warn]</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="filter-logfiles"><code class="docutils literal notranslate"><span class="pre">filter_logfiles</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to filter the log file after filtering the messages in memory.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="dump-messages-to-console">
+<h3><code class="docutils literal notranslate"><span class="pre">dump_messages_to_console</span></code><a class="headerlink" href="#dump-messages-to-console" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Dumps all messages in memory to the console.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="id2"><code class="docutils literal notranslate"><span class="pre">elementfilter</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: A filter for which types of messages to dump to the console.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">[Error,</span> <span class="pre">Warn]</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all messages will be dumped.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="wipe-messages">
+<h3><code class="docutils literal notranslate"><span class="pre">wipe_messages</span></code><a class="headerlink" href="#wipe-messages" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Wipes all messages from memory.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="wipe-logfiles"><code class="docutils literal notranslate"><span class="pre">wipe_logfiles</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to wipe the log file as well.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the log file will be wiped as well.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="clear-log">
+<h3><code class="docutils literal notranslate"><span class="pre">clear_log</span></code><a class="headerlink" href="#clear-log" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Description</strong>: Clears the log file.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+</section>
+<section id="set-max-messages-in-log">
+<h3><code class="docutils literal notranslate"><span class="pre">set_max_messages_in_log</span></code><a class="headerlink" href="#set-max-messages-in-log" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Sets the maximum number of messages to keep in the log file.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="max-file-size"><code class="docutils literal notranslate"><span class="pre">max_file_size</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The maximum number of messages to keep in the log file.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">10000</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="get">
+<h3><code class="docutils literal notranslate"><span class="pre">get</span></code><a class="headerlink" href="#get" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Gets the messages in memory.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="id3"><code class="docutils literal notranslate"><span class="pre">elementfilter</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[LogMessage]</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Description</strong>: Retrieve only the messages that passed in.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">Error,</span> <span class="pre">Warn</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all messages will be returned. If more than one argument is passed, if a message matches at least one of the arguments, it will be returned.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="combine">
+<h3><code class="docutils literal notranslate"><span class="pre">combine</span></code><a class="headerlink" href="#combine" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Combines two or more log nodes into one.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="other"><code class="docutils literal notranslate"><span class="pre">other</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">LogNode</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The log node to merge into the current one.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">LogNode(&quot;my</span> <span class="pre">epic</span> <span class="pre">log</span> <span class="pre">node&quot;)</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="merge-log-files"><code class="docutils literal notranslate"><span class="pre">merge_log_files</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Description</strong>: Whether to merge the log files of the log nodes.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>Note</strong>: If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the log files will be merged into one, the other log file will stay.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Note</strong>: The log node that is being combined into the current one will not be affected, however the current log node will get all the messages from the other log node at that time, they will not be linked afterwards.</p></li>
+</ul>
+</section>
+<section id="squash">
+<h3><code class="docutils literal notranslate"><span class="pre">squash</span></code><a class="headerlink" href="#squash" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Description</strong>: Squashes a LogNode into a single message.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="id4"><code class="docutils literal notranslate"><span class="pre">message</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The message to squash the log node into.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">This</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">squashed</span> <span class="pre">message</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="dunders">
+<h3>dunders<a class="headerlink" href="#dunders" title="Link to this heading">¶</a></h3>
+<ul>
+<li><h4 class="rubric" id="repr"><code class="docutils literal notranslate"><span class="pre">__repr__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Returns a string representation of the log node.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">str</span></code></p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">LogNode</span> <span class="pre">example</span> <span class="pre">at</span> <span class="pre">output</span> <span class="pre">console</span></code>, <code class="docutils literal notranslate"><span class="pre">LogNode</span> <span class="pre">example</span> <span class="pre">at</span> <span class="pre">output</span> <span class="pre">log.log</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="len"><code class="docutils literal notranslate"><span class="pre">__len__</span></code></h4>
+<ul class="simple">
+<li><p><strong>Description</strong>: Returns the number of messages in memory.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">10</span></code></p></li>
+</ul>
+</li>
+<li><h4 class="rubric" id="contains"><code class="docutils literal notranslate"><span class="pre">__contains__</span></code></h4>
+<ul>
+<li><p><strong>Description</strong>: Checks if the log node has a specific message.</p></li>
+<li><p><strong>Returns</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
+<li><p><strong>Parameters</strong>:</p>
+<ul>
+<li><h4 class="rubric" id="id5"><code class="docutils literal notranslate"><span class="pre">message</span></code></h4>
+<ul class="simple">
+<li><p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">LogMessage</span></code></p></li>
+<li><p><strong>Default</strong>: <em><strong>REQUIRED</strong></em></p></li>
+<li><p><strong>Description</strong>: The message to check for.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">Error,</span> <span class="pre">Warn,</span> <span class="pre">Info</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">ObjLog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced.html">Advanced guide.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Kokonico.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/API/LogNode.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
