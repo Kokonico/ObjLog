@@ -1,6 +1,6 @@
 
 Welcome to the ObjLog documentation!
-==================================
+====================================
 
 .. this is rst file for the documentation of the ObjLog package
 
@@ -20,10 +20,6 @@ Welcome to the ObjLog documentation!
    :caption: Contents:
 
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
+Can't find what you're looking for?
+====================================
 * :ref:`search`
