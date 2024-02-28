@@ -16,6 +16,7 @@ class LogMessage:
 
     color = None
     level = None
+    exception = None  # for cleanliness (only used in PythonExceptionMessage subclass)
 
     def __init__(self, message):
         self.message = str(message)
