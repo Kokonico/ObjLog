@@ -7,12 +7,10 @@ Welcome to the ObjLog documentation!
 .. toctree::
    :maxdepth: 2
    :caption: User Guide
-
-   installation
+    
+   what_is_objlog
    quickstart
-   usage
    advanced
-   faq
    api
 
 .. toctree::
