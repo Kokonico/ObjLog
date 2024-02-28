@@ -74,7 +74,7 @@ prints(log.get()) # prints: [Info("Hello, world!")]
 
 log.wipe_messages()
 
-lprints(og.get()) # prints: []
+prints(log.get()) # prints: []
 ```
 
 keep in mind this will not clear any log files that are being logged to, to do that you can either set the parameter `wipe_logfiles` to True when calling the `wipe_messages` method, or you can call the `clear_log` method if you do not want to wipe the memory.
