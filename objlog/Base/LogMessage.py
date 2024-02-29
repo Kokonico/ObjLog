@@ -49,7 +49,8 @@ class LogMessage:
         # and shave ms
         try:
             dt = datetime.fromtimestamp(self.unix / 1000)
-            dt = str(dt).split(".")[0]  # not using strfime because it doesn't work when python is shutting down
+            dt = str(dt).split(".")
+            dt = (dt[0] + ":" + dt[1][:3]) # shave ms to 3 digits
         except Exception as e:
             dt = f"TIME ERROR ({e.__class__.__name__})"
 

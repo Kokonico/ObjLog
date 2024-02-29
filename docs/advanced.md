@@ -86,7 +86,7 @@ prints(log.get()) # prints: [Info("Hello, world!")]
 
 log.wipe_messages(wipe_logfiles=True)
 
-prints(log.get()0 # prints: []
+prints(log.get() # prints: []
 
 # or
 
