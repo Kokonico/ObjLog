@@ -46,11 +46,9 @@ class LogMessage:
         :return: The colored message.
         """
         # convert unix to datetime
-        # and shave ms
         try:
             dt = datetime.fromtimestamp(self.unix / 1000)
-            dt = str(dt).split(".")
-            dt = (dt[0] + ":" + dt[1][:3]) # shave ms to 3 digits
+            dt = str(dt)[:-3]
         except Exception as e:
             dt = f"TIME ERROR ({e.__class__.__name__})"
 

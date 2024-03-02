@@ -545,11 +545,10 @@ class TestLogMessage(unittest.TestCase):
         for message in messages:
             self.assertTrue(isinstance(message.colored(), str))
             dt = datetime.datetime.fromtimestamp(message.unix / 1000)
-            # grab ms (round to 3 digits)
-            ms = str(dt).split(".")[1][:3]
-            dt = dt.strftime("%Y-%m-%d %H:%M:%S")
+            # shave ms to 3 decimal places
+            dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             self.assertEqual(
-                f"{message.color}[{str(dt) + ":" + ms}] {message.level}: {message.message}\033[0m",
+                f"{message.color}[{dt}] {message.level}: {message.message}\033[0m",
                 message.colored()
             )
 

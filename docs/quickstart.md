@@ -93,7 +93,7 @@ log.log(Info("Hello, world!"))
 Now, when you run the script, you should see something along the lines of this (your date and time will be different):
 
 ```bash
-[my logger] [2024-02-24 12:55:13:650] INFO: Hello, World!
+[my logger] [2024-02-24 12:55:13.609] INFO: Hello, World!
 ```
 
 notice that the message is prefixed with the name of the logger, this means that you can have multiple loggers in your program, and you can tell which logger is logging the message.
@@ -112,8 +112,8 @@ log2.log(Info("Hello, world!"))
 This will output:
 
 ```bash
-[logger 1] [2024-02-24 12:55:13:650] INFO: Hello, World!
-[logger 2] [2024-02-24 12:55:13:650] INFO: Hello, World!
+[logger 1] [2024-02-24 12:55:13.650] INFO: Hello, World!
+[logger 2] [2024-02-24 12:55:13.650] INFO: Hello, World!
 ```
 
 now your logger will print messages to the console, but what if you want to only print messages of a certain type, like only errors?
@@ -133,7 +133,7 @@ log.log(Error("Hello, world!"))
 This will output:
 
 ```bash
-[my logger] [2024-02-24 12:55:13:650] ERROR: Hello, World!
+[my logger] [2024-02-24 12:55:13.650] ERROR: Hello, World!
 ```
 
 Now, only messages of type `Error` will be printed to the console.
@@ -155,15 +155,15 @@ log.log(Error("Hello, world!"))
 This will output:
 
 ```bash
-[my logger] [2024-02-24 12:55:13:650] INFO: Hello, World!
-[my logger] [2024-02-24 12:55:13:650] ERROR: Hello, World!
+[my logger] [2024-02-24 12:55:13.650] INFO: Hello, World!
+[my logger] [2024-02-24 12:55:13.650] ERROR: Hello, World!
 ```
 
 And the file `log.log` will contain:
 
 ```bash
-[my logger] [2024-02-24 12:55:13:650] INFO: Hello, World!
-[my logger] [2024-02-24 12:55:13:650] ERROR: Hello, World!
+[my logger] [2024-02-24 12:55:13.650] INFO: Hello, World!
+[my logger] [2024-02-24 12:55:13.650] ERROR: Hello, World!
 ```
 
 Now you have a basic understanding of how to use ObjLog, and you can start logging messages in your programs.

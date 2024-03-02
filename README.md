@@ -27,11 +27,11 @@ log.log(Fatal("this is a fatal message"))
 
 output:
 ```shell
-[Basic Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[Basic Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[Basic Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[Basic Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[Basic Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
+[Basic Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[Basic Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[Basic Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[Basic Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[Basic Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
 ```
 
 (it's even colored in the console!)
@@ -55,20 +55,20 @@ log.log(Fatal("this is a fatal message"))
 
 output:
 ```shell
-[File Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[File Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[File Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[File Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[File Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
+[File Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[File Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[File Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[File Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[File Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
 ```
 
 example.log:
 ```shell
-[File Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[File Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[File Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[File Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[File Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
+[File Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[File Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[File Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[File Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[File Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
 ```
 
 ### I want a custom log message type!
@@ -88,7 +88,7 @@ log.log(CustomMessage("this is a custom message"))
 
 output:
 ```shell
-[Custom Example] [2023-12-08 08:36:33.155766] CUSTOM: This is a custom message
+[Custom Example] [2023-12-08 08:36:33.155] CUSTOM: This is a custom message
 ```
 
 (colored green in the console!)
@@ -119,20 +119,20 @@ log.dump_messages_to_console()  # this will print the messages to the console, b
 
 output:
 ```shell
-[Buffered Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[Buffered Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[Buffered Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[Buffered Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[Buffered Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
+[Buffered Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[Buffered Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[Buffered Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[Buffered Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[Buffered Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
 ```
 
 example.log:
 ```shell
-[Buffered Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[Buffered Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[Buffered Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[Buffered Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[Buffered Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
+[Buffered Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[Buffered Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[Buffered Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[Buffered Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[Buffered Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
 ```
 
 ### Amazing! How do I filter messages?
@@ -177,8 +177,8 @@ log.log(Info("this is an info message"))
 log.dump_messages_to_console(elementfilter=[CustomMessage])  # this will only print the custom messages to the console
 
 # output:
-# [Filter Example] [2023-12-08 08:36:33.155766] CUSTOM: This is a custom message
-# [Filter Example] [2023-12-08 08:36:33.155790] CUSTOM: This is another custom message
+# [Filter Example] [2023-12-08 08:36:33.155] CUSTOM: This is a custom message
+# [Filter Example] [2023-12-08 08:36:33.155] CUSTOM: This is another custom message
 ```
 
 ### I want to not have a log file, and then I want to switch to having a log file (and store my old messages in it)!
@@ -214,26 +214,26 @@ log.log(Debug("this is a debug message 3")) # this message will be saved to the 
 
 example.log:
 ```shell
-[Switch Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
-[Switch Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 2
-[Switch Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 2
-[Switch Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 2
-[Switch Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 2
+[Switch Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
+[Switch Example] [2023-12-08 08:36:33.155] INFO: This is an info message 2
+[Switch Example] [2023-12-08 08:36:33.155] WARN: This is a warning message 2
+[Switch Example] [2023-12-08 08:36:33.155] ERROR: This is an error message 2
+[Switch Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message 2
 ```
 
 example2.log:
 ```shell
-[Switch Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message
-[Switch Example] [2023-12-08 08:36:33.155790] INFO: This is an info message
-[Switch Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message
-[Switch Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message
-[Switch Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message
-[Switch Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
-[Switch Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 2
-[Switch Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 2
-[Switch Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 2
-[Switch Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 2
-[Switch Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 3
+[Switch Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message
+[Switch Example] [2023-12-08 08:36:33.155] INFO: This is an info message
+[Switch Example] [2023-12-08 08:36:33.155] WARN: This is a warning message
+[Switch Example] [2023-12-08 08:36:33.155] ERROR: This is an error message
+[Switch Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message
+[Switch Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
+[Switch Example] [2023-12-08 08:36:33.155] INFO: This is an info message 2
+[Switch Example] [2023-12-08 08:36:33.155] WARN: This is a warning message 2
+[Switch Example] [2023-12-08 08:36:33.155] ERROR: This is an error message 2
+[Switch Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message 2
+[Switch Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 3
 ```
 
 ### I have a very limited amount of RAM, and I want to limit the amount of messages that are stored in memory!
@@ -255,11 +255,11 @@ log.log(Debug("this is a debug message 2"))  # this message will be stored in me
 
 limited.log:
 ```shell
-[Limited Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 1
-[Limited Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 1
-[Limited Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 1
-[Limited Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 1
-[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
+[Limited Example] [2023-12-08 08:36:33.155] INFO: This is an info message 1
+[Limited Example] [2023-12-08 08:36:33.155] WARN: This is a warning message 1
+[Limited Example] [2023-12-08 08:36:33.155] ERROR: This is an error message 1
+[Limited Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message 1
+[Limited Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
 ```
 
 ### I have a limited amount of SSD space, and I want to limit the amount of messages that are stored in the log file!
@@ -287,21 +287,21 @@ log = LogNode(name="Limited Example", max_messages_in_memory=5, max_log_messages
 
 output:
 ```shell
-[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 1
-[Limited Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 1
-[Limited Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 1
-[Limited Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 1
-[Limited Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 1
-[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
+[Limited Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 1
+[Limited Example] [2023-12-08 08:36:33.155] INFO: This is an info message 1
+[Limited Example] [2023-12-08 08:36:33.155] WARN: This is a warning message 1
+[Limited Example] [2023-12-08 08:36:33.155] ERROR: This is an error message 1
+[Limited Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message 1
+[Limited Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
 ```
 
 limited.log:
 ```shell
-[Limited Example] [2023-12-08 08:36:33.155790] INFO: This is an info message 1
-[Limited Example] [2023-12-08 08:36:33.155799] WARN: This is a warning message 1
-[Limited Example] [2023-12-08 08:36:33.155805] ERROR: This is an error message 1
-[Limited Example] [2023-12-08 08:36:33.155810] FATAL: This is a fatal message 1
-[Limited Example] [2023-12-08 08:36:33.155766] DEBUG: This is a debug message 2
+[Limited Example] [2023-12-08 08:36:33.155] INFO: This is an info message 1
+[Limited Example] [2023-12-08 08:36:33.155] WARN: This is a warning message 1
+[Limited Example] [2023-12-08 08:36:33.155] ERROR: This is an error message 1
+[Limited Example] [2023-12-08 08:36:33.155] FATAL: This is a fatal message 1
+[Limited Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
 ```
 
 ### I want to log messages, but I don't want to print them to the console or a log file, and I don't want to store them in memory!
