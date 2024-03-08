@@ -3,7 +3,7 @@ from objlog.Base.LogMessage import LogMessage  # "no parent package" error happe
 # IDK why
 from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 
-from typing import TypeVar, Type, Union
+from typing import TypeVar, Type, Union, Optional
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
@@ -27,8 +27,8 @@ class LogNode:
 
     open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
 
-    def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
-                 print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
+    def __init__(self, name: str, log_file: Optional[str] = None, print_to_console: bool = False,
+                 print_filter: Optional[list] = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
                  log_when_closed: bool = True, wipe_log_file_on_init: bool = False):
         self.log_file = log_file
         self.name = name
@@ -48,7 +48,7 @@ class LogNode:
                 f.write("")
 
     # noinspection PyUnresolvedReferences
-    def log(self, message: LogMessage | Exception | BaseException, override_log_file: str | None = None,
+    def log(self, message: Optional[LogMessage], override_log_file: Optional[str] = None,
             force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True) -> None:
         """
@@ -90,7 +90,7 @@ class LogNode:
                 # write the message
                 f.write(message_str + '\n')
                 self.log_len += 1
-        
+
         # TODO: fix the force_print thing when passing in an Exception or BaseException
         # we don't need to do this for now, but it's a good idea to do it in the future
         if (self.print or force_print[0]) and (
@@ -100,7 +100,7 @@ class LogNode:
             elif force_print[0] is False and self.print:
                 print(f"[{self.name}] {message.colored()}")
 
-    def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
+    def set_output_file(self, file: Optional[str], preserve_old_messages: bool = False) -> None:
         """
         Set log output file.
         If preserve_old_messages is True, the old messages will be logged to the new file.
@@ -117,7 +117,7 @@ class LogNode:
             for i in self.messages:
                 self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
-    def dump_messages(self, file: str, elementfilter: list | None = None,
+    def dump_messages(self, file: str, elementfilter: Optional[list] = None,
                       wipe_messages_from_memory: bool = False) -> None:
         """
         Dump all logged messages to a file, also filtering them if needed.
@@ -138,7 +138,8 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]], filter_logfiles: bool = False) -> None:
+    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]],
+               filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
 
@@ -222,7 +223,7 @@ class LogNode:
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]] | tuple) -> list:
+    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> list:
         """
         Get all messages saved in memory, optionally filtered.
 

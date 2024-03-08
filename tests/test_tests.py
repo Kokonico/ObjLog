@@ -9,6 +9,7 @@ import subprocess
 
 from objlog import LogNode, LogMessage, utils
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
+from typing import Optional
 
 LOG_FOLDER = "logs"
 
@@ -20,7 +21,7 @@ class CustomMessage(LogMessage):
     level = "CUSTOM"
 
 
-def gen_random_messages(amount: int, extra_classes: list | None = None):
+def gen_random_messages(amount: int, extra_classes: Optional[list] = None):
     """generate random messages"""
     messages = []
     if extra_classes is None:
