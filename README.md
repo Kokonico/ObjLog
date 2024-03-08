@@ -1,6 +1,14 @@
 # ObjLog
 > logging, Objectified
 
+## *EXPERIMENTAL BRANCH*
+
+This branch is for testing backporting the library to python 3.9.
+It is not guaranteed to be stable, and may not work at all.
+If you want to use this library in a project, please use a release version, or a tagged commit.
+
+if you do use this branch for your project, and it breaks things, that's on you, not me.
+
 ## Notice
 
 This repo is a living repository, and the master branch is not guaranteed to be stable. If you want to use this library in a project, please use a release version, or a tagged commit.
