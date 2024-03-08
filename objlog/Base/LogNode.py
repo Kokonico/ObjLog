@@ -3,7 +3,7 @@ from objlog.Base.LogMessage import LogMessage  # "no parent package" error happe
 # IDK why
 from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 
-from typing import TypeVar, Type, Union, Optional
+from typing import TypeVar, Type, Union, Optional, Tuple, List
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
@@ -49,7 +49,7 @@ class LogNode:
 
     # noinspection PyUnresolvedReferences
     def log(self, message: Optional[LogMessage], override_log_file: Optional[str] = None,
-            force_print: tuple[bool, bool] = (False, False),
+            force_print: Tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True) -> None:
         """
         Logs a message to the LogNode.
@@ -138,7 +138,7 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]],
+    def filter(self, typefilter: List[Union[Type[LogMessage], Type[Exception], Type[BaseException]]],
                filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
