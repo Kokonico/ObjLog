@@ -259,6 +259,18 @@ Defined when creating a new LogNode.
   - **Returns**: `bool`
   - **Parameters**: `None`
   - **Note**: This is a shorthand for `has(Error, Fatal, PythonExceptionMessage)`.
+
+
+### `rename`
+  - **Description**: Renames the log node.
+  - **Returns**: `None`
+  - **Parameters**:
+    - #### `new_name`
+      - **Type**: `str`
+      - **Default**: ***REQUIRED***
+      - **Description**: The new name of the log node.
+      - **Example**: `my new log node`
+  - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them.
   
 ### dunders
 

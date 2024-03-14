@@ -24,7 +24,7 @@ try:
     log.set_max_messages_in_memory(10)
     log.set_max_messages_in_log(20)
     log.set_output_file("log.log", preserve_old_messages=True)
-    log.dump_messages_to_console(elementfilter=[Debug, Info, Warn, Error, Fatal])
+    log.dump_messages_to_console(Debug, Info, Warn, Error, Fatal)
     log.dump_messages("dump.log", elementfilter=[Debug, Info, Warn, Error, Fatal], wipe_messages_from_memory=True)
     log.log(Debug("This is a debug message"))
     log.log(Info("This is an info message"))

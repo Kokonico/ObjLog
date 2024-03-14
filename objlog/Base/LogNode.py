@@ -292,6 +292,15 @@ class LogNode:
         # ignore the warning, it's a false positive
         return len(self.get(args)) > 0
 
+    def rename(self, new_name: str):
+        """
+        Rename the LogNode.
+
+        :param new_name: The new name of the LogNode.
+        :return: None
+        """
+        self.name = new_name
+
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
             f"LogNode {self.name} at output console" if self.print else f"LogNode {self.name} at output None"

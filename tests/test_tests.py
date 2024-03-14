@@ -519,6 +519,42 @@ class TestLogNode(unittest.TestCase):
             test_function()
         self.tearDown()
 
+    def test_rename_log_node(self):
+        old_name = self.log.name
+
+        # log some messages
+
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        for message in messages:
+            self.log.log(message)
+
+        self.log.rename("NewName")
+        self.assertEqual("NewName", self.log.name)
+        # check all messages for old name
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            for line in lines:
+                self.assertTrue(old_name in line)
+
+        # log some more messages
+
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+
+        for message in messages:
+            self.log.log(message)
+
+        # check last 100 messages
+
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            # check if the last 100 messages are from the new name
+            for line in lines[-100:]:
+                self.assertTrue("NewName" in line)
+
+
+        self.log.rename("Test")  # revert to the original name (for other tests)
+        self.tearDown()
+
 
 class TestLogMessage(unittest.TestCase):
     """
