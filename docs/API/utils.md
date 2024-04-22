@@ -17,4 +17,4 @@
     - **Default**: `False`
     - **Description**: If True, the program will raise a SystemExit after logging the exception. If False, the program will continue running.
     - **Note**: This parameter overrides `raise_exceptions` and will always close the program if an exception is raised without raising it.
-    Also, this parameter is not reccomended for internal code, and should only be used in user-facing code.
+    Also, this parameter is not recommended for internal code, and should only be used in user-facing code.
