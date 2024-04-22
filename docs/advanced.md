@@ -206,7 +206,7 @@ my_function() # logs the exception to LogNode 'log' when it occurs
 
 ## `@monitor` decorator
 
-The `@monitor` decorator is a decorator that logs any exceptions that occur in the function it is decorating.
+The `@monitor` decorator is a decorator in the `utils` subpackage that logs any exceptions that occur in the function it is decorating.
 
 it has a few parameters:
 
