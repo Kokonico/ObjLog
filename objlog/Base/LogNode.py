@@ -38,7 +38,17 @@ class LogNode:
         self.maxinf = max_log_messages
         self.print_filter = print_filter
         self.log_closure_message = log_when_closed
-        self.log_len = 0
+        if log_file:
+            with self.open(log_file) as f:
+                self.log_len = len(f.readlines())
+                if self.log_len > max_log_messages:
+                    # chop the file
+                    lines = f.readlines()
+                    lines = lines[-max_log_messages:]
+                    with self.open(log_file, "w") as f2:
+                        f2.writelines(lines)
+        else:
+            self.log_len = 0
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
