@@ -45,8 +45,9 @@ class LogNode:
                     # chop the file
                     lines = f.readlines()
                     lines = lines[-max_log_messages:]
-                    with self.open(log_file, "w") as f2:
+                    with self.open(log_file, "w+") as f2:
                         f2.writelines(lines)
+                    self.log_len = len(lines)
         else:
             self.log_len = 0
 
