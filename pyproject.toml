@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ObjLog"
-version = "2.1.2"
+version = "2.1.3"
 description = "Logging, Objectified."
 authors = ["Kokonico <kokonico@duck.com>"]
 readme = "README.md"

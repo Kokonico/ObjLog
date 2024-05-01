@@ -54,7 +54,7 @@ class LogNode:
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
             # your IDE might say that this code is broken, but it's not.
-            # i'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
+            # I'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
             with self.open(log_file, "w+") as f:
                 f.write("")
 
@@ -175,9 +175,12 @@ class LogNode:
         """
 
         for i in self.messages:
-            if elementfilter is None or (elementfilter is not None and isinstance(i, tuple(elementfilter))):
-                self.log(i, force_print=(True, True), preserve_message_in_memory=False)
-
+            if elementfilter is None or elementfilter == (None,):
+                print(i.colored())
+            elif isinstance(i, tuple(elementfilter)):
+                print(i.colored())
+            elif tuple(elementfilter) == ():
+                print(i.colored())
     def wipe_messages(self, wipe_logfiles: bool = False) -> None:
         """
         Wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
