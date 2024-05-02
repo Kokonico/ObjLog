@@ -38,4 +38,5 @@ jobs:
 
     - name: Run tests
       run: |
+        mkdir logs
         python -m poetry run python -m unittest tests/test_tests.py
