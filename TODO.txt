@@ -1,1 +1,4 @@
-nothing atm :D
+3.0
+performance improvements??
+change all the syntax to unions
+benchmark stuff

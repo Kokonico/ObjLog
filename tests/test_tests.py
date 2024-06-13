@@ -356,7 +356,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.clear_log()
-        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", [CustomMessage])
+        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", CustomMessage)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             for line in f.readlines():
                 self.assertEqual("CUSTOM:", line.split(" ")[2])
@@ -367,7 +367,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.clear_log()
-        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", [CustomMessage, Debug])
+        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", CustomMessage, Debug)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             for line in f.readlines():
                 self.assertTrue(line.split(" ")[2] in ["CUSTOM:", "DEBUG:"])

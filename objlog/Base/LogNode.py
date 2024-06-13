@@ -64,57 +64,60 @@ class LogNode:
                 f.write("")
 
     # noinspection PyUnresolvedReferences
-    def log(self, message: LogMessage | Exception | BaseException, override_log_file: str | None = None,
+    def log(self, *messages: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+            override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True) -> None:
         """
         Logs a message to the LogNode.
 
-        :param message: The message to log
+        :param messages: The message(s) to log
         :param override_log_file:  overrides the log file to log to set in the LogNode.
         :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
         :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
         :return: None
         """
-        # make sure it's a LogMessage or its subclass
-        if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
-                                                                                                         BaseException):
-            raise TypeError("message must be a LogMessage/Exception or its subclass")
-        else:
-            if isinstance(message, Exception):
+
+        for message in messages:
+            # make sure it's a LogMessage or its subclass
+            if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
+                                                                                                             BaseException):
+                raise TypeError("message must be a LogMessage/Exception or its subclass")
+
+            if isinstance(message, (BaseException, Exception)):
+                # TODO: fix weird type hinting
                 message = PythonExceptionMessage(message)
-        if preserve_message_in_memory:
-            self.messages.append(message)
 
-        if isinstance(self.log_file, str) or isinstance(override_log_file, str):
-            message_str = f"[{self.name}] {str(message)}"
+            if preserve_message_in_memory:
+                self.messages.append(message)
 
-            # log it
-            with self.open(self.log_file, "a+") as f:
-                # move the file pointer to the beginning of the file
-                f.seek(0)
+            if isinstance(self.log_file, str) or isinstance(override_log_file, str):
+                message_str = f"[{self.name}] {str(message)}"
 
-                # check if the number of messages in the file is bigger than/equal to the max
-                if self.log_len > self.maxinf:
-                    # if so, crop the file's oldest messages recursively until it's smaller than (or equal to) the max
-                    lines = f.readlines()
-                    lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
-                    with self.open(self.log_file, "w") as f2:
-                        f2.writelines(lines)
-                    self.log_len = len(lines)
+                # log it
+                with self.open(self.log_file, "a+") as f:
+                    # move the file pointer to the beginning of the file
+                    f.seek(0)
 
-                # write the message
-                f.write(message_str + '\n')
-                self.log_len += 1
-        
-        # TODO: fix the force_print thing when passing in an Exception or BaseException
-        # we don't need to do this for now, but it's a good idea to do it in the future
-        if (self.print or force_print[0]) and (
-                self.print_filter is None or isinstance(message, tuple(self.print_filter))):
-            if force_print[1] and force_print[0]:
-                print(f"[{self.name}] {message.colored()}")
-            elif force_print[0] is False and self.print:
-                print(f"[{self.name}] {message.colored()}")
+                    # check if the number of messages in the file is bigger than/equal to the max
+                    if self.log_len > self.maxinf:
+                        # if so, crop the file's oldest messages recursively until it's smaller than (or equal to)
+                        # the max
+                        lines = f.readlines()
+                        lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
+                        with self.open(self.log_file, "w") as f2:
+                            f2.writelines(lines)
+                        self.log_len = len(lines)
+
+                    # write the message
+                    f.write(message_str + '\n')
+                    self.log_len += 1
+            if (self.print or force_print[0]) and (
+                    self.print_filter is None or isinstance(message, tuple(self.print_filter))):
+                if force_print[1] and force_print[0]:
+                    print(f"[{self.name}] {message.colored()}")
+                elif force_print[0] is False and self.print:
+                    print(f"[{self.name}] {message.colored()}")
 
     def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
         """
@@ -133,7 +136,7 @@ class LogNode:
             for i in self.messages:
                 self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
-    def dump_messages(self, file: str, elementfilter: list | None = None,
+    def dump_messages(self, file: str, *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
                       wipe_messages_from_memory: bool = False) -> None:
         """
         Dump all logged messages to a file, also filtering them if needed.
@@ -143,10 +146,10 @@ class LogNode:
         :param wipe_messages_from_memory: Whether to wipe the messages from the LogNode's memory after dumping them.
         :return: None
         """
-        if elementfilter is not None:
+        if len(elementfilter) > 0:
             with self.open(file, "a") as f:
                 for i in self.messages:
-                    if isinstance(i, tuple(elementfilter)):
+                    if isinstance(i, elementfilter):
                         f.write(str(i) + '\n')
         else:
             with self.open(file, "a") as f:
@@ -154,7 +157,8 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]], filter_logfiles: bool = False) -> None:
+    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]],
+               filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
 
@@ -186,6 +190,7 @@ class LogNode:
                 print(i.colored())
             elif tuple(elementfilter) == ():
                 print(i.colored())
+
     def wipe_messages(self, wipe_logfiles: bool = False) -> None:
         """
         Wipe all messages from memory, can free up a lot of memory if you have a lot of messages,

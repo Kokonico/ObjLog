@@ -1,5 +1,6 @@
 """the default log messages"""
 from .Base import LogMessage, internal
+from typing import TypeVar, Type, Union
 
 
 class Debug(LogMessage):
@@ -54,7 +55,7 @@ class PythonExceptionMessage(LogMessage):
     color = "\033[91m"  # red color
     message = "N/A"
 
-    def __init__(self, exception: Exception):
+    def __init__(self, exception: Union[Type[Exception], Type[BaseException]]):
         """
         :param exception:
         """
