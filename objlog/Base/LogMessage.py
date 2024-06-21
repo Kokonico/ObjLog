@@ -16,6 +16,7 @@ class LogMessage:
     color = None
     level = None
     exception = None  # for cleanliness (only used in PythonExceptionMessage subclass)
+    # reason for using None instead of not defining it is to avoid weird errors if the subclass doesn't define it.
 
     def __init__(self, message):
         self.message = str(message)
