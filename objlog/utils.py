@@ -1,5 +1,5 @@
 """miscellaneous utility functions for your convenience"""
-from objlog import LogNode
+from . import LogNode
 import traceback
 
 

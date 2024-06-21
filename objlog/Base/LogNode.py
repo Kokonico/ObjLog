@@ -3,12 +3,23 @@ from objlog.Base.LogMessage import LogMessage  # "no parent package" error happe
 # IDK why
 from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 
-from typing import TypeVar, Type, Union
+from typing import TypeVar, Type, Union, Protocol
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 import os
 from collections import deque
+
+
+class Loggable(Protocol):
+    """
+    just for type hinting
+    """
+    def __init__(self, message: str):
+        pass
+
+
+T = TypeVar('T', bound=Loggable)
 
 
 class LogNode:
@@ -64,7 +75,7 @@ class LogNode:
                 f.write("")
 
     # noinspection PyUnresolvedReferences
-    def log(self, *messages: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+    def log(self, *messages: T,
             override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True) -> None:
@@ -338,6 +349,7 @@ class LogNode:
     def __del__(self):
         # log the deletion
         if self.log_closure_message:
+            # noinspection PyTypeChecker
             self.log(Debug("LogNode closed."))
         # python will delete self automatically (thanks python)
 
