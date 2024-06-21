@@ -7,6 +7,7 @@ from typing import TypeVar, Type, Union, Protocol
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
+import os
 from collections import deque
 
 
