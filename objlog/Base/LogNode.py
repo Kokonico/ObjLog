@@ -7,7 +7,6 @@ from typing import TypeVar, Type, Union, Protocol
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
-import os
 from collections import deque
 
 
@@ -51,8 +50,8 @@ class LogNode:
         self.print_filter = print_filter
         self.log_closure_message = log_when_closed
         if log_file:
+            # create the log file if it doesn't exist
             if not os.path.exists(log_file):
-                # create the file if it doesn't exist
                 with self.open(log_file, "w") as f:
                     f.write("")
             with self.open(log_file) as f:
