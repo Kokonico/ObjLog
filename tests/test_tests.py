@@ -12,8 +12,6 @@ from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionM
 
 LOG_FOLDER = "logs"
 
-# TODO: fix TIME ERROR on lognode closure.
-
 
 class CustomMessage(LogMessage):
     color = "\033[0m"

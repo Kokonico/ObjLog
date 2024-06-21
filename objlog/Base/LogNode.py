@@ -69,12 +69,10 @@ class LogNode:
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
-            # your IDE might say that this code is broken, but it's not.
-            # I'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
             with self.open(log_file, "w+") as f:
                 f.write("")
+                self.log_len = 0
 
-    # noinspection PyUnresolvedReferences
     def log(self, *messages: T,
             override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
@@ -96,7 +94,6 @@ class LogNode:
                 raise TypeError("message must be a LogMessage/Exception or its subclass")
 
             if isinstance(message, (BaseException, Exception)):
-                # TODO: fix weird type hinting
                 message = PythonExceptionMessage(message)
 
             if preserve_message_in_memory:

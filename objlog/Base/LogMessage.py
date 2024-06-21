@@ -1,5 +1,4 @@
 """a base message to be logged, WARNING: this class should not be used directly, use a subclass instead"""
-import sys
 from datetime import datetime
 from time import time_ns
 import random
