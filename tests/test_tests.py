@@ -299,6 +299,38 @@ class TestLogNode(unittest.TestCase):
         del log
         self.tearDown()
 
+    def test_lognode_set_max_log_size_and_max_messages(self):
+        log = LogNode(name="Test", max_log_messages=10, max_messages_in_memory=10,
+                      log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"))
+        # log 100 messages
+        messages = gen_random_messages(100)
+        for message in messages:
+            log.log(message)
+        # check that the log file has 10 messages
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+
+        # now set the max log size to 20
+        log.set_max_messages_in_log(20)
+
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+        # log 100 messages
+        messages = gen_random_messages(100)
+        for message in messages:
+            log.log(message)
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(20, len(f.readlines()))
+
+        # now truncate the log to 10 messages
+
+        log.set_max_messages_in_log(10)
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+
+        del log
+        self.tearDown()
+
     # filter tests
 
     def test_lognode_filter(self):

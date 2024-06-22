@@ -9,12 +9,14 @@ LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 import os
 from collections import deque
+import pickle
 
 
 class Loggable(Protocol):
     """
     just for type hinting
     """
+
     def __init__(self, message: str):
         pass
 
@@ -333,6 +335,16 @@ class LogNode:
         """
         self.name = new_name
 
+    def save(self, file: str) -> None:
+        """
+        Save the LogNode to a file.
+
+        :param file: The file to save the LogNode to.
+        :return: None
+        """
+        with self.open(file + ".lgnd", "wb") as f:
+            pickle.dump(self, f)
+
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
             f"LogNode {self.name} at output console" if self.print else f"LogNode {self.name} at output None"
@@ -357,3 +369,16 @@ class LogNode:
     def __iter__(self):
         # iterate over the messages
         return iter(self.messages)
+
+
+# load the LogNode from a file
+
+def load(file: str) -> LogNode:
+    """
+    Load a LogNode from a file.
+
+    :param file: The file to load the LogNode from.
+    :return: The loaded LogNode.
+    """
+    with open(file, "rb") as f:
+        return pickle.load(f)

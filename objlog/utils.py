@@ -1,6 +1,7 @@
 """miscellaneous utility functions for your convenience"""
 from . import LogNode
 import traceback
+import pickle
 
 
 def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):

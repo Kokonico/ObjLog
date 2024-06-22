@@ -7,6 +7,7 @@ from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 log = LogNode(name="Error Catching Example")
 
+
 # this log node will not print to the console
 
 # by default, the log node will not print to the console, and will not save it to a file
@@ -17,6 +18,7 @@ log = LogNode(name="Error Catching Example")
 def type_error():
     # noinspection PyTypeChecker
     return 1 + "1"
+
 
 # run the function, this will log the exception, print the error and the stacktrace, and close the program
 
