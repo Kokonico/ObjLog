@@ -154,7 +154,7 @@ log.dump_messages("example.log", elementfilter=[Warn, Error, Fatal])  # this wil
 
 # you can do the same thing with dump_messages_to_console()
 
-log.dump_messages_to_console(elementfilter=[Warn, Error, Fatal])
+log.dump_messages_to_console(Warn, Error, Fatal)
 
 # you can also filter the log in-place
 
@@ -327,7 +327,7 @@ output:
 
 ## I want more examples!
 
-check out the [example's](examples) folder within this project, plenty of examples there!
+check out the [examples](examples) folder within this project, plenty of examples there!
 
 ## I want to use this in a project!
 Feel free to! This project is licensed under the Zlib license, so you can use it in any project, commercial or not, as long as you give credit to the original author (me) and don't claim it as your own.
