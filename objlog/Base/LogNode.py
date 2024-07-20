@@ -62,6 +62,7 @@ class LogNode:
             # I'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
             with self.open(log_file, "w+") as f:
                 f.write("")
+                self.log_len = 0
 
     # noinspection PyUnresolvedReferences
     def log(self, message: LogMessage | Exception | BaseException, override_log_file: str | None = None,
