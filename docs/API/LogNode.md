@@ -169,11 +169,11 @@ Defined when creating a new LogNode.
   - **Returns**: `None`
   - **Parameters**:
     - #### `elementfilter`
-      - **Type**: `list[LogMessage/Exception/BaseException]`, `None`
+      - **Type**: `LogMessage(s)/Exception(s)/BaseException(s)`, `None`
       - **Default**: `None`
       - **Description**: A filter for which types of messages to dump to the console.
-      - **Example**: `[Error, Warn, ImportError]`
-      - **Note**: If `None`, all messages will be dumped.
+      - **Example**: `Error, Warn, ImportError`
+      - **Note**: If the only element received is `None`, all messages will be dumped.
 
 ### `wipe_messages`
   - **Description**: Wipes all messages from memory.
