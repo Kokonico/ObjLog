@@ -10,6 +10,8 @@ LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 import os
 from collections import deque
 import pickle
+import random
+import time
 
 
 class Loggable(Protocol):
@@ -52,6 +54,7 @@ class LogNode:
         self.maxinf = max_log_messages
         self.print_filter = print_filter
         self.log_closure_message = log_when_closed
+        self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         if log_file:
             # create the log file if it doesn't exist
             if not os.path.exists(log_file):
@@ -339,7 +342,7 @@ class LogNode:
         """
         Save the LogNode to a file.
 
-        :param file: The file to save the LogNode to.
+        :param file: The filename to save the LogNode to.
         :return: None
         """
         with self.open(file + ".lgnd", "wb") as f:

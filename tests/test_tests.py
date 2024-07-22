@@ -7,6 +7,7 @@ import datetime
 import os
 import subprocess
 
+import objlog
 from objlog import LogNode, LogMessage, utils
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
 
@@ -584,6 +585,13 @@ class TestLogNode(unittest.TestCase):
 
         self.log.rename("Test")  # revert to the original name (for other tests)
         self.tearDown()
+
+    def test_lgnd_save_and_load(self):
+        self.log.save(os.path.join(LOG_FOLDER, "lgndtest"))
+        log2 = objlog.load(os.path.join(LOG_FOLDER, "lgndtest.lgnd"))
+        self.assertEqual(self.log.uuid, log2.uuid)
+        self.tearDown()
+
 
 
 class TestLogMessage(unittest.TestCase):
