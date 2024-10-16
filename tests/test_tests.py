@@ -39,6 +39,10 @@ class TestLogNode(unittest.TestCase):
         cls.log2 = LogNode(name="Test2", log_file=os.path.join(LOG_FOLDER, "LogNodeTest2.log"), log_when_closed=False)
         cls.log_at_console = LogNode(name="Test", print_to_console=True)
         cls.log_at_none = LogNode(name="Test")
+        # delete all files (except for .gitkeep) in the log folder
+        for file in os.listdir(LOG_FOLDER):
+            if file != ".gitkeep":
+                os.remove(os.path.join(LOG_FOLDER, file))
 
     def tearDown(self):
         """Clear the log after each test"""
