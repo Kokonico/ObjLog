@@ -90,7 +90,7 @@ log = LogNode("my logger", print_to_console=True)
 log.log(Info("Hello, world!"))
 ```
 
-Now, when you run the script, you should see something along the lines of this (your date and time will be different):
+Now, when you run the script, you should see something like this (your date and time will be different):
 
 ```bash
 [my logger] [2024-02-24 12:55:13.609] INFO: Hello, World!

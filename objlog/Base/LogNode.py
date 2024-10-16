@@ -90,7 +90,7 @@ class LogNode:
         :param override_log_file:  overrides the log file to log to set in the LogNode.
         :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
         :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
-        :param verbose: gives you a list on some stats about the log, like how long it took to log, the object itself, etc.
+        :param verbose: Gives you a list of some stats about the log, like how long it took to log, the object itself, etc.
         :return: None
         """
 
@@ -359,7 +359,7 @@ class LogNode:
         Rename the LogNode.
 
         :param new_name: The new name of the LogNode.
-        :param update_in_logs: Whether to update the name in the log files
+        :param update_in_logs: Whether to update the name in the log files.
         :return: None
         """
         if update_in_logs and isinstance(self.log_file, str):
@@ -378,6 +378,8 @@ class LogNode:
         :return: None
         """
         with self.open(file + ".lgnd", "wb") as f:
+            # pycharm is dumb
+            # noinspection PyTypeChecker
             pickle.dump(self, f)
 
     def __repr__(self):

@@ -36,7 +36,7 @@
   - **Returns**: `string`
 
 - #### `__repr__`
-    - **Description**: Nearly indentical to `__str__` but does not include the timestamp.
+    - **Description**: Nearly identical to `__str__` but does not include the timestamp.
     - **Returns**: `string`
 
 - #### `__eq__`

@@ -1,7 +1,6 @@
 """even more exceptions to monitor"""
 
-from objlog import LogNode, LogMessage, utils
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog import LogNode, utils
 
 # create a log node
 

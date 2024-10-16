@@ -15,7 +15,7 @@ Please describe the changes here:
 
 Please verify your PR by checking the boxes below
 
-- [ ] I have commented my code and made it easy to understand.
+- [ ] I have commented on my code and made it easy to understand.
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes

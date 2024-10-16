@@ -1,7 +1,7 @@
 """squash example for objlog"""
 
-from objlog import LogNode, LogMessage
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog import LogNode
+from objlog.LogMessages import Debug, Info
 
 # create a LogNode
 node = LogNode("squash_example", "squash_example.log")

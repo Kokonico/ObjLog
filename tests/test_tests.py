@@ -2,7 +2,6 @@
 
 import unittest
 import random
-import os
 import datetime
 import os
 import subprocess

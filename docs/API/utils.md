@@ -2,7 +2,7 @@
 
 ## @monitor
 - **Type**: Decorator
-- **Description**: Monitor a function, if a python exception is raised, it will be logged and the function will return None.
+- **Description**: Monitor a function, if a python exception is raised, it will be logged, and the function will return None.
 - **Parameters**:
   - `log_node`
     - **Type**: `LogNode`

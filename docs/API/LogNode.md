@@ -222,7 +222,7 @@ Defined when creating a new LogNode.
       - **Default**: `None`
       - **Description**: Retrieve only the messages that passed in.
       - **Example**: `Error, Warn, ImportError`
-      - **Note**: If `None`, all messages will be returned. If more than one argument is passed, if a message matches at least one of the arguments, it will be returned. Also if you use get() to get a python exception, you will receive a PythonExceptionMessage object, to access the exception, use the `exception` attribute like this: `get(ImportError)[0].exception`.
+      - **Note**: If `None`, all messages will be returned. If more than one argument is passed, if a message matches at least one of the arguments, it will be returned. Also, if you use get() to get a python exception, you will receive a PythonExceptionMessage object, to access the exception, use the `exception` attribute like this: `get(ImportError)[0].exception`.
 
 ### `combine`
   - **Description**: Combines two or more log nodes into one.
@@ -239,7 +239,7 @@ Defined when creating a new LogNode.
       - **Description**: Whether to merge the log files of the log nodes.
       - **Example**: `True`
       - **Note**: If `True`, the log files will be merged into one, the other log file will stay.
-  - **Note**: The log node that is being combined into the current one will not be affected, however the current log node will get all the messages from the other log node at that time, they will not be linked afterwards.
+  - **Note**: The log node that is being combined into the current one will not be affected, however, the current log node will get all the messages from the other log node at that time, they will not be linked afterward.
 
 ### `squash`
   - **Description**: Squashes a LogNode into a single message.
@@ -271,7 +271,7 @@ Defined when creating a new LogNode.
   - **Description**: Checks if the log node has any errors.
   - **Returns**: `bool`
   - **Parameters**: `None`
-  - **Note**: This is a shorthand for `has(Error, Fatal, PythonExceptionMessage)`.
+  - **Note**: This is shorthand for `has(Error, Fatal, PythonExceptionMessage)`.
 
 
 ### `rename`

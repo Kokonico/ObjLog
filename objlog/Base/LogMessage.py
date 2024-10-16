@@ -1,8 +1,7 @@
 """a base message to be logged, WARNING: this class should not be used directly, use a subclass instead"""
-import time
-from datetime import datetime
-from time import time_ns, strftime
 import random
+import time
+from time import time_ns, strftime
 
 
 class LogMessage:
@@ -17,7 +16,7 @@ class LogMessage:
     color = None
     level = None
     exception = None  # for cleanliness (only used in PythonExceptionMessage subclass)
-    # reason for using None instead of not defining it is to avoid weird errors if the subclass doesn't define it.
+    # the reason for using None instead of not defining it is to avoid weird errors if the subclass doesn't define it.
 
     def __init__(self, message):
         if self.color is None or self.level is None:

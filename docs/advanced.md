@@ -22,7 +22,7 @@ class CustomLogMessage(LogMessage):
     color = "\033[35m"
 ```
 
-it's exactly the same as the built-in LogMessage types, but with a different level and color.
+it's exactly the same as the built-in LogMessage types but with a different level and color.
 
 ```python
 # extends the code from above.
@@ -119,7 +119,7 @@ print(log.has(Info)) # prints: True
 print(log.has(Debug)) # prints: False
 ```
 
-if you want to find if you have a specific kind of python exception, you can just pass the exception type to the `has`
+if you want to find if you have a specific kind of python exception, you can pass the exception type to the `has`
 method.
 
 ```python
@@ -233,7 +233,7 @@ exit on exception acts differently depending on where the lognode outputs to.
 
 if the lognode outputs to a file and doesn't print, it will log the exception and location to where the exception
 occurred,
-and then exit the program printing a message along the lines of
+and then exit the program printing a message like
 "An exception occurred: (exception message) please check the log file for more information."
 
 however, if the lognode outputs to the console, it will not print any extra info, and you will see the exception message printed to the console (assuming it's in the print list).

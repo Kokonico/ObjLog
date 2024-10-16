@@ -1,7 +1,7 @@
-"""example for limiting the size of the loggers message list to prevent memory leaks in ObjLog"""
+"""example for limiting the size of the logger's message list to prevent memory leaks in ObjLog"""
 
 from objlog import LogNode
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog.LogMessages import Debug, Info
 
 # create a logger
 logger = LogNode(name="example", max_messages_in_memory=5)
@@ -27,5 +27,5 @@ logger.set_max_messages_in_memory(3)  # this will drop debug message 2 and 3, bu
 # this can be used to prevent memory leaks in long-running applications, as the logger without a limit will grow
 # larger and larger.
 
-# by default, the limit is set to 1000 messages. Setting it to None will disable the limit.
-# be careful with this, as it can lead to memory leaks if the logger is used in a long-running application.
+# By default, the limit is set to 1000 messages. Setting it to None will disable the limit.
+# Be careful with this, as it can lead to memory leaks if the logger is used in a long-running application.

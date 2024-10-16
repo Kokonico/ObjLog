@@ -1,6 +1,5 @@
 """the default log messages"""
 from .Base import LogMessage, internal
-from typing import TypeVar, Type, Union
 
 
 class Debug(LogMessage):

@@ -7,7 +7,7 @@ This repo is a living repository, and the master branch is not guaranteed to be 
 It is always in the works, and new features are being added all the time!
 
 ## what is this?
-This is a logging library for python. It is designed to be simple to use, and easy to understand.
+This is a logging library for python. It is designed to be straightforward to use, and easy to understand.
 
 ## What dependencies do I need?
 None! This library is built only using built-in python libraries, so you don't need to install anything extra!
@@ -101,7 +101,7 @@ output:
 (colored green in the console!)
 
 
-### I want to log messages, but not print them to the console or a log file, than when I'm done, I want to print them all at once!
+### I want to log messages, but not print them to the console or a log file, then when I'm done, I want to print them all at once!
 
 ```python
 from objlog import LogNode, LogMessage
@@ -243,7 +243,7 @@ example2.log:
 [Switch Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 3
 ```
 
-### I have a very limited amount of RAM, and I want to limit the amount of messages that are stored in memory!
+### I have a very limited amount of RAM, and I want to limit the number of messages that are stored in memory!
 
 ```python
 from objlog import LogNode
@@ -269,7 +269,7 @@ limited.log:
 [Limited Example] [2023-12-08 08:36:33.155] DEBUG: This is a debug message 2
 ```
 
-### I have a limited amount of SSD space, and I want to limit the amount of messages that are stored in the log file!
+### I have a limited amount of SSD space, and I want to limit the number of messages that are stored in the log file!
 
 ```python
 from objlog import LogNode
@@ -347,7 +347,7 @@ I'll review it, and if it's good, I'll merge it!
 (for more information, see [CONTRIBUTING](CONTRIBUTING.md))
 
 ## I want to report a bug or request a feature!
-Feel free to! Just open an issue, and I'll look into it!
+Feel free to! Open an issue, and I'll look into it!
 
 ## I found a security vulnerability!
-Please don't open an issue for that! Instead, either make a pull request with the fix, or submit a vulnerability report! please read [SECURITY](SECURITY.md) for more information.
+Please don't open an issue for that! Instead, either make a pull request with the fix or submit a vulnerability report! Please read [SECURITY](SECURITY.md) for more information.
