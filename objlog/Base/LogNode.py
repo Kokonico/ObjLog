@@ -81,7 +81,8 @@ class LogNode:
     def log(self, *messages: T,
             override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True) -> None:
+            preserve_message_in_memory: bool = True,
+            verbose: bool = False) -> None | dict:
         """
         Logs a message to the LogNode.
 
@@ -89,20 +90,36 @@ class LogNode:
         :param override_log_file:  overrides the log file to log to set in the LogNode.
         :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
         :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
+        :param verbose: gives you a list on some stats about the log, like how long it took to log, the object itself, etc.
         :return: None
         """
 
+        verbose_out = {
+            "processtime_ns": 0,
+            "logged": []
+        }
+
+        log_start = time.time_ns()
+
         for message in messages:
             # make sure it's a LogMessage or its subclass
+            current_verbose = {
+                "message": "",
+                "id_in_node": -1000,
+            }
             if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
                                                                                                              BaseException):
                 raise TypeError("message must be a LogMessage/Exception or its subclass")
 
             if isinstance(message, (BaseException, Exception)):
                 message = PythonExceptionMessage(message)
+            current_verbose["message"] = message.message
 
             if preserve_message_in_memory:
                 self.messages.append(message)
+                current_verbose["id_in_node"] = len(self.messages)
+            else:
+                current_verbose["id_in_node"] = -1001
 
             if isinstance(self.log_file, str) or isinstance(override_log_file, str):
                 message_str = f"[{self.name}] {str(message)}"
@@ -131,6 +148,12 @@ class LogNode:
                     print(f"[{self.name}] {message.colored()}")
                 elif force_print[0] is False and self.print:
                     print(f"[{self.name}] {message.colored()}")
+            verbose_out["logged"].append(current_verbose)
+
+        log_end = time.time_ns()
+        verbose_out["processtime_ns"] = (log_end - log_start)
+
+        return verbose_out if verbose else None
 
     def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
         """
@@ -372,16 +395,3 @@ class LogNode:
     def __iter__(self):
         # iterate over the messages
         return iter(self.messages)
-
-
-# load the LogNode from a file
-
-def load(file: str) -> LogNode:
-    """
-    Load a LogNode from a file.
-
-    :param file: The file to load the LogNode from.
-    :return: The loaded LogNode.
-    """
-    with open(file, "rb") as f:
-        return pickle.load(f)

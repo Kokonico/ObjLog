@@ -259,9 +259,39 @@ it will always raise the exception after logging it.
 
 it won't do anything extra, it will just raise the exception.
 
+## Saving Lognodes for later use
+
+You may have noticed that after a LogNode is closed, the rich versions of all the messages are lost,
+the only things that remains are the strings within the log files.
+If you want preserve the lognode so that you can use the rich versions of the messages later, you can use the `save` method to save the lognode to a `.lgnd` file.
+
+```python
+log = LogNode("my logger")
+
+log.log(Info("Hello, world!"))
+
+del log  # message is lost
+
+log = LogNode("my logger")
+
+log.log(Info("Hello, world!"))
+
+log.save("my_lognode")  # messages and lognode saved to a file.
+del log # lognode no longer exists in program, but is saved in file.
+```
+
+you can then load the lognode back into the program by using the `load` method.
+
+```python
+objlog.load("my_lognode.lgnd")  # loads the lognode back into the program.
+
+log.get() # returns: [Info("Hello, world!")]
+```
+
+using this method, you can save lognodes for later use, and even share the rich log messages with others.
+
 ## Conclusion
 
 That's it for the advanced guide. You should now have a good understanding of how to use ObjLog in more advanced ways.
 
 for the complete API reference, see the [API reference](api.md).
-```

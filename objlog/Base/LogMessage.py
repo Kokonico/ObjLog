@@ -1,6 +1,7 @@
 """a base message to be logged, WARNING: this class should not be used directly, use a subclass instead"""
+import time
 from datetime import datetime
-from time import time_ns
+from time import time_ns, strftime
 import random
 
 
@@ -19,16 +20,17 @@ class LogMessage:
     # reason for using None instead of not defining it is to avoid weird errors if the subclass doesn't define it.
 
     def __init__(self, message):
+        if self.color is None or self.level is None:
+            raise TypeError("The color and level attributes must be set in the subclass.")
         self.message = str(message)
         self.unix = time_ns() // 1_000_000
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
-        if self.color is None or self.level is None:
-            raise TypeError("The color and level attributes must be set in the subclass.")
+        self.date_formatted = strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000))
+        self.date_formatted= self.date_formatted + "." + f"{self.unix % 1000:03d}"
 
     def __str__(self):
-        dt = datetime.fromtimestamp(self.unix / 1000)
-        return f"[{dt}] {self.level}: {self.message}"
+        return f"[{self.date_formatted}] {self.level}: {self.message}"
 
     def __repr__(self):
         return f"{self.level}: {self.message}"
@@ -45,11 +47,5 @@ class LogMessage:
 
         :return: The colored message.
         """
-        # convert unix to datetime
-        try:
-            dt = datetime.fromtimestamp(self.unix / 1000)
-            dt = str(dt)[:-3]
-        except Exception as e:
-            dt = f"TIME ERROR ({e.__class__.__name__})"
 
-        return f"{self.color}[{dt}] {self.level}: {self.message}\033[0m"
+        return f"{self.color}{self.__str__()}\033[0m"

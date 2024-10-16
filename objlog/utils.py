@@ -55,3 +55,18 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
         return wrapper
 
     return decorator
+
+
+def load(file: str) -> LogNode:
+    """
+    Load a LogNode from a file.
+
+    :param file: The file to load the LogNode from.
+    :return: The loaded LogNode.
+    """
+    with open(file, "rb") as f:
+        node = pickle.load(f)
+        # make sure the pickle object is a LogNode
+        if not isinstance(node, LogNode):
+            raise TypeError("The object loaded from the file is not a LogNode.")
+        return node
