@@ -342,7 +342,7 @@ class LogNode:
 
         :return: True if the log node has any errors, False otherwise
         """
-        return len(self.get(Error, Fatal, PythonExceptionMessage)) > 0
+        return self.has(Error, Fatal, PythonExceptionMessage)
 
     def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
         """
@@ -354,13 +354,20 @@ class LogNode:
         # ignore the warning, it's a false positive
         return len(self.get(args)) > 0
 
-    def rename(self, new_name: str):
+    def rename(self, new_name: str, update_in_logs: bool = False):
         """
         Rename the LogNode.
 
         :param new_name: The new name of the LogNode.
+        :param update_in_logs: Whether to update the name in the log files
         :return: None
         """
+        if update_in_logs and isinstance(self.log_file, str):
+            with self.open(self.log_file, "w+") as f:
+                # replace the name in the log file
+                lines = f.readlines()
+                for i in lines:
+                    f.write(i.replace(f"[{self.name}]", f"[{new_name}]"))
         self.name = new_name
 
     def save(self, file: str) -> None:

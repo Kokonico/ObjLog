@@ -109,10 +109,10 @@ Defined when creating a new LogNode.
     - **Example**: `True`
     - **Note**: the return structure is as follows:
     ```python
-    {'processtime_ns': 4000, 'logged': [{'message': 'benchmark test', 'id_in_node': 1, 'type': 'Info'}]}
+    {'processtime_ns': 4000, 'logged': [{'message': 'benchmark test', 'id_in_node': 1, 'type': 'INFO'}]}
     ```
     `processtime_ns` is how many nanoseconds it took to log the message, and logged is a list of the messages you logged, as well as their respective indexes
-  - `message` is the raw text that was imputted into the message
+  - `message` is the raw text inputted into the message
   - `id_in_node` is the index of the message in the log node's `messages` deque.
   - `type` is the type of the message, for example, `Info`, `Error`, `Warn`, etc.
 
@@ -283,7 +283,12 @@ Defined when creating a new LogNode.
       - **Default**: ***REQUIRED***
       - **Description**: The new name of the log node.
       - **Example**: `my new log node`
-  - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them.
+    - #### `update_in_logs`
+      - **Type**: `bool`
+      - **Default**: `False`
+      - **Description**: Whether to update the name of the lognode in the log files.
+      - **Example**: `True`
+  - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them unless `update_in_logs` is set to `True`.
   
 ### dunders
 

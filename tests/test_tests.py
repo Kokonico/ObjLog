@@ -560,8 +560,7 @@ class TestLogNode(unittest.TestCase):
         # log some messages
 
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
-        for message in messages:
-            self.log.log(message)
+        self.log.log(*messages)
 
         self.log.rename("NewName")
         self.assertEqual("NewName", self.log.name)
@@ -587,7 +586,28 @@ class TestLogNode(unittest.TestCase):
                 self.assertTrue("NewName" in line)
 
 
-        self.log.rename("Test")  # revert to the original name (for other tests)
+        self.log.rename(old_name)  # revert to the original name (for other tests)
+        self.tearDown()
+
+    def test_rename_with_log_file(self):
+        old_name = self.log.name
+        # log some messages
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        self.log.log(*messages)
+        self.log.rename("NewName", update_in_logs=True)
+        self.assertEqual("NewName", self.log.name)
+        # check all messages for old name within the log file
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            for line in lines:
+                self.assertFalse(old_name in line)
+        # check all messages for new name within the log file
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            for line in lines:
+                self.assertTrue("NewName" in line)
+        # rename back to the original name
+        self.log.rename(old_name, update_in_logs=True)
         self.tearDown()
 
     def test_lgnd_save_and_load(self):
@@ -620,6 +640,10 @@ class TestLogMessage(unittest.TestCase):
     (NOTICE, ALL OF THESE TESTS WILL BE DONE WITH CHILD CLASSES.
     THIS IS BECAUSE LogMessage IS NOT MEANT TO BE USED ALONE)
     """
+
+    def test_logmessage_hates_being_used_directly(self):
+        with self.assertRaises(TypeError):
+            LogMessage("this is a message")
 
     def test_builtins_are_logmessages(self):
         self.assertTrue(isinstance(Debug("test"), LogMessage))
