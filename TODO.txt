@@ -1,3 +1,4 @@
 3.0
 performance improvements???
 benchmark stuff
+make lognodes not crap themselves when their log file is deleted while they're running

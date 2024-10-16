@@ -9,6 +9,13 @@ It is always in the works, and new features are being added all the time!
 ## what is this?
 This is a logging library for python. It is designed to be simple to use, and easy to understand.
 
+## What dependencies do I need?
+None! This library is built only using built-in python libraries, so you don't need to install anything extra!
+
+## What about Development dependencies?
+You can run the tests just with unittest!
+Tox is used for running the tests in multiple python versions, but you don't need to install it to run the tests.
+
 ## how do I use it?
 You can use it like this:
 
