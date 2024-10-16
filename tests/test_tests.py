@@ -596,6 +596,22 @@ class TestLogNode(unittest.TestCase):
         self.assertEqual(self.log.uuid, log2.uuid)
         self.tearDown()
 
+    def test_verbose(self):
+        result = self.log.log(Info("this is an info message"), verbose=True)
+        # make sure result has all fields
+        self.assertTrue("processtime_ns" in result)
+        self.assertTrue("logged" in result)
+
+    def test_many_verbose(self):
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        result = self.log.log(*messages, verbose=True)
+        # make sure result has all messages
+        self.assertEqual(len(result["logged"]), len(messages))
+        for message in result["logged"]:
+            self.assertTrue('message' in message)
+            self.assertTrue('id_in_node' in message)
+            self.assertTrue('type' in message)
+
 
 
 class TestLogMessage(unittest.TestCase):

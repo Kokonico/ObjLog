@@ -106,6 +106,7 @@ class LogNode:
             current_verbose = {
                 "message": "",
                 "id_in_node": -1000,
+                "type": "UNDEFINED-FIXME"
             }
             if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
                                                                                                              BaseException):
@@ -114,6 +115,7 @@ class LogNode:
             if isinstance(message, (BaseException, Exception)):
                 message = PythonExceptionMessage(message)
             current_verbose["message"] = message.message
+            current_verbose["type"] = message.level
 
             if preserve_message_in_memory:
                 self.messages.append(message)
