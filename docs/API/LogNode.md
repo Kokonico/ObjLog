@@ -67,6 +67,56 @@ Defined when creating a new LogNode.
 - **Example**: `True`
 - **Note**: If `False`, the log file will be appended to, if true, the log file will be overwritten, than appended to.
 
+## Attributes
+
+### `print`
+- **Type**: `bool`
+- **Description**: Whether the LogNode prints logged messages to the console.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences.
+
+### `name`
+- **Type**: `string`
+- **Description**: The name of the LogNode.
+- **Example**: `'my log node'`
+- **Note**: Not recommended to change after initialization, consider using the `rename` method instead.
+
+### `log_file`
+- **Type**: `string`, `None`
+- **Description**: The path to the log file, if any.
+- **Example**: `'my_log_file.log'`
+- **Note**: Not recommended to change after initialization, consider using the `set_output_file` method instead.
+
+### `messages`
+- **Type**: `deque[LogMessage]`
+- **Description**: The messages in memory.
+- **Example**: `[Info("Hello, world!"), Error("I am an error!")]`
+- **Note**: Extremely not recommended to change manually, modify only using the methods provided.
+
+### `uuid`
+- **Type**: `string`
+- **Description**: The unique identifier of the LogNode.
+- **Example**: `'1729141009132775000-82'`
+- **Note**: Heavily advised not to change manually, doing so can cause serious issues.
+
+### `log_when_closed`
+- **Type**: `bool`
+- **Description**: Returns if the log node logs a message when closed or not.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences.
+
+### `max`
+- **Type**: `int`
+- **Description**: The maximum number of messages to keep in memory.
+- **Example**: `1000`
+- **Note**: Should not be changed manually, use the `set_max_messages_in_memory` method instead.
+
+### `maxinf`
+- **Type**: `int`
+- **Description**: The maximum number of messages to keep in the log file.
+- **Example**: `10000`
+- **Note**: Should not be changed manually, use the `set_max_messages_in_log` method instead.
+
 ## Methods
 
 ### `log`
@@ -203,6 +253,16 @@ Defined when creating a new LogNode.
 ### `clear_log`
   - **Description**: Clears the log file.
   - **Returns**: `None`
+
+### `set_max_messages_in_memory`:
+- **Description**: Sets the maximum number of messages to keep in memory.
+- **Returns**: `None`
+- **Parameters**:
+  - #### `max_messages`
+    - **Type**: `int`
+    - **Default**: ***REQUIRED***
+    - **Description**: The maximum number of messages to keep in memory.
+    - **Example**: `1000`
 
 ### `set_max_messages_in_log`
   - **Description**: Sets the maximum number of messages to keep in the log file.

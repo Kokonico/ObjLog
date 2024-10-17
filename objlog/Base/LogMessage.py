@@ -26,7 +26,7 @@ class LogMessage:
         # create uuid
         self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
         self.date_formatted = strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000))
-        self.date_formatted= self.date_formatted + "." + f"{self.unix % 1000:03d}"
+        self.date_formatted = self.date_formatted + "." + f"{self.unix % 1000:03d}"
 
     def __str__(self):
         return f"[{self.date_formatted}] {self.level}: {self.message}"

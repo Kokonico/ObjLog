@@ -53,7 +53,7 @@ class LogNode:
         self.max = max_messages_in_memory
         self.maxinf = max_log_messages
         self.print_filter = print_filter
-        self.log_closure_message = log_when_closed
+        self.log_when_closed = log_when_closed
         self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         if log_file:
             # create the log file if it doesn't exist
@@ -394,7 +394,7 @@ class LogNode:
 
     def __del__(self):
         # log the deletion
-        if self.log_closure_message:
+        if self.log_when_closed:
             # noinspection PyTypeChecker
             self.log(Debug("LogNode closed."))
         # python will delete self automatically (thanks python)
