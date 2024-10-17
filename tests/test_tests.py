@@ -342,7 +342,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         # filter out all messages that are not CustomMessage
-        self.log.filter([CustomMessage])
+        self.log.filter(CustomMessage)
         for message in self.log:
             self.assertTrue(isinstance(message, CustomMessage))
         self.tearDown()
@@ -352,7 +352,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         # filter out all messages that are not CustomMessage
-        self.log.filter([CustomMessage, Debug])
+        self.log.filter(CustomMessage, Debug)
         for message in self.log:
             self.assertTrue(isinstance(message, CustomMessage) or isinstance(message, Debug))
         self.tearDown()
@@ -362,7 +362,7 @@ class TestLogNode(unittest.TestCase):
         self.log.log(ZeroDivisionError("this is a ZeroDivisionError"))
         self.log.log(NotImplementedError("this is a NotImplementedError"))
 
-        self.log.filter([ImportError, ZeroDivisionError])
+        self.log.filter(ImportError, ZeroDivisionError)
 
     def test_lognode_dump(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])

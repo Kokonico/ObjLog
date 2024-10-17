@@ -148,7 +148,7 @@ log.log(Info("Hello, world!"))
 log.log(Debug("Hello, world!"))
 log.log(Warn("Hello, world!"))
 
-log.filter([Info, Debug])
+log.filter(Info, Debug)
 
 print(log.get()) # prints: [Info("Hello, world!"), Debug("Hello, world!")]
 ```
@@ -160,7 +160,7 @@ log.log(Info("Hello, world!"))
 log.log(Debug("Hello, world!"))
 log.log(Warn("Hello, world!"))
 
-log.filter([Info, Debug], filter_logfiles=True)
+log.filter(Info, Debug, filter_logfiles=True)
 
 print(log.get()) # prints: [Info("Hello, world!"), Debug("Hello, world!")]
 ```

@@ -16,7 +16,7 @@ import time
 
 class Loggable(Protocol):
     """
-    just for type hinting
+    just for type hinting, don't use this class
     """
 
     def __init__(self, message: str):
@@ -195,7 +195,7 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]],
+    def filter(self, *typefilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
                filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.

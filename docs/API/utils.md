@@ -1,6 +1,6 @@
 # Utils
 
-## @monitor
+## `@monitor`
 - **Type**: Decorator
 - **Description**: Monitor a function, if a python exception is raised, it will be logged, and the function will return None.
 - **Parameters**:
@@ -18,3 +18,13 @@
     - **Description**: If True, the program will raise a SystemExit after logging the exception. If False, the program will continue running.
     - **Note**: This parameter overrides `raise_exceptions` and will always close the program if an exception is raised without raising it.
     Also, this parameter is not recommended for internal code, and should only be used in user-facing code.
+
+## `load()`
+- **Type**: Function
+- **Description**: Load a LogNode from a file.
+- **Parameters**:
+  - `file`
+    - **Type**: `str`
+    - **Default**: ***Required***
+    - **Description**: The path to the file to load the LogNode from.
+    - **Note**: The file must be a pickle file containing a LogNode object, if it is not a log node, an error will be raised.

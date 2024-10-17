@@ -25,6 +25,7 @@ Defined when creating a new LogNode.
 - **default**: `False`
 - **Description**: Whether to print the log to the console.
 - **Example**: `True`
+- **Note**: Can be changed at any time by setting the `print` attribute of the LogNode to `True` or `False`.
 
 ### `print_filter`
 
@@ -75,11 +76,11 @@ Defined when creating a new LogNode.
 
 - **Parameters**:
 
-  - #### `message`
-    - **Type**: `LogMessage, Exception, BaseException`
+  - #### `messages`
+    - **Type**: `LogMessage(s), Exception(s), BaseException(s)`
     - **Default**: ***REQUIRED***
-    - **Description**: The message to log.
-    - **Example**: `'Info("Hello, world!")'
+    - **Description**: The message(s) to log.
+    - **Example**: `'Info("Hello, world!")'`, `'Info("I am message 1"), Error("I am message 2")'`
 
   - #### `override_log_file`
     - **Type**: `string`, `None`
@@ -148,10 +149,10 @@ Defined when creating a new LogNode.
       - **Note**: Supports relative and absolute paths.
     
     - #### `elementfilter`
-      - **Type**: `list[LogMessage/Exception/BaseException]`, `None`
+      - **Type**: `LogMessage(s)/Exception(s)/BaseException(s)`, `None`
       - **Default**: `None`
       - **Description**: A filter for which types of messages to dump to the file.
-      - **Example**: `[Error, Warn]`
+      - **Example**: `Error, Warn`
       - **Note**: If `None`, all messages will be dumped.
     
     - #### `wipe_messages_from_memory`
@@ -166,10 +167,10 @@ Defined when creating a new LogNode.
   - **Returns**: `None`
   - **Parameters**:
     - #### `typefilter`
-      - **Type**: `list[LogMessage/Exception/BaseException]`, `None`
+      - **Type**: `LogMessage(s)/Exception(s)/BaseException(s)`, `None`
       - **Default**: ***REQUIRED***
       - **Description**: A function to filter the messages within the log node, it will keep only the messages that are in the list.
-      - **Example**: `[Error, Warn, ImportError]`
+      - **Example**: `Error, Warn, ImportError`
     
     - #### `filter_logfiles`
       - **Type**: `bool`
@@ -289,6 +290,17 @@ Defined when creating a new LogNode.
       - **Description**: Whether to update the name of the lognode in the log files.
       - **Example**: `True`
   - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them unless `update_in_logs` is set to `True`.
+
+### `save`
+  - **Description**: Saves the log node to a file.
+  - **Returns**: `None`
+  - **Parameters**:
+    - #### `file`
+      - **Type**: `str`
+      - **Default**: ***REQUIRED***
+      - **Description**: The path to the file to save the log node to.
+      - **Example**: `my_log_node`
+      - **Note**: Supports relative and absolute paths, also add `.lgnd` to the end of the file name.
   
 ### dunders
 
