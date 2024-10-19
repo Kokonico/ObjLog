@@ -165,11 +165,11 @@ log.dump_messages_to_console(Warn, Error, Fatal)
 
 # you can also filter the log in-place
 
-log.filter(typefilter=[Warn, Error, Fatal])  # this will remove all messages that are not a warning, error, or fatal from the log's memory
+log.filter(Warn, Error, Fatal)  # this will remove all messages that are not a warning, error, or fatal from the log's memory
 
 # you can also use the filter method to filter the logfile
 
-log.filter(typefilter=[Warn, Error, Fatal], filter_logfiles=True)  # this will remove all messages that are not a warning, error, or fatal from the log's memory, and overwrite the logfile with the filtered messages
+log.filter(Warn, Error, Fatal, filter_logfiles=True)  # this will remove all messages that are not a warning, error, or fatal from the log's memory, and overwrite the logfile with the filtered messages
 
 # it even works with custom message types!
 
@@ -181,7 +181,7 @@ log.log(CustomMessage("this is a custom message"))
 log.log(CustomMessage("this is another custom message"))
 log.log(Info("this is an info message"))
 
-log.dump_messages_to_console(elementfilter=[CustomMessage])  # this will only print the custom messages to the console
+log.dump_messages_to_console(CustomMessage)  # this will only print the custom messages to the console
 
 # output:
 # [Filter Example] [2023-12-08 08:36:33.155] CUSTOM: This is a custom message
