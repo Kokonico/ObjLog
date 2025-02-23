@@ -99,15 +99,16 @@ class LogNode:
             "logged": []
         }
 
-        log_start = time.time_ns()
+        if verbose:
+            log_start = time.time_ns()
 
         for message in messages:
-            # make sure it's a LogMessage or its subclass
             current_verbose = {
                 "message": "",
                 "id_in_node": -1000,
                 "type": "UNDEFINED-FIXME"
             }
+            # make sure it's a LogMessage or its subclass
             if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
                                                                                                              BaseException):
                 raise TypeError("message must be a LogMessage/Exception or its subclass")
@@ -124,36 +125,35 @@ class LogNode:
                 current_verbose["id_in_node"] = -1001
 
             if isinstance(self.log_file, str) or isinstance(override_log_file, str):
-                message_str = f"[{self.name}] {str(message)}"
 
                 # log it
                 with self.open(self.log_file, "a+") as f:
-                    # move the file pointer to the beginning of the file
+                    # Move the file pointer to the beginning
                     f.seek(0)
 
-                    # check if the number of messages in the file is bigger than/equal to the max
+                    # Check if the number of messages in the file is bigger than/equal to the max
                     if self.log_len > self.maxinf:
-                        # if so, crop the file's oldest messages recursively until it's smaller than (or equal to)
-                        # the max
+                        # Crop the file's oldest messages until it's smaller than (or equal to) the max
                         lines = f.readlines()
-                        lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
-                        with self.open(self.log_file, "w") as f2:
-                            f2.writelines(lines)
+                        lines = lines[-self.maxinf + 1:]
+                        f.seek(0)
+                        f.truncate()
+                        f.writelines(lines)
                         self.log_len = len(lines)
 
-                    # write the message
-                    f.write(message_str + '\n')
+                    # Write the message
+                    f.write(f"[{self.name}] {str(message)}\n")
                     self.log_len += 1
             if (self.print or force_print[0]) and (
                     self.print_filter is None or isinstance(message, tuple(self.print_filter))):
-                if force_print[1] and force_print[0]:
-                    print(f"[{self.name}] {message.colored()}")
-                elif force_print[0] is False and self.print:
+                if force_print[1] or self.print:
                     print(f"[{self.name}] {message.colored()}")
             verbose_out["logged"].append(current_verbose)
 
-        log_end = time.time_ns()
-        verbose_out["processtime_ns"] = (log_end - log_start)
+        if verbose:
+            log_end = time.time_ns()
+            # that warning is a false positive trust
+            verbose_out["processtime_ns"] = (log_end - log_start)
 
         return verbose_out if verbose else None
 

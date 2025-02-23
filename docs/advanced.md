@@ -245,7 +245,6 @@ if the LogNode does not output to a file, it will print the whole traceback to t
 raise exceptions is useful for when you want to log an exception and then raise it.
 
 ```python
-
 @monitor(log, raise_exceptions=True)
 def my_function():
     1 / 0
@@ -259,7 +258,7 @@ it will always raise the exception after logging it.
 
 it won't do anything extra, it will just raise the exception.
 
-## Saving Lognodes for later use
+## Saving LogNodes for later use
 
 You may have noticed that after a LogNode is closed, the rich versions of all the messages are lost,
 the only things that remains are the strings within the log files.
@@ -276,7 +275,7 @@ log = LogNode("my logger")
 
 log.log(Info("Hello, world!"))
 
-log.save("my_lognode")  # messages and lognode saved to a file.
+log.save("my_lognode")  # messages and lognode saved to the file 'my_lognode.lgnd'
 del log # lognode no longer exists in program, but is saved in file.
 ```
 
