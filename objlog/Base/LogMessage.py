@@ -21,10 +21,11 @@ class LogMessage:
     def __init__(self, message):
         if self.color is None or self.level is None:
             raise TypeError("The color and level attributes must be set in the subclass.")
+        self.time_ns = time_ns()
         self.message = str(message)
-        self.unix = time_ns() // 1_000_000
+        self.unix = self.time_ns // 1_000_000
         # create uuid
-        self.uuid = f"{time_ns()}-{random.randint(0, 1000)}"
+        self.uuid = f"{self.time_ns}-{random.randint(0, 1000)}"
         self.date_formatted = strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000))
         self.date_formatted = self.date_formatted + "." + f"{self.unix % 1000:03d}"
 

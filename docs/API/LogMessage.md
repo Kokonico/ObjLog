@@ -11,6 +11,11 @@
 
 ## Attributes
 
+### `time_ns`
+- **Type**: `integer`
+- **Description**: The time the LogMessage was created in nanoseconds.
+- **Example**: `1617225013000000000`
+
 ### `unix`
 - **Type**: `integer
 - **Description**: The unix timestamp that the LogMessage was created.

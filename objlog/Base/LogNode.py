@@ -91,7 +91,7 @@ class LogNode:
         :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
         :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
         :param verbose: Gives you a list of some stats about the log, like how long it took to log, the object itself, etc.
-        :return: None
+        :return: None | dict
         """
 
         verbose_out = {

@@ -169,4 +169,3 @@ And the file `log.log` will contain:
 Now you have a basic understanding of how to use ObjLog, and you can start logging messages in your programs.
 
 For more complex uses, please refer to the [advanced guide](advanced.md).
-```

@@ -122,7 +122,7 @@ Defined when creating a new LogNode.
 ### `log`
 
 - **Description**: Logs a message to the log node.
-- **Returns**: `None`
+- **Returns**: `None`, `dict`
 
 - **Parameters**:
 
@@ -153,6 +153,7 @@ Defined when creating a new LogNode.
     - **Description**: Whether to preserve the message in memory. If `False`, the message will not be stored in memory.
     - **Example**: `False`
     - **Note**: Mostly used for internal purposes. If you are not sure, leave it as `True`.
+
     - #### `verbose`
     - **Type**: `bool`
     - **Default**: `False`
@@ -165,7 +166,7 @@ Defined when creating a new LogNode.
     `processtime_ns` is how many nanoseconds it took to log the message, and logged is a list of the messages you logged, as well as their respective indexes
   - `message` is the raw text inputted into the message
   - `id_in_node` is the index of the message in the log node's `messages` deque.
-  - `type` is the type of the message, for example, `Info`, `Error`, `Warn`, etc.
+  - `type` is the type of the message as a string, for example, `Info`, `Error`, `Warn`, etc.
 
 ### `set_output_file` 
 

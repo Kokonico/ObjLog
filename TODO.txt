@@ -1,4 +1,2 @@
 3.0
-performance improvements???
-benchmark stuff
-make lognodes not crap themselves when their log file is deleted while they're running
+Async Logging (as an option probably, not default. the tests HATE it as they share the same log file)
