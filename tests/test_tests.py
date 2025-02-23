@@ -620,6 +620,7 @@ class TestLogNode(unittest.TestCase):
         # make sure result has all fields
         self.assertTrue("processtime_ns" in result)
         self.assertTrue("logged" in result)
+        self.tearDown()
 
     def test_many_verbose(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
@@ -630,6 +631,16 @@ class TestLogNode(unittest.TestCase):
             self.assertTrue('message' in message)
             self.assertTrue('id_in_node' in message)
             self.assertTrue('type' in message)
+        self.tearDown()
+
+    def test_logfile_deletion_mid_run(self):
+        try:
+            for i in range(100):
+                self.log.log(Info("this is an info message"))
+                if i == 50:
+                    os.remove(self.log.log_file)
+        except Exception as e:
+            self.fail(f"Exception occurred: {e}")
 
 
 
