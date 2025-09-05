@@ -125,6 +125,12 @@ Defined when creating a new LogNode.
 - **Example**: `10000`
 - **Note**: Should not be changed manually, use the `set_max_messages_in_log` method instead.
 
+### `enabled`
+- **Type**: `bool`
+- **Description**: Whether the log node is enabled. If `False`, `log()` will do nothing and return `None` immediately.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences, or use the `enable()` and `disable()` methods.
+
 ## Methods
 
 ### `log`
