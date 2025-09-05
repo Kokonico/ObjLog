@@ -27,4 +27,4 @@ log.dump_messages_to_console(Warn, Fatal)
 
 # or to dump only debug messages to a file:
 
-log.dump_messages("debug.log", elementfilter=[Debug])
+log.dump_messages("debug.log", Debug)

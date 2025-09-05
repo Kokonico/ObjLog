@@ -2,13 +2,29 @@
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
 from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
+from objlog.constants import VERSION_MAJOR as lgnd_version
 
-from typing import TypeVar, Type, Union
+from typing import TypeVar, Type, Union, Protocol
 
 LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
 
 import os
 from collections import deque
+import pickle
+import random
+import time
+
+
+class Loggable(Protocol):
+    """
+    just for type hinting, don't use this class
+    """
+
+    def __init__(self, message: str):
+        pass
+
+
+T = TypeVar('T', bound=Loggable)
 
 
 class LogNode:
@@ -24,13 +40,16 @@ class LogNode:
     :param max_log_messages: The maximum number of messages to be saved in the log file, defaults to 1000.
     :param log_when_closed: Whether to log a message when the LogNode is deleted.
     :param wipe_log_file_on_init: Whether to clear the log file specified (if any) when the LogNode is created.
+    :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
     """
 
     open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
-                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False):
+                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
+        self.enabled = enabled
+        self.version = lgnd_version
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
@@ -38,10 +57,11 @@ class LogNode:
         self.max = max_messages_in_memory
         self.maxinf = max_log_messages
         self.print_filter = print_filter
-        self.log_closure_message = log_when_closed
+        self.log_when_closed = log_when_closed
+        self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         if log_file:
+            # create the log file if it doesn't exist
             if not os.path.exists(log_file):
-                # create the file if it doesn't exist
                 with self.open(log_file, "w") as f:
                     f.write("")
             with self.open(log_file) as f:
@@ -58,64 +78,91 @@ class LogNode:
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
-            # your IDE might say that this code is broken, but it's not.
-            # I'm aware that it should probably be lit on fire and thrown into a volcano, but it works for now.
             with self.open(log_file, "w+") as f:
                 f.write("")
                 self.log_len = 0
 
-    # noinspection PyUnresolvedReferences
-    def log(self, message: LogMessage | Exception | BaseException, override_log_file: str | None = None,
+    def log(self, *messages: T,
+            override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True) -> None:
+            preserve_message_in_memory: bool = True,
+            verbose: bool = False) -> None | dict:
         """
-        Logs a message to the LogNode.
+        Logs a message to the LogNode. Does nothing if the LogNode is disabled.
 
-        :param message: The message to log
+        :param messages: The message(s) to log
         :param override_log_file:  overrides the log file to log to set in the LogNode.
         :param force_print: Force the message to either print or not print, regardless of the LogNode's print setting.
         :param preserve_message_in_memory: Weather to save the message in the LogNode's memory.
-        :return: None
+        :param verbose: Gives you a list of some stats about the log, like how long it took to log, the object itself, etc.
+        :return: None | dict
         """
-        # make sure it's a LogMessage or its subclass
-        if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
-                                                                                                         BaseException):
-            raise TypeError("message must be a LogMessage/Exception or its subclass")
-        else:
-            if isinstance(message, Exception):
+
+        if not self.enabled:
+            return None
+
+        verbose_out = {
+            "processtime_ns": 0,
+            "logged": []
+        }
+
+        if verbose:
+            log_start = time.time_ns()
+
+        for message in messages:
+            current_verbose = {
+                "message": "",
+                "id_in_node": -1000,
+                "type": "UNDEFINED-FIXME"
+            }
+            # make sure it's a LogMessage or its subclass
+            if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
+                                                                                                             BaseException):
+                raise TypeError("message must be a LogMessage/Exception or its subclass")
+
+            if isinstance(message, (BaseException, Exception)):
                 message = PythonExceptionMessage(message)
-        if preserve_message_in_memory:
-            self.messages.append(message)
+            current_verbose["message"] = message.message
+            current_verbose["type"] = message.level
 
-        if isinstance(self.log_file, str) or isinstance(override_log_file, str):
-            message_str = f"[{self.name}] {str(message)}"
+            if preserve_message_in_memory:
+                self.messages.append(message)
+                current_verbose["id_in_node"] = len(self.messages)
+            else:
+                current_verbose["id_in_node"] = -1001
 
-            # log it
-            with self.open(self.log_file, "a+") as f:
-                # move the file pointer to the beginning of the file
-                f.seek(0)
+            if isinstance(self.log_file, str) or isinstance(override_log_file, str):
 
-                # check if the number of messages in the file is bigger than/equal to the max
-                if self.log_len > self.maxinf:
-                    # if so, crop the file's oldest messages recursively until it's smaller than (or equal to) the max
-                    lines = f.readlines()
-                    lines = lines[-self.maxinf + 1:]  # scuffed code, do not touch
-                    with self.open(self.log_file, "w") as f2:
-                        f2.writelines(lines)
-                    self.log_len = len(lines)
+                # log it
+                with self.open(self.log_file, "a+") as f:
+                    # Move the file pointer to the beginning
+                    f.seek(0)
 
-                # write the message
-                f.write(message_str + '\n')
-                self.log_len += 1
-        
-        # TODO: fix the force_print thing when passing in an Exception or BaseException
-        # we don't need to do this for now, but it's a good idea to do it in the future
-        if (self.print or force_print[0]) and (
-                self.print_filter is None or isinstance(message, tuple(self.print_filter))):
-            if force_print[1] and force_print[0]:
-                print(f"[{self.name}] {message.colored()}")
-            elif force_print[0] is False and self.print:
-                print(f"[{self.name}] {message.colored()}")
+                    # Check if the number of messages in the file is bigger than/equal to the max
+                    if self.log_len > self.maxinf:
+                        # Crop the file's oldest messages until it's smaller than (or equal to) the max
+                        lines = f.readlines()
+                        lines = lines[-self.maxinf + 1:]
+                        f.seek(0)
+                        f.truncate()
+                        f.writelines(lines)
+                        self.log_len = len(lines)
+
+                    # Write the message
+                    f.write(f"[{self.name}] {str(message)}\n")
+                    self.log_len += 1
+            if (self.print or force_print[0]) and (
+                    self.print_filter is None or isinstance(message, tuple(self.print_filter))):
+                if force_print[1] or self.print:
+                    print(f"[{self.name}] {message.colored()}")
+            verbose_out["logged"].append(current_verbose)
+
+        if verbose:
+            log_end = time.time_ns()
+            # that warning is a false positive trust
+            verbose_out["processtime_ns"] = (log_end - log_start)
+
+        return verbose_out if verbose else None
 
     def set_output_file(self, file: str | None, preserve_old_messages: bool = False) -> None:
         """
@@ -134,7 +181,7 @@ class LogNode:
             for i in self.messages:
                 self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
-    def dump_messages(self, file: str, elementfilter: list | None = None,
+    def dump_messages(self, file: str, *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
                       wipe_messages_from_memory: bool = False) -> None:
         """
         Dump all logged messages to a file, also filtering them if needed.
@@ -144,10 +191,10 @@ class LogNode:
         :param wipe_messages_from_memory: Whether to wipe the messages from the LogNode's memory after dumping them.
         :return: None
         """
-        if elementfilter is not None:
+        if len(elementfilter) > 0:
             with self.open(file, "a") as f:
                 for i in self.messages:
-                    if isinstance(i, tuple(elementfilter)):
+                    if isinstance(i, elementfilter):
                         f.write(str(i) + '\n')
         else:
             with self.open(file, "a") as f:
@@ -155,7 +202,8 @@ class LogNode:
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, typefilter: list[Union[Type[LogMessage], Type[Exception], Type[BaseException]]], filter_logfiles: bool = False) -> None:
+    def filter(self, *typefilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+               filter_logfiles: bool = False) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
 
@@ -187,6 +235,7 @@ class LogNode:
                 print(i.colored())
             elif tuple(elementfilter) == ():
                 print(i.colored())
+
     def wipe_messages(self, wipe_logfiles: bool = False) -> None:
         """
         Wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
@@ -300,7 +349,7 @@ class LogNode:
 
         :return: True if the log node has any errors, False otherwise
         """
-        return len(self.get(Error, Fatal, PythonExceptionMessage)) > 0
+        return self.has(Error, Fatal, PythonExceptionMessage)
 
     def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
         """
@@ -312,14 +361,61 @@ class LogNode:
         # ignore the warning, it's a false positive
         return len(self.get(args)) > 0
 
-    def rename(self, new_name: str):
+    def rename(self, new_name: str, update_in_logs: bool = False):
         """
         Rename the LogNode.
 
         :param new_name: The new name of the LogNode.
+        :param update_in_logs: Whether to update the name in the log files.
         :return: None
         """
+        if update_in_logs and isinstance(self.log_file, str):
+            with self.open(self.log_file, "w+") as f:
+                # replace the name in the log file
+                lines = f.readlines()
+                for i in lines:
+                    f.write(i.replace(f"[{self.name}]", f"[{new_name}]"))
         self.name = new_name
+
+    def save(self, file: str) -> None:
+        """
+        Save the LogNode to a file.
+
+        :param file: The filename to save the LogNode to.
+        :return: None
+        """
+        with self.open(file + ".lgnd", "wb") as f:
+            # pycharm is dumb
+            # noinspection PyTypeChecker
+            pickle.dump(self, f)
+
+    def enable(self) -> None:
+        """
+        Enable the LogNode.
+        This is analogous to setting self.enabled = True
+
+        :return: None
+        """
+        self.enabled = True
+
+    def disable(self) -> None:
+        """
+        Disable the LogNode.
+        This is analogous to setting self.enabled = False
+
+        :return: None
+        """
+        self.enabled = False
+
+    # internal methods
+    def _post_load(self):
+        """post lgnd load hook, don't use this"""
+        # currently this is the earliest version that supports lgnd files, so no need to do anything.
+        # but in the future, if the version changes, we might need to do something here.
+        # example:
+        # if not hasattr(self, "new_attribute"):
+        #     self.new_attribute = default_value
+        pass
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
@@ -333,7 +429,8 @@ class LogNode:
 
     def __del__(self):
         # log the deletion
-        if self.log_closure_message:
+        if self.log_when_closed:
+            # noinspection PyTypeChecker
             self.log(Debug("LogNode closed."))
         # python will delete self automatically (thanks python)
 

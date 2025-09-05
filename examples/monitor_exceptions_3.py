@@ -1,11 +1,11 @@
 """even more exceptions to monitor"""
 
-from objlog import LogNode, LogMessage, utils
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog import LogNode, utils
 
 # create a log node
 
 log = LogNode(name="Error Catching Example")
+
 
 # this log node will not print to the console
 
@@ -17,6 +17,7 @@ log = LogNode(name="Error Catching Example")
 def type_error():
     # noinspection PyTypeChecker
     return 1 + "1"
+
 
 # run the function, this will log the exception, print the error and the stacktrace, and close the program
 

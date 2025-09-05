@@ -90,7 +90,7 @@ log = LogNode("my logger", print_to_console=True)
 log.log(Info("Hello, world!"))
 ```
 
-Now, when you run the script, you should see something along the lines of this (your date and time will be different):
+Now, when you run the script, you should see something like this (your date and time will be different):
 
 ```bash
 [my logger] [2024-02-24 12:55:13.609] INFO: Hello, World!
@@ -169,4 +169,3 @@ And the file `log.log` will contain:
 Now you have a basic understanding of how to use ObjLog, and you can start logging messages in your programs.
 
 For more complex uses, please refer to the [advanced guide](advanced.md).
-```

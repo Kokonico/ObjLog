@@ -21,7 +21,7 @@ $ poetry install
 ## Submitting a Pull Request
 To submit a pull request, first [push](https://help.github.com/articles/pushing-to-a-remote/) your changes to your fork. Then, [submit a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
-I'll review your pull request as soon as I can, and if any changes are needed I'll let you know. If everything looks good, I'll merge your pull request and your changes will be included in the next release.
+I'll review your pull request as soon as I can, and if any changes are needed, I'll let you know. If everything looks good, I'll merge your pull request and your changes will be included in the next release.
 
 ## License
 By contributing to this project, you agree that your contributions will be licensed under the [Zlib license](LICENSE).

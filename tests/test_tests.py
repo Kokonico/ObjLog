@@ -2,17 +2,15 @@
 
 import unittest
 import random
-import os
 import datetime
 import os
 import subprocess
 
+import objlog
 from objlog import LogNode, LogMessage, utils
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal, PythonExceptionMessage
 
 LOG_FOLDER = "logs"
-
-# TODO: fix TIME ERROR on lognode closure.
 
 
 class CustomMessage(LogMessage):
@@ -36,6 +34,10 @@ class TestLogNode(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Create a LogNode instance for all tests in this class"""
+        # delete all files (except for .gitkeep) in the log folder
+        for file in os.listdir(LOG_FOLDER):
+            if file != ".gitkeep":
+                os.remove(os.path.join(LOG_FOLDER, file))
         cls.log = LogNode(name="Test", log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"), log_when_closed=False)
         cls.log2 = LogNode(name="Test2", log_file=os.path.join(LOG_FOLDER, "LogNodeTest2.log"), log_when_closed=False)
         cls.log_at_console = LogNode(name="Test", print_to_console=True)
@@ -47,6 +49,8 @@ class TestLogNode(unittest.TestCase):
         self.log2.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
         self.log_at_console.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
         self.log_at_none.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
+        self.log.enable()
+        self.log2.enable()
 
     # kinda essential tests
 
@@ -301,6 +305,38 @@ class TestLogNode(unittest.TestCase):
         del log
         self.tearDown()
 
+    def test_lognode_set_max_log_size_and_max_messages(self):
+        log = LogNode(name="Test", max_log_messages=10, max_messages_in_memory=10,
+                      log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"))
+        # log 100 messages
+        messages = gen_random_messages(100)
+        for message in messages:
+            log.log(message)
+        # check that the log file has 10 messages
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+
+        # now set the max log size to 20
+        log.set_max_messages_in_log(20)
+
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+        # log 100 messages
+        messages = gen_random_messages(100)
+        for message in messages:
+            log.log(message)
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(20, len(f.readlines()))
+
+        # now truncate the log to 10 messages
+
+        log.set_max_messages_in_log(10)
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(10, len(f.readlines()))
+
+        del log
+        self.tearDown()
+
     # filter tests
 
     def test_lognode_filter(self):
@@ -308,7 +344,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         # filter out all messages that are not CustomMessage
-        self.log.filter([CustomMessage])
+        self.log.filter(CustomMessage)
         for message in self.log:
             self.assertTrue(isinstance(message, CustomMessage))
         self.tearDown()
@@ -318,7 +354,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         # filter out all messages that are not CustomMessage
-        self.log.filter([CustomMessage, Debug])
+        self.log.filter(CustomMessage, Debug)
         for message in self.log:
             self.assertTrue(isinstance(message, CustomMessage) or isinstance(message, Debug))
         self.tearDown()
@@ -328,7 +364,7 @@ class TestLogNode(unittest.TestCase):
         self.log.log(ZeroDivisionError("this is a ZeroDivisionError"))
         self.log.log(NotImplementedError("this is a NotImplementedError"))
 
-        self.log.filter([ImportError, ZeroDivisionError])
+        self.log.filter(ImportError, ZeroDivisionError)
 
     def test_lognode_dump(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
@@ -356,7 +392,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.clear_log()
-        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", [CustomMessage])
+        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", CustomMessage)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             for line in f.readlines():
                 self.assertEqual("CUSTOM:", line.split(" ")[2])
@@ -367,7 +403,7 @@ class TestLogNode(unittest.TestCase):
         for message in messages:
             self.log.log(message)
         self.log.clear_log()
-        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", [CustomMessage, Debug])
+        self.log.dump_messages(f"{os.path.join(LOG_FOLDER, 'LogNodeTest.log')}", CustomMessage, Debug)
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             for line in f.readlines():
                 self.assertTrue(line.split(" ")[2] in ["CUSTOM:", "DEBUG:"])
@@ -525,8 +561,7 @@ class TestLogNode(unittest.TestCase):
         # log some messages
 
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
-        for message in messages:
-            self.log.log(message)
+        self.log.log(*messages)
 
         self.log.rename("NewName")
         self.assertEqual("NewName", self.log.name)
@@ -552,8 +587,72 @@ class TestLogNode(unittest.TestCase):
                 self.assertTrue("NewName" in line)
 
 
-        self.log.rename("Test")  # revert to the original name (for other tests)
+        self.log.rename(old_name)  # revert to the original name (for other tests)
         self.tearDown()
+
+    def test_rename_with_log_file(self):
+        old_name = self.log.name
+        # log some messages
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        self.log.log(*messages)
+        self.log.rename("NewName", update_in_logs=True)
+        self.assertEqual("NewName", self.log.name)
+        # check all messages for old name within the log file
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            for line in lines:
+                self.assertFalse(old_name in line)
+        # check all messages for new name within the log file
+        with open(self.log.log_file) as f:
+            lines = f.readlines()
+            for line in lines:
+                self.assertTrue("NewName" in line)
+        # rename back to the original name
+        self.log.rename(old_name, update_in_logs=True)
+        self.tearDown()
+
+    def test_lgnd_save_and_load(self):
+        self.log.save(os.path.join(LOG_FOLDER, "lgndtest"))
+        log2 = objlog.load(os.path.join(LOG_FOLDER, "lgndtest.lgnd"))
+        self.assertEqual(self.log.uuid, log2.uuid)
+        self.tearDown()
+
+    def test_verbose(self):
+        result = self.log.log(Info("this is an info message"), verbose=True)
+        # make sure result has all fields
+        self.assertTrue("processtime_ns" in result)
+        self.assertTrue("logged" in result)
+        self.tearDown()
+
+    def test_many_verbose(self):
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        result = self.log.log(*messages, verbose=True)
+        # make sure result has all messages
+        self.assertEqual(len(result["logged"]), len(messages))
+        for message in result["logged"]:
+            self.assertTrue('message' in message)
+            self.assertTrue('id_in_node' in message)
+            self.assertTrue('type' in message)
+        self.tearDown()
+
+    def test_logfile_deletion_mid_run(self):
+        try:
+            for i in range(100):
+                self.log.log(Info("this is an info message"))
+                if i == 50:
+                    os.remove(self.log.log_file)
+        except Exception as e:
+            self.fail(f"Exception occurred: {e}")
+
+    def test_log_disable_enable(self):
+        self.log.disable()
+        self.log.log(Info("this is an info message"))
+        self.assertEqual(0, len(self.log))
+        self.log.enable()
+        self.log.log(Info("this is an info message"))
+        self.assertEqual(1, len(self.log))
+        self.tearDown()
+
 
 
 class TestLogMessage(unittest.TestCase):
@@ -562,6 +661,10 @@ class TestLogMessage(unittest.TestCase):
     (NOTICE, ALL OF THESE TESTS WILL BE DONE WITH CHILD CLASSES.
     THIS IS BECAUSE LogMessage IS NOT MEANT TO BE USED ALONE)
     """
+
+    def test_logmessage_hates_being_used_directly(self):
+        with self.assertRaises(TypeError):
+            LogMessage("this is a message")
 
     def test_builtins_are_logmessages(self):
         self.assertTrue(isinstance(Debug("test"), LogMessage))
@@ -592,7 +695,7 @@ class TestLogMessage(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(str(message), str))
-            dt = datetime.datetime.fromtimestamp(message.unix / 1000)
+            dt = datetime.datetime.fromtimestamp(message.unix / 1000).__str__()[:-3]
             self.assertEqual(f"[{dt}] {message.level}: {message.message}", str(message))
 
     def test_logmessage_repr(self):

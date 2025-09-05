@@ -1,6 +1,6 @@
 """Filter messages from a log in ObjLog"""
 
-from objlog import LogNode, LogMessage
+from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 log = LogNode(name="Filter Messages Example", print_to_console=True, log_file="filter_messages.log")

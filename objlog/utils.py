@@ -1,7 +1,9 @@
 """miscellaneous utility functions for your convenience"""
-from objlog import LogNode
+from . import LogNode
 import traceback
+import pickle
 
+from .constants import VERSION_MAJOR, VERSION_STRING
 
 def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):
     """
@@ -42,7 +44,7 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
                     if log_node.print is False and log_node.log_file is not None:
                         print(f"An exception occurred: {e}, please check the log file for more information.")
                     # if log node prints to the console, no need to print the message again
-                    # if lognode does not print to the console or save to a file,  print the stack trace to the console
+                    # if lognode does not print to the console or save to a file, print the stack trace to the console
                     if log_node.print is False and log_node.log_file is None:
                         print(f"An unhandled exception occurred: {e}")
                         print(traceback.format_exc())
@@ -54,3 +56,23 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
         return wrapper
 
     return decorator
+
+
+def load(file: str) -> LogNode:
+    """
+    Load a LogNode from a file.
+
+    :param file: The file to load the LogNode from.
+    :return: The loaded LogNode.
+    """
+    with open(file, "rb") as f:
+        node = pickle.load(f)
+        if not isinstance(node, LogNode):
+            raise TypeError("The object loaded from the file is not a LogNode.")
+        if node.version != VERSION_MAJOR:
+            raise ValueError(
+                f"The LogNode version ({node.version}) is not compatible with the current major version ({VERSION_MAJOR}).")
+        # Call post-load hook to set defaults for new attributes
+        if hasattr(node, "_post_load"):
+            node._post_load()
+        return node

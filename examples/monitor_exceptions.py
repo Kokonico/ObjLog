@@ -1,7 +1,7 @@
 """log python errors with objlog without extra code"""
 
-from objlog import LogNode, LogMessage
-from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
+from objlog import LogNode
+from objlog.LogMessages import Debug, Info, Warn, Error
 from objlog.utils import monitor
 
 # create a log node

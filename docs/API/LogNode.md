@@ -25,6 +25,7 @@ Defined when creating a new LogNode.
 - **default**: `False`
 - **Description**: Whether to print the log to the console.
 - **Example**: `True`
+- **Note**: Can be changed at any time by setting the `print` attribute of the LogNode to `True` or `False`.
 
 ### `print_filter`
 
@@ -66,20 +67,84 @@ Defined when creating a new LogNode.
 - **Example**: `True`
 - **Note**: If `False`, the log file will be appended to, if true, the log file will be overwritten, than appended to.
 
+### `enabled`
+
+- **Type**: `bool`
+- **default**: `True`
+- **Description**: Whether the log node is enabled. If `False`, `log()` will do nothing and return `None` immediately.
+- **Example**: `True`
+- **Note**: Can be changed at any time by setting the `enabled` attribute of the LogNode to `True` or `False`, or by using the `enable()` and `disable()` methods.
+
+## Attributes
+
+### `print`
+- **Type**: `bool`
+- **Description**: Whether the LogNode prints logged messages to the console.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences.
+
+### `name`
+- **Type**: `string`
+- **Description**: The name of the LogNode.
+- **Example**: `'my log node'`
+- **Note**: Not recommended to change after initialization, consider using the `rename` method instead.
+
+### `log_file`
+- **Type**: `string`, `None`
+- **Description**: The path to the log file, if any.
+- **Example**: `'my_log_file.log'`
+- **Note**: Not recommended to change after initialization, consider using the `set_output_file` method instead.
+
+### `messages`
+- **Type**: `deque[LogMessage]`
+- **Description**: The messages in memory.
+- **Example**: `[Info("Hello, world!"), Error("I am an error!")]`
+- **Note**: Extremely not recommended to change manually, modify only using the methods provided.
+
+### `uuid`
+- **Type**: `string`
+- **Description**: The unique identifier of the LogNode.
+- **Example**: `'1729141009132775000-82'`
+- **Note**: Heavily advised not to change manually, doing so can cause serious issues.
+
+### `log_when_closed`
+- **Type**: `bool`
+- **Description**: Returns if the log node logs a message when closed or not.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences.
+
+### `max`
+- **Type**: `int`
+- **Description**: The maximum number of messages to keep in memory.
+- **Example**: `1000`
+- **Note**: Should not be changed manually, use the `set_max_messages_in_memory` method instead.
+
+### `maxinf`
+- **Type**: `int`
+- **Description**: The maximum number of messages to keep in the log file.
+- **Example**: `10000`
+- **Note**: Should not be changed manually, use the `set_max_messages_in_log` method instead.
+
+### `enabled`
+- **Type**: `bool`
+- **Description**: Whether the log node is enabled. If `False`, `log()` will do nothing and return `None` immediately.
+- **Example**: `True`
+- **Note**: Can be changed at any time without consequences, or use the `enable()` and `disable()` methods.
+
 ## Methods
 
 ### `log`
 
 - **Description**: Logs a message to the log node.
-- **Returns**: `None`
+- **Returns**: `None`, `dict`
 
 - **Parameters**:
 
-  - #### `message`
-    - **Type**: `LogMessage, Exception, BaseException`
+  - #### `messages`
+    - **Type**: `LogMessage(s), Exception(s), BaseException(s)`
     - **Default**: ***REQUIRED***
-    - **Description**: The message to log.
-    - **Example**: `'Info("Hello, world!")'
+    - **Description**: The message(s) to log.
+    - **Example**: `'Info("Hello, world!")'`, `'Info("I am message 1"), Error("I am message 2")'`
 
   - #### `override_log_file`
     - **Type**: `string`, `None`
@@ -103,7 +168,21 @@ Defined when creating a new LogNode.
     - **Example**: `False`
     - **Note**: Mostly used for internal purposes. If you are not sure, leave it as `True`.
 
-### `set_output_file`
+    - #### `verbose`
+    - **Type**: `bool`
+    - **Default**: `False`
+    - **Description**: Whether to return a list of extra data when the function completes
+    - **Example**: `True`
+    - **Note**: the return structure is as follows:
+    ```python
+    {'processtime_ns': 4000, 'logged': [{'message': 'benchmark test', 'id_in_node': 1, 'type': 'INFO'}]}
+    ```
+    `processtime_ns` is how many nanoseconds it took to log the message, and logged is a list of the messages you logged, as well as their respective indexes
+  - `message` is the raw text inputted into the message
+  - `id_in_node` is the index of the message in the log node's `messages` deque.
+  - `type` is the type of the message as a string, for example, `Info`, `Error`, `Warn`, etc.
+
+### `set_output_file` 
 
 - **Description**: Sets the log file for the entire log node.
 - **Returns**: `None`
@@ -135,10 +214,10 @@ Defined when creating a new LogNode.
       - **Note**: Supports relative and absolute paths.
     
     - #### `elementfilter`
-      - **Type**: `list[LogMessage/Exception/BaseException]`, `None`
+      - **Type**: `LogMessage(s)/Exception(s)/BaseException(s)`, `None`
       - **Default**: `None`
       - **Description**: A filter for which types of messages to dump to the file.
-      - **Example**: `[Error, Warn]`
+      - **Example**: `Error, Warn`
       - **Note**: If `None`, all messages will be dumped.
     
     - #### `wipe_messages_from_memory`
@@ -153,10 +232,10 @@ Defined when creating a new LogNode.
   - **Returns**: `None`
   - **Parameters**:
     - #### `typefilter`
-      - **Type**: `list[LogMessage/Exception/BaseException]`, `None`
+      - **Type**: `LogMessage(s)/Exception(s)/BaseException(s)`, `None`
       - **Default**: ***REQUIRED***
       - **Description**: A function to filter the messages within the log node, it will keep only the messages that are in the list.
-      - **Example**: `[Error, Warn, ImportError]`
+      - **Example**: `Error, Warn, ImportError`
     
     - #### `filter_logfiles`
       - **Type**: `bool`
@@ -190,6 +269,16 @@ Defined when creating a new LogNode.
   - **Description**: Clears the log file.
   - **Returns**: `None`
 
+### `set_max_messages_in_memory`:
+- **Description**: Sets the maximum number of messages to keep in memory.
+- **Returns**: `None`
+- **Parameters**:
+  - #### `max_messages`
+    - **Type**: `int`
+    - **Default**: ***REQUIRED***
+    - **Description**: The maximum number of messages to keep in memory.
+    - **Example**: `1000`
+
 ### `set_max_messages_in_log`
   - **Description**: Sets the maximum number of messages to keep in the log file.
   - **Returns**: `None`
@@ -209,7 +298,7 @@ Defined when creating a new LogNode.
       - **Default**: `None`
       - **Description**: Retrieve only the messages that passed in.
       - **Example**: `Error, Warn, ImportError`
-      - **Note**: If `None`, all messages will be returned. If more than one argument is passed, if a message matches at least one of the arguments, it will be returned. Also if you use get() to get a python exception, you will receive a PythonExceptionMessage object, to access the exception, use the `exception` attribute like this: `get(ImportError)[0].exception`.
+      - **Note**: If `None`, all messages will be returned. If more than one argument is passed, if a message matches at least one of the arguments, it will be returned. Also, if you use get() to get a python exception, you will receive a PythonExceptionMessage object, to access the exception, use the `exception` attribute like this: `get(ImportError)[0].exception`.
 
 ### `combine`
   - **Description**: Combines two or more log nodes into one.
@@ -226,7 +315,7 @@ Defined when creating a new LogNode.
       - **Description**: Whether to merge the log files of the log nodes.
       - **Example**: `True`
       - **Note**: If `True`, the log files will be merged into one, the other log file will stay.
-  - **Note**: The log node that is being combined into the current one will not be affected, however the current log node will get all the messages from the other log node at that time, they will not be linked afterwards.
+  - **Note**: The log node that is being combined into the current one will not be affected, however, the current log node will get all the messages from the other log node at that time, they will not be linked afterward.
 
 ### `squash`
   - **Description**: Squashes a LogNode into a single message.
@@ -258,7 +347,7 @@ Defined when creating a new LogNode.
   - **Description**: Checks if the log node has any errors.
   - **Returns**: `bool`
   - **Parameters**: `None`
-  - **Note**: This is a shorthand for `has(Error, Fatal, PythonExceptionMessage)`.
+  - **Note**: This is shorthand for `has(Error, Fatal, PythonExceptionMessage)`.
 
 
 ### `rename`
@@ -270,8 +359,36 @@ Defined when creating a new LogNode.
       - **Default**: ***REQUIRED***
       - **Description**: The new name of the log node.
       - **Example**: `my new log node`
-  - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them.
-  
+    - #### `update_in_logs`
+      - **Type**: `bool`
+      - **Default**: `False`
+      - **Description**: Whether to update the name of the lognode in the log files.
+      - **Example**: `True`
+  - **Note**: The name of the log node can be changed at any time, but old messages in the log file will still have the old name next to them unless `update_in_logs` is set to `True`.
+
+### `save`
+  - **Description**: Saves the log node to a file.
+  - **Returns**: `None`
+  - **Parameters**:
+    - #### `file`
+      - **Type**: `str`
+      - **Default**: ***REQUIRED***
+      - **Description**: The path to the file to save the log node to.
+      - **Example**: `my_log_node`
+      - **Note**: Supports relative and absolute paths, also add `.lgnd` to the end of the file name.
+
+### `enable`  
+  - **Description**: Enables the log node.
+  - **Returns**: `None`
+  - **Parameters**: `None`
+  - **Note**: If the log node is already enabled, this method does nothing, this is shorthand for `lognode.enabled = True`.
+
+### `disable`
+  - **Description**: Disables the log node.
+  - **Returns**: `None`
+  - **Parameters**: `None`
+  - **Note**: If the log node is already disabled, this method does nothing. This is shorthand for `lognode.enabled = False`.
+
 ### dunders
 
  - #### `__repr__`

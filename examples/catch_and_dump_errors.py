@@ -19,7 +19,7 @@ log.log(Fatal("this is a fatal message"))
 
 if log.has_errors():
     print("caught an error, dumping...")
-    log.dump_messages("errors.log", [Error, Fatal])
+    log.dump_messages("errors.log", Error, Fatal)
 
 # custom error handling
 
@@ -39,4 +39,4 @@ log.log(CustomError("this is a custom error message"))
 
 if log.has(CustomError):
     print("caught a custom error, dumping...")
-    log.dump_messages("custom_errors.log", [CustomError])
+    log.dump_messages("custom_errors.log", CustomError)

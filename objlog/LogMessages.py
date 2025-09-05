@@ -54,7 +54,7 @@ class PythonExceptionMessage(LogMessage):
     color = "\033[91m"  # red color
     message = "N/A"
 
-    def __init__(self, exception: Exception):
+    def __init__(self, exception: Exception | BaseException):
         """
         :param exception:
         """
