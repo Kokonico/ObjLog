@@ -67,6 +67,14 @@ Defined when creating a new LogNode.
 - **Example**: `True`
 - **Note**: If `False`, the log file will be appended to, if true, the log file will be overwritten, than appended to.
 
+### `enabled`
+
+- **Type**: `bool`
+- **default**: `True`
+- **Description**: Whether the log node is enabled. If `False`, `log()` will do nothing and return `None` immediately.
+- **Example**: `True`
+- **Note**: Can be changed at any time by setting the `enabled` attribute of the LogNode to `True` or `False`, or by using the `enable()` and `disable()` methods.
+
 ## Attributes
 
 ### `print`
@@ -362,7 +370,19 @@ Defined when creating a new LogNode.
       - **Description**: The path to the file to save the log node to.
       - **Example**: `my_log_node`
       - **Note**: Supports relative and absolute paths, also add `.lgnd` to the end of the file name.
-  
+
+### `enable`  
+  - **Description**: Enables the log node.
+  - **Returns**: `None`
+  - **Parameters**: `None`
+  - **Note**: If the log node is already enabled, this method does nothing, this is shorthand for `lognode.enabled = True`.
+
+### `disable`
+  - **Description**: Disables the log node.
+  - **Returns**: `None`
+  - **Parameters**: `None`
+  - **Note**: If the log node is already disabled, this method does nothing. This is shorthand for `lognode.enabled = False`.
+
 ### dunders
 
  - #### `__repr__`

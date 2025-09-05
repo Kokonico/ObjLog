@@ -49,6 +49,8 @@ class TestLogNode(unittest.TestCase):
         self.log2.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
         self.log_at_console.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
         self.log_at_none.wipe_messages(wipe_logfiles=True)  # wipe messages and logfiles
+        self.log.enable()
+        self.log2.enable()
 
     # kinda essential tests
 
@@ -641,6 +643,15 @@ class TestLogNode(unittest.TestCase):
                     os.remove(self.log.log_file)
         except Exception as e:
             self.fail(f"Exception occurred: {e}")
+
+    def test_log_disable_enable(self):
+        self.log.disable()
+        self.log.log(Info("this is an info message"))
+        self.assertEqual(0, len(self.log))
+        self.log.enable()
+        self.log.log(Info("this is an info message"))
+        self.assertEqual(1, len(self.log))
+        self.tearDown()
 
 
 

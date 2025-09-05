@@ -289,6 +289,24 @@ log.get() # returns: [Info("Hello, world!")]
 
 using this method, you can save lognodes for later use, and even share the rich log messages with others.
 
+## Disabling logging temporarily
+You can disable logging temporarily by using the `enable()` and `disable()` methods of the LogNode
+or by changing the `enabled` attribute directly.
+This will change the behavior of the `log()` method to do nothing if `enabled` is True.
+To re-enable logging, simply set `enabled` back to False.
+- you can use this to disable logging when a verbose mode in your program is not enabled.
+
+```python
+log = LogNode("my logger")
+log.disable()  # disable logging
+# or: log.enabled = False
+log.log(Info("This will not be logged")) # does nothing and returns None.
+log.log(Debug("This will also not be logged"), verbose=True) # does nothing and returns None, even though verbose is True.
+log.enable()  # enable logging
+# or: log.enabled = True
+log.log(Info("This will be logged")) # logs the message and returns None (unless in verbose mode).
+```
+
 ## Conclusion
 
 That's it for the advanced guide. You should now have a good understanding of how to use ObjLog in more advanced ways.

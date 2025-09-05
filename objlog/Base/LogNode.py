@@ -45,7 +45,8 @@ class LogNode:
 
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
-                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False):
+                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
+        self.enabled = enabled
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
@@ -84,7 +85,7 @@ class LogNode:
             preserve_message_in_memory: bool = True,
             verbose: bool = False) -> None | dict:
         """
-        Logs a message to the LogNode.
+        Logs a message to the LogNode. Does nothing if the LogNode is disabled.
 
         :param messages: The message(s) to log
         :param override_log_file:  overrides the log file to log to set in the LogNode.
@@ -93,6 +94,9 @@ class LogNode:
         :param verbose: Gives you a list of some stats about the log, like how long it took to log, the object itself, etc.
         :return: None | dict
         """
+
+        if not self.enabled:
+            return None
 
         verbose_out = {
             "processtime_ns": 0,
@@ -381,6 +385,24 @@ class LogNode:
             # pycharm is dumb
             # noinspection PyTypeChecker
             pickle.dump(self, f)
+
+    def enable(self) -> None:
+        """
+        Enable the LogNode.
+        This is analogous to setting self.enabled = True
+
+        :return: None
+        """
+        self.enabled = True
+
+    def disable(self) -> None:
+        """
+        Disable the LogNode.
+        This is analogous to setting self.enabled = False
+
+        :return: None
+        """
+        self.enabled = False
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
