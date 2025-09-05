@@ -3,6 +3,7 @@ from . import LogNode
 import traceback
 import pickle
 
+from .constants import VERSION_MAJOR, VERSION_STRING
 
 def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):
     """
@@ -66,7 +67,12 @@ def load(file: str) -> LogNode:
     """
     with open(file, "rb") as f:
         node = pickle.load(f)
-        # make sure the pickle object is a LogNode
         if not isinstance(node, LogNode):
             raise TypeError("The object loaded from the file is not a LogNode.")
+        if node.version != VERSION_MAJOR:
+            raise ValueError(
+                f"The LogNode version ({node.version}) is not compatible with the current major version ({VERSION_MAJOR}).")
+        # Call post-load hook to set defaults for new attributes
+        if hasattr(node, "_post_load"):
+            node._post_load()
         return node

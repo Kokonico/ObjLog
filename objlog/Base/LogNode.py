@@ -2,6 +2,7 @@
 from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
 # IDK why
 from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
+from objlog.constants import VERSION_MAJOR as lgnd_version
 
 from typing import TypeVar, Type, Union, Protocol
 
@@ -39,6 +40,7 @@ class LogNode:
     :param max_log_messages: The maximum number of messages to be saved in the log file, defaults to 1000.
     :param log_when_closed: Whether to log a message when the LogNode is deleted.
     :param wipe_log_file_on_init: Whether to clear the log file specified (if any) when the LogNode is created.
+    :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
     """
 
     open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
@@ -47,6 +49,7 @@ class LogNode:
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
                  log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
         self.enabled = enabled
+        self.version = lgnd_version
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
@@ -403,6 +406,16 @@ class LogNode:
         :return: None
         """
         self.enabled = False
+
+    # internal methods
+    def _post_load(self):
+        """post lgnd load hook, don't use this"""
+        # currently this is the earliest version that supports lgnd files, so no need to do anything.
+        # but in the future, if the version changes, we might need to do something here.
+        # example:
+        # if not hasattr(self, "new_attribute"):
+        #     self.new_attribute = default_value
+        pass
 
     def __repr__(self):
         return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
