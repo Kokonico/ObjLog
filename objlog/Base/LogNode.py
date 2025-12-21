@@ -1,8 +1,7 @@
 """The LogNode class, the main class of the ObjLogger"""
-from objlog.Base.LogMessage import LogMessage  # "no parent package" error happens when I don't specify the package,
-# IDK why
-from objlog.LogMessages import Debug, Error, Fatal, PythonExceptionMessage
-from objlog.constants import VERSION_MAJOR as lgnd_version
+from .LogMessage import LogMessage
+from ..LogMessages import Debug, Error, Fatal, PythonExceptionMessage
+from ..constants import VERSION_MAJOR as LGND_VERSION
 
 from typing import TypeVar, Type, Union, Protocol
 
@@ -47,7 +46,7 @@ class LogNode:
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
                  log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
         self.enabled = enabled
-        self.version = lgnd_version
+        self.version = LGND_VERSION
         self.log_file = log_file
         self.name = name
         self.print = print_to_console
