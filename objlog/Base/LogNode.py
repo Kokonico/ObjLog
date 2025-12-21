@@ -241,7 +241,7 @@ class LogNode:
         :param wipe_logfiles: Whether to wipe the log files too.
         :return: None
          """
-        self.messages = []
+        self.messages = deque(maxlen=self.log_len)
         if wipe_logfiles:
             self.clear_log()
 
