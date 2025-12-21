@@ -43,8 +43,6 @@ class LogNode:
     :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
     """
 
-    open = open  # this prevents an exception from being raised when the LogNode is deleted, not sure why
-
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
                  log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
@@ -62,15 +60,15 @@ class LogNode:
         if log_file:
             # create the log file if it doesn't exist
             if not os.path.exists(log_file):
-                with self.open(log_file, "w") as f:
+                with open(log_file, "w") as f:
                     f.write("")
-            with self.open(log_file) as f:
+            with open(log_file) as f:
                 self.log_len = len(f.readlines())
                 if self.log_len > max_log_messages:
                     # chop the file
                     lines = f.readlines()
                     lines = lines[-max_log_messages:]
-                    with self.open(log_file, "w+") as f2:
+                    with open(log_file, "w+") as f2:
                         f2.writelines(lines)
                     self.log_len = len(lines)
         else:
@@ -78,7 +76,7 @@ class LogNode:
 
         # check if log exists (in the file system), and if so, clear it
         if isinstance(log_file, str) and wipe_log_file_on_init:
-            with self.open(log_file, "w+") as f:
+            with open(log_file, "w+") as f:
                 f.write("")
                 self.log_len = 0
 
@@ -134,7 +132,7 @@ class LogNode:
             if isinstance(self.log_file, str) or isinstance(override_log_file, str):
 
                 # log it
-                with self.open(self.log_file, "a+") as f:
+                with open(self.log_file, "a+") as f:
                     # Move the file pointer to the beginning
                     f.seek(0)
 
@@ -192,12 +190,12 @@ class LogNode:
         :return: None
         """
         if len(elementfilter) > 0:
-            with self.open(file, "a") as f:
+            with open(file, "a") as f:
                 for i in self.messages:
                     if isinstance(i, elementfilter):
                         f.write(str(i) + '\n')
         else:
-            with self.open(file, "a") as f:
+            with open(file, "a") as f:
                 f.write('\n'.join(map(str, self.messages)))
         if wipe_messages_from_memory:
             self.wipe_messages()
@@ -214,7 +212,7 @@ class LogNode:
         self.messages = self.get(*typefilter)
         if filter_logfiles:
             if isinstance(self.log_file, str):
-                with self.open(self.log_file, "w") as f:
+                with open(self.log_file, "w") as f:
                     for i in self.messages:
                         f.write(str(i) + '\n')
 
@@ -256,7 +254,7 @@ class LogNode:
         :return: None
         """
         if isinstance(self.log_file, str):
-            with self.open(self.log_file, "w") as f:
+            with open(self.log_file, "w") as f:
                 f.write("")
                 self.log_len = 0
 
@@ -282,7 +280,7 @@ class LogNode:
         self.maxinf = max_file_size
         # crop the file if it's too big
         if isinstance(self.log_file, str):
-            with self.open(self.log_file, "r+") as f:
+            with open(self.log_file, "r+") as f:
                 if self.log_len >= self.maxinf:
                     lines = f.readlines()
                     lines = lines[-self.maxinf:]
@@ -325,7 +323,7 @@ class LogNode:
 
         if merge_log_files:
             self.clear_log()
-            with self.open(self.log_file, "w") as f:
+            with open(self.log_file, "w") as f:
                 for i in self.messages:
                     f.write(str(i) + '\n')
 
@@ -340,7 +338,7 @@ class LogNode:
         self.messages.append(message)
         if squash_logfile:
             self.clear_log()
-            with self.open(self.log_file, "w") as f:
+            with open(self.log_file, "w") as f:
                 f.write(str(message) + '\n')
 
     def has_errors(self) -> bool:
@@ -370,7 +368,7 @@ class LogNode:
         :return: None
         """
         if update_in_logs and isinstance(self.log_file, str):
-            with self.open(self.log_file, "w+") as f:
+            with open(self.log_file, "w+") as f:
                 # replace the name in the log file
                 lines = f.readlines()
                 for i in lines:
@@ -384,7 +382,7 @@ class LogNode:
         :param file: The filename to save the LogNode to.
         :return: None
         """
-        with self.open(file + ".lgnd", "wb") as f:
+        with open(file + ".lgnd", "wb") as f:
             # pycharm is dumb
             # noinspection PyTypeChecker
             pickle.dump(self, f)
