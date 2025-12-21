@@ -208,7 +208,7 @@ class LogNode:
         :param filter_logfiles: Whether to filter the log files too.
         :return: None
         """
-        self.messages = self.get(*typefilter)
+        self.messages = deque(self.get(*typefilter), maxlen=self.max)
         if filter_logfiles:
             if isinstance(self.log_file, str):
                 with open(self.log_file, "w") as f:
@@ -241,7 +241,7 @@ class LogNode:
         :param wipe_logfiles: Whether to wipe the log files too.
         :return: None
          """
-        self.messages = deque(maxlen=self.log_len)
+        self.messages = deque(maxlen=self.max)
         if wipe_logfiles:
             self.clear_log()
 
@@ -356,7 +356,7 @@ class LogNode:
         :return: True if the log node has any of the specified LogMessage types, False otherwise
         """
         # ignore the warning, it's a false positive
-        return len(self.get(args)) > 0
+        return len(self.get(*args)) > 0
 
     def rename(self, new_name: str, update_in_logs: bool = False):
         """
@@ -412,6 +412,10 @@ class LogNode:
         # example:
         # if not hasattr(self, "new_attribute"):
         #     self.new_attribute = default_value
+
+        # fix old .lgnd files with incorrect list as self.messages and convert them to deque
+        if not isinstance(self.messages, deque):
+            self.messages = deque(self.messages, maxlen=self.max)
         pass
 
     def __repr__(self):

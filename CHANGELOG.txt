@@ -1,3 +1,1 @@
-allow logging multiple messages in a lognode.log() call, extra parameters must be explicitly specified.
-changed any function previously using an elementfilter list argument to take all arguments as filters. again, explicit parameters will be required.
-you can now remove a lognode's logfile without the lognode exploding your code. it'll just create it again.
+fixed several small bugs
