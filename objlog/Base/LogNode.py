@@ -131,7 +131,7 @@ class LogNode:
             if isinstance(self.log_file, str) or isinstance(override_log_file, str):
 
                 # log it
-                with open(self.log_file, "a+") as f:
+                with open(self.log_file if not override_log_file else override_log_file, "a+") as f:
                     # Move the file pointer to the beginning
                     f.seek(0)
 

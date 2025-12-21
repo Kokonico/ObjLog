@@ -409,6 +409,15 @@ class TestLogNode(unittest.TestCase):
                 self.assertTrue(line.split(" ")[2] in ["CUSTOM:", "DEBUG:"])
         self.tearDown()
 
+    def test_lognode_override_output_file(self):
+        self.log.log(Info("this is an info message"), override_log_file=os.path.join(LOG_FOLDER, "LogNodeTest_override.log"))
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest_override.log")) as f:
+            self.assertEqual(1, len(f.readlines()))
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            self.assertEqual(0, len(f.readlines()))
+        self.tearDown()
+        os.remove(os.path.join(LOG_FOLDER, "LogNodeTest_override.log"))
+
     def test_lognode_set_output_file(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
