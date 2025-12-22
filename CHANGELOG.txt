@@ -1,1 +1,1 @@
-fixed several small bugs
+fixed log size bug

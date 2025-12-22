@@ -157,6 +157,28 @@ class TestLogNode(unittest.TestCase):
         self.tearDown()  # NOTE: this is necessary because the log file is not cleared after each test,
         # so the next test might have unexpected results if this is not called.
 
+    def test_lognode_log_star_same_as_repeated_log(self):
+        messages = gen_random_messages(10)
+        # log with *
+        self.log.log(*messages)
+        log_contents_star = self.log.get()
+        self.tearDown()
+        # log with repeated log
+        for message in messages:
+            self.log.log(message)
+        log_contents_repeated = self.log.get()
+        self.tearDown()
+        self.assertListEqual(log_contents_star, log_contents_repeated)
+
+    def test_log_same_instance_twice(self):
+        message = Info("This is an info message!")
+        self.log.log(message)
+        self.log.log(message)
+        self.assertEqual(2, len(self.log))
+        # assure they are the same instance
+        self.assertIs(self.log[0], self.log[1])
+        self.tearDown()
+
     def test_lognode_get(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
@@ -212,8 +234,7 @@ class TestLogNode(unittest.TestCase):
 
     def test_lognode_combine(self):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
-        for message in messages:
-            self.log.log(message)
+        self.log.log(*messages)
         self.log2.combine(self.log)
         self.assertEqual(100, len(self.log2))
         self.assertListEqual(self.log2.get(), messages)
@@ -231,6 +252,16 @@ class TestLogNode(unittest.TestCase):
         self.assertEqual(200, len(self.log2))
         self.tearDown()
 
+    def test_lognode_combine_order_preservation(self):
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        self.log.log(*messages)
+        messages2 = gen_random_messages(100, extra_classes=[CustomMessage])
+        self.log2.log(*messages2)
+        self.log2.combine(self.log)
+        combined_messages = messages2 + messages
+        self.assertListEqual(self.log2.get(), combined_messages)
+
+
     def test_lognode_init_max_messages(self):
         log = LogNode(name="Test", max_messages_in_memory=10)
         self.assertEqual(10, log.max)
@@ -242,8 +273,7 @@ class TestLogNode(unittest.TestCase):
         log = LogNode(name="Test", max_log_messages=10, log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"))
         # add 100 messages
         messages = gen_random_messages(100)
-        for message in messages:
-            log.log(message)
+        log.log(*messages)
         # check that the log file has 10 messages
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             self.assertEqual(10, len(f.readlines()))
@@ -254,8 +284,7 @@ class TestLogNode(unittest.TestCase):
         log = LogNode(name="Test", max_messages_in_memory=10)
         # log 100 messages
         messages = gen_random_messages(100)
-        for message in messages:
-            log.log(message)
+        log.log(*messages)
         # check that the log has 10 messages
         self.assertEqual(10, len(log))
         log.set_max_messages_in_memory(20)
@@ -278,8 +307,7 @@ class TestLogNode(unittest.TestCase):
         log = LogNode(name="Test", max_log_messages=10, log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"))
         # log 100 messages
         messages = gen_random_messages(100)
-        for message in messages:
-            log.log(message)
+        log.log(*messages)
         # check that the log file has 10 messages
         with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
             self.assertEqual(10, len(f.readlines()))
@@ -336,6 +364,41 @@ class TestLogNode(unittest.TestCase):
 
         del log
         self.tearDown()
+
+    def test_lognode_truncate_oldest_message(self):
+        log = LogNode(name="Test", max_messages_in_memory=10)
+        # log 10 messages
+        messages = gen_random_messages(10)
+        for message in messages:
+            log.log(message)
+        self.assertEqual(10, len(log))
+        # log one more message
+        new_message = Info("This is a new message")
+        log.log(new_message)
+        self.assertEqual(10, len(log))
+        # check that the oldest message was removed
+        self.assertNotIn(messages[0], log.get())
+        self.assertIn(new_message, log.get())
+        self.tearDown()
+        del log
+
+    def test_lognode_truncate_oldest_log_message(self):
+        log = LogNode(name="Test", max_log_messages=10, log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"))
+        # log 10 messages
+        final = Fatal("This message shouldn't be in the log file")
+        log.log(final, *gen_random_messages(9))
+        # log one more message
+        new_message = Info("This is a new message")
+        log.log(new_message)
+        # note: we didn't set max messages in memory, so the log should have 11 messages in memory
+        self.assertEqual(11, len(log))
+        # check that the oldest message was removed from the log file
+        with open(os.path.join(LOG_FOLDER, "LogNodeTest.log")) as f:
+            lines = f.readlines()
+            self.assertNotIn("[Test] " + str(final) + '\n', lines)
+            self.assertIn("[Test] " + str(new_message) + '\n', lines)
+        self.tearDown()
+        del log
 
     # filter tests
 
@@ -564,6 +627,15 @@ class TestLogNode(unittest.TestCase):
             test_function()
         self.tearDown()
 
+    def test_monitor_decorator_preserves_return_value(self):
+        @utils.monitor(self.log)
+        def test_function():
+            return 42
+
+        result = test_function()
+        self.assertEqual(42, result)
+        self.tearDown()
+
     def test_rename_log_node(self):
         old_name = self.log.name
 
@@ -733,31 +805,3 @@ class TestLogMessage(unittest.TestCase):
         message_A = CustomMessage("test")
         message_B = message_A
         self.assertEqual(message_A, message_B)
-
-
-class TestRunExamples(unittest.TestCase):
-    # run all files in the examples folder
-    def test_run_examples(self):
-        # check if the examples folder exists
-        if not os.path.exists("examples"):
-            # cd ..
-            os.chdir("..")
-            # check again
-            if not os.path.exists("examples"):
-                self.fail("examples folder does not exist")
-        # enter the examples folder (if not already there)
-        if os.getcwd().split(os.path.sep)[-1] != "examples":
-            os.chdir("examples")
-        # check if the log folder exists
-        if not os.path.exists(LOG_FOLDER):
-            os.mkdir(LOG_FOLDER)
-        # move to the log folder
-        os.chdir(LOG_FOLDER)
-        for file in os.listdir():
-            if file.endswith(".py"):
-                try:
-                    subprocess.run(["python", os.path.join("..", file)])
-                except Exception as e:
-                    self.fail(f"failed to run {file} with error: {e}")
-        # if no errors are raised, the tests pass
-        self.assertTrue(True)

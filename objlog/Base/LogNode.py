@@ -58,11 +58,13 @@ class LogNode:
         self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         if log_file:
             # create the log file if it doesn't exist
-            if not os.path.exists(log_file):
+            if not os.path.exists(log_file) or wipe_log_file_on_init:
                 with open(log_file, "w") as f:
                     f.write("")
-            with open(log_file) as f:
-                self.log_len = len(f.readlines())
+                    self.log_len = 0
+            else:
+                with open(log_file, 'r') as f:
+                    self.log_len = len(f.readlines())
                 if self.log_len > max_log_messages:
                     # chop the file
                     lines = f.readlines()
@@ -128,26 +130,41 @@ class LogNode:
             else:
                 current_verbose["id_in_node"] = -1001
 
-            if isinstance(self.log_file, str) or isinstance(override_log_file, str):
+            target = self.log_file if not override_log_file else override_log_file
+
+            if isinstance(target, str):
+
+                # ensure the directory exists
+                os.makedirs(os.path.dirname(target), exist_ok=True)
+
+                # ensure the file exists
+                if not os.path.exists(target):
+                    with open(target, "w") as f:
+                        f.write("")
+                        self.log_len = 0
 
                 # log it
-                with open(self.log_file if not override_log_file else override_log_file, "a+") as f:
-                    # Move the file pointer to the beginning
-                    f.seek(0)
 
-                    # Check if the number of messages in the file is bigger than/equal to the max
-                    if self.log_len > self.maxinf:
-                        # Crop the file's oldest messages until it's smaller than (or equal to) the max
-                        lines = f.readlines()
-                        lines = lines[-self.maxinf + 1:]
-                        f.seek(0)
-                        f.truncate()
-                        f.writelines(lines)
-                        self.log_len = len(lines)
+                if self.maxinf <= 0:
+                    with open(target, "a") as f:
+                        # Write the message
+                        f.write(f"[{self.name}] {str(message)}\n")
+                        self.log_len += 1
+                else:
+                    # crop the file if it's too big
+                    with open(target, "r+") as f:
+                        if self.log_len >= self.maxinf:
+                            lines = f.readlines()
+                            lines = lines[-(self.maxinf - 1):]
+                            f.seek(0)
+                            f.truncate()
+                            f.writelines(lines)
+                            self.log_len = len(lines)
+                    with open(target, "a") as f:
+                        # Write the message
+                        f.write(f"[{self.name}] {str(message)}\n")
+                        self.log_len += 1
 
-                    # Write the message
-                    f.write(f"[{self.name}] {str(message)}\n")
-                    self.log_len += 1
             if (self.print or force_print[0]) and (
                     self.print_filter is None or isinstance(message, tuple(self.print_filter))):
                 if force_print[1] or self.print:
@@ -175,8 +192,7 @@ class LogNode:
 
         self.log_file = file
         if preserve_old_messages and isinstance(file, str):
-            for i in self.messages:
-                self.log(i, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
+            self.log(*self.messages, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False))
 
     def dump_messages(self, file: str, *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
                       wipe_messages_from_memory: bool = False) -> None:
