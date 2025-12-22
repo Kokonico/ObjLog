@@ -135,7 +135,8 @@ class LogNode:
             if isinstance(target, str):
 
                 # ensure the directory exists
-                os.makedirs(os.path.dirname(target), exist_ok=True)
+                if not os.path.dirname(target) == "":
+                    os.makedirs(os.path.dirname(target), exist_ok=True)
 
                 # ensure the file exists
                 if not os.path.exists(target):
