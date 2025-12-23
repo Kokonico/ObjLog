@@ -72,7 +72,4 @@ def load(file: str) -> LogNode:
         if node.version != VERSION_MAJOR:
             raise ValueError(
                 f"The LogNode version ({node.version}) is not compatible with the current major version ({VERSION_MAJOR}).")
-        # Call post-load hook to set defaults for new attributes
-        if hasattr(node, "_post_load"):
-            node._post_load()
         return node
