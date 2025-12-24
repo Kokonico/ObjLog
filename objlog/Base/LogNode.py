@@ -124,9 +124,6 @@ class LogNode:
         :return: None | dict
         """
 
-        if not self.enabled:
-            return None
-
         if self.asynchronous and not _bypass_async and not verbose:
             # add the log command to the queue
             # _bypass_async is set within the worker thread to avoid infinite loop
@@ -136,6 +133,9 @@ class LogNode:
                 "preserve_message_in_memory": preserve_message_in_memory,
                 "verbose": verbose,
             }))
+            return None
+
+        if not self.enabled:
             return None
 
         verbose_out = {
@@ -177,6 +177,7 @@ class LogNode:
         if verbose:
             log_end = time.time_ns()
             # that warning is a false positive trust
+            # noinspection PyUnboundLocalVariable
             verbose_out["processtime_ns"] = (log_end - log_start)
 
         target = self.log_file if not override_log_file else override_log_file
@@ -571,9 +572,13 @@ class LogNode:
         This is analogous to setting self.enabled = True
 
         :param _bypass_async: Internal use only, bypasses async logging system if enabled.
-
         :return: None
         """
+
+        if self.asynchronous and not _bypass_async:
+            # add to the command queue
+            self.command_queue.put((self.enable, (), {}))
+            return
 
         self.enabled = True
 
@@ -623,10 +628,7 @@ class LogNode:
                     print(f"[{self.name}] Worker thread encountered an exception: {e}", file=sys.stderr)
                     traceback.print_exc()
             finally:
-                try:
-                    self.command_queue.task_done()
-                except Exception:
-                    pass
+                self.command_queue.task_done()
 
     # pickle support
     def __getstate__(self):

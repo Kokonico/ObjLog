@@ -724,9 +724,11 @@ class TestLogNode(unittest.TestCase):
     def test_log_disable_enable(self):
         self.log.disable()
         self.log.log(Info("this is an info message"))
+        self.log.await_finish()
         self.assertEqual(0, len(self.log))
         self.log.enable()
         self.log.log(Info("this is an info message"))
+        self.log.await_finish()
         self.assertEqual(1, len(self.log))
         self.tearDown()
 
