@@ -749,7 +749,7 @@ class TestLogMessage(unittest.TestCase):
         messages = gen_random_messages(100, extra_classes=[CustomMessage])
         for message in messages:
             self.assertTrue(isinstance(str(message), str))
-            dt = datetime.datetime.fromtimestamp(message.unix / 1000).__str__()[:-3]
+            dt = datetime.datetime.fromtimestamp(message.unix / 1000)
             # shave ms to 3 decimal places
             dt = dt.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             self.assertEqual(f"[{dt}] {message.level}: {message.message}", str(message))
