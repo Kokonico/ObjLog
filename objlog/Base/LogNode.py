@@ -146,36 +146,52 @@ class LogNode:
         if verbose:
             log_start = time.time_ns()
 
-        for message in messages:
-            current_verbose = {
-                "message": "",
-                "id_in_node": -1000,
-                "type": "UNDEFINED-FIXME"
-            }
-            # make sure it's a LogMessage or its subclass
-            if not isinstance(message, LogMessage) and not isinstance(message, Exception) and not isinstance(message,
+        # convert all exceptions to PythonExceptionMessage
+        for i in range(len(messages)):
+            if not isinstance(messages[i], LogMessage) and not isinstance(messages[i], Exception) and not isinstance(messages[i],
                                                                                                              BaseException):
                 raise TypeError("message must be a LogMessage/Exception or its subclass")
 
-            if isinstance(message, (BaseException, Exception)):
-                message = PythonExceptionMessage(message)
-            current_verbose["message"] = message.message
-            current_verbose["type"] = message.level
+            if isinstance(messages[i], (BaseException, Exception)):
+                messages = list(messages)
+                messages[i] = PythonExceptionMessage(messages[i])
+
+        for i, message in enumerate(messages):
+            current_verbose = {"message": message.message, "id_in_node": -1000, "type": message.level}
 
             if preserve_message_in_memory:
-                self.messages.append(message)
-                current_verbose["id_in_node"] = len(self.messages)
+                current_verbose["id_in_node"] = len(self.messages) + i + 1
             else:
                 current_verbose["id_in_node"] = -1001
 
-            target = self.log_file if not override_log_file else override_log_file
+            if (self.print or force_print[0]) and (
+                    self.print_filter is None or isinstance(message, tuple(self.print_filter))):
+                if force_print[1] or self.print:
+                    # print(f"[{self.name}] {message.colored()}")
+                    sys.stdout.write(f"[{self.name}] {message.colored()}\n")
+            verbose_out["logged"].append(current_verbose)
 
-            if isinstance(target, str):
+        if preserve_message_in_memory:
+            self.messages.extend(messages)
 
-                # ensure the directory exists
-                if not os.path.dirname(target) == "":
-                    os.makedirs(os.path.dirname(target), exist_ok=True)
+        if verbose:
+            log_end = time.time_ns()
+            # that warning is a false positive trust
+            verbose_out["processtime_ns"] = (log_end - log_start)
 
+        target = self.log_file if not override_log_file else override_log_file
+
+        if isinstance(target, str):
+
+            # ensure the directory exists
+            if not os.path.dirname(target) == "":
+                os.makedirs(os.path.dirname(target), exist_ok=True)
+
+            # ensure the file exists
+            if not os.path.exists(target):
+                with open(target, "w") as f:
+                    f.write("")
+                    self.log_len = 0
                 # ensure the file exists
                 if not os.path.exists(target):
                     with self.open(target, "w") as f:
@@ -214,6 +230,23 @@ class LogNode:
             log_end = time.time_ns()
             # that warning is a false positive trust
             verbose_out["processtime_ns"] = (log_end - log_start)
+            # log it
+            with open(target, "a") as f:
+                for message in messages:
+                    if isinstance(message, (BaseException, Exception)):
+                        message = PythonExceptionMessage(message)
+                    f.write(f"[{self.name}] {str(message)}\n")
+                    self.log_len += 1
+
+            # check if we need to crop the file
+            if self.log_len > self.maxinf:
+                with open(target, "r+") as f:
+                    lines = f.readlines()
+                    lines = lines[-self.maxinf:]
+                    f.seek(0)
+                    f.truncate()
+                    f.writelines(lines)
+                    self.log_len = len(lines)
 
         return verbose_out if verbose else None
 
