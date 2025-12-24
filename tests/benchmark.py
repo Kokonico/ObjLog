@@ -3,7 +3,7 @@ import os
 
 import objlog
 
-log = objlog.LogNode("benchmark", asynchronous=False)
+log = objlog.LogNode("benchmark", asynchronous=True)
 
 
 v = log.log(objlog.LogMessages.Info("benchmark test"), verbose=True)
@@ -28,8 +28,8 @@ v = log.log(objlog.LogMessages.Info("benchmark test"), verbose=True)
 print(v)
 
 os.remove("benchmark.log") if os.path.exists("benchmark.log") else None
-# log.set_output_file(None)
-log.print = True
+log.set_output_file(None)
+# log.print = True
 
 # test messages in 1 second
 import time

@@ -45,7 +45,12 @@ class LogNode:
     :param log_when_closed: Whether to log a message when the LogNode is deleted.
     :param wipe_log_file_on_init: Whether to clear the log file specified (if any) when the LogNode is created.
     :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
-    :param asynchronous: Whether to have the LogNode run asynchronously, offloading a majority of its work to a separate thread. Usually faster for logging large amounts of messages unless you're not printing or logging to a file.
+    :param asynchronous: Whether to have the LogNode run asynchronously, offloading a majority of its work to a separate thread.
+    Usually faster for logging large amounts of messages.
+    However, it can be slower if you aren't logging many messages or only saving them, not printing or logging to a file.
+    only minor changes are needed to replace a synchronous LogNode with an asynchronous one.
+    Make sure to use `await_finish()` when you need to ensure all messages have been processed.
+    Any function that reads from the LogNode (like `get()`) will automatically wait for the LogNode to finish processing.
     """
 
     open = open  # I removed this once before, and it broke log on quit, so putting it back
