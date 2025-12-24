@@ -45,7 +45,7 @@ class LogNode:
     :param log_when_closed: Whether to log a message when the LogNode is deleted.
     :param wipe_log_file_on_init: Whether to clear the log file specified (if any) when the LogNode is created.
     :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
-    :param asynchronous: Whether to have the LogNode run asynchronously, offloading a majority of its work to a separate thread.
+    :param asynchronous: Whether to have the LogNode run asynchronously, offloading a majority of its work to a separate thread. Usually faster for logging large amounts of messages unless you're not printing or logging to a file.
     """
 
     open = open  # I removed this once before, and it broke log on quit, so putting it back
@@ -88,14 +88,12 @@ class LogNode:
                     self.log_len = 0
             else:
                 with open(log_file, 'r') as f:
-                    self.log_len = len(f.readlines())
+                    lines = f.readlines()
+                self.log_len = len(lines)
                 if self.log_len > max_log_messages:
-                    # chop the file
-                    with open(log_file, 'r') as f:
-                        lines = f.readlines()
                     lines = lines[-max_log_messages:]
-                    with open(log_file, "w+") as f2:
-                        f2.writelines(lines)
+                    with open(log_file, "w+") as f:
+                        f.writelines(lines)
                     self.log_len = len(lines)
         else:
             self.log_len = 0
@@ -138,10 +136,11 @@ class LogNode:
         if not self.enabled:
             return None
 
-        verbose_out = {
-            "processtime_ns": 0,
-            "logged": []
-        }
+        if verbose:
+            verbose_out = {
+                "processtime_ns": 0,
+                "logged": []
+            }
 
         if verbose:
             log_start = time.time_ns()
@@ -157,19 +156,21 @@ class LogNode:
                 messages[i] = PythonExceptionMessage(messages[i])
 
         for i, message in enumerate(messages):
-            current_verbose = {"message": message.message, "id_in_node": -1000, "type": message.level}
+            if verbose:
+                current_verbose = {"message": message.message, "id_in_node": -1000, "type": message.level}
 
-            if preserve_message_in_memory:
-                current_verbose["id_in_node"] = len(self.messages) + i + 1
-            else:
-                current_verbose["id_in_node"] = -1001
+                if preserve_message_in_memory:
+                    current_verbose["id_in_node"] = len(self.messages) + i + 1
+                else:
+                    current_verbose["id_in_node"] = -1001
 
             if (self.print or force_print[0]) and (
                     self.print_filter is None or isinstance(message, tuple(self.print_filter))):
                 if force_print[1] or self.print:
                     # print(f"[{self.name}] {message.colored()}")
                     sys.stdout.write(f"[{self.name}] {message.colored()}\n")
-            verbose_out["logged"].append(current_verbose)
+            if verbose:
+                verbose_out["logged"].append(current_verbose)
 
         if preserve_message_in_memory:
             self.messages.extend(messages)
@@ -190,58 +191,19 @@ class LogNode:
 
             # ensure the file exists
             if not os.path.exists(target):
-                with open(target, "w") as f:
-                    f.write("")
-                    self.log_len = 0
-                # ensure the file exists
-                if not os.path.exists(target):
-                    with self.open(target, "w") as f:
-                        f.write("")
-                        self.log_len = 0
+                with self.open(target, "w") as f:
+                    f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
+                    self.log_len = len(messages)
 
+            else:
                 # log it
-
-                if self.maxinf <= 0:
-                    with self.open(target, "a") as f:
-                        # Write the message
-                        f.write(f"[{self.name}] {str(message)}\n")
-                        self.log_len += 1
-                else:
-                    # crop the file if it's too big
-                    with self.open(target, "r+") as f:
-                        if self.log_len >= self.maxinf:
-                            lines = f.readlines()
-                            lines = lines[-(self.maxinf - 1):]
-                            f.seek(0)
-                            f.truncate()
-                            f.writelines(lines)
-                            self.log_len = len(lines)
-                    with self.open(target, "a") as f:
-                        # Write the message
-                        f.write(f"[{self.name}] {str(message)}\n")
-                        self.log_len += 1
-
-            if (self.print or force_print[0]) and (
-                    self.print_filter is None or isinstance(message, tuple(self.print_filter))):
-                if force_print[1] or self.print:
-                    print(f"[{self.name}] {message.colored()}")
-            verbose_out["logged"].append(current_verbose)
-
-        if verbose:
-            log_end = time.time_ns()
-            # that warning is a false positive trust
-            verbose_out["processtime_ns"] = (log_end - log_start)
-            # log it
-            with open(target, "a") as f:
-                for message in messages:
-                    if isinstance(message, (BaseException, Exception)):
-                        message = PythonExceptionMessage(message)
-                    f.write(f"[{self.name}] {str(message)}\n")
-                    self.log_len += 1
+                with self.open(target, "a") as f:
+                    f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
+                    self.log_len += len(messages)
 
             # check if we need to crop the file
             if self.log_len > self.maxinf:
-                with open(target, "r+") as f:
+                with self.open(target, "r+") as f:
                     lines = f.readlines()
                     lines = lines[-self.maxinf:]
                     f.seek(0)

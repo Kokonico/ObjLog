@@ -22,12 +22,12 @@ class LogMessage:
         if self.color is None or self.level is None:
             raise TypeError("The color and level attributes must be set in the subclass.")
         self.time_ns = time_ns()
-        self.message = str(message)
+        self.message = str(message) if not isinstance(message, str) else message # only convert to str if not already a str (performance)
         self.unix = self.time_ns // 1_000_000
         # create uuid
-        self.uuid = f"{self.time_ns}-{random.randint(0, 1000)}"
-        self.date_formatted = strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000))
-        self.date_formatted = self.date_formatted + "." + f"{self.unix % 1000:03d}"
+        self.uuid = '-'.join([str(self.time_ns), str(random.randint(0, 1000))]) # f"{self.time_ns}-{random.randint(0, 1000)}"
+        # note: using ''.join is faster than f-strings or concatenation in a loop
+        self.date_formatted =  ''.join([strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000)), ".", f"{self.unix % 1000:03d}"])
 
     def __str__(self):
         return f"[{self.date_formatted}] {self.level}: {self.message}"
