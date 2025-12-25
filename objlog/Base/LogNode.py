@@ -42,6 +42,8 @@ class LogNode:
     :param enabled: Whether the LogNode is enabled, if False, the LogNode will not log any messages.
     """
 
+    open = open  # I removed this once before, and it broke log on quit, so putting it back
+
     def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
                  print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
                  log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True):
@@ -140,20 +142,20 @@ class LogNode:
 
                 # ensure the file exists
                 if not os.path.exists(target):
-                    with open(target, "w") as f:
+                    with self.open(target, "w") as f:
                         f.write("")
                         self.log_len = 0
 
                 # log it
 
                 if self.maxinf <= 0:
-                    with open(target, "a") as f:
+                    with self.open(target, "a") as f:
                         # Write the message
                         f.write(f"[{self.name}] {str(message)}\n")
                         self.log_len += 1
                 else:
                     # crop the file if it's too big
-                    with open(target, "r+") as f:
+                    with self.open(target, "r+") as f:
                         if self.log_len >= self.maxinf:
                             lines = f.readlines()
                             lines = lines[-(self.maxinf - 1):]
@@ -161,7 +163,7 @@ class LogNode:
                             f.truncate()
                             f.writelines(lines)
                             self.log_len = len(lines)
-                    with open(target, "a") as f:
+                    with self.open(target, "a") as f:
                         # Write the message
                         f.write(f"[{self.name}] {str(message)}\n")
                         self.log_len += 1
