@@ -1,6 +1,6 @@
 [project]
 name = "ObjLog"
-version = "3.0.4"
+version = "3.0.5"
 description = "Logging, Objectified."
 authors = [
     { name = "Kokonico", email = "kokonico@duck.com" }
