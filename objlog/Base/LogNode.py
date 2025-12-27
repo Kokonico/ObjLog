@@ -70,14 +70,9 @@ class LogNode:
         self.log_when_closed = log_when_closed
         self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         self.asynchronous = asynchronous
+        self.log_len = 0
 
-        # structure design:
-        # the command queue
-        # when any function is called that modifies the lognode state or logs a message,
-        # a command is added to the queue
-        # the worker thread processes the commands in the queue
-        # exception: anything that must return a value from the lognode (like get()) is processed synchronously
-        # it will wait for the queue to be empty before executing the command, and then return the result
+        self._lock = threading.Lock()
 
         if self.asynchronous:
             self.command_queue = Queue()
@@ -90,24 +85,21 @@ class LogNode:
             if not os.path.exists(log_file) or wipe_log_file_on_init:
                 with open(log_file, "w") as f:
                     f.write("")
-                    self.log_len = 0
+                self.log_len = 0
             else:
                 with open(log_file, 'r') as f:
                     lines = f.readlines()
-                self.log_len = len(lines)
                 if self.log_len > max_log_messages:
                     lines = lines[-max_log_messages:]
                     with open(log_file, "w+") as f:
-                        f.writelines(lines)
-                    self.log_len = len(lines)
+                        if wipe_log_file_on_init:
+                            f.write("")
+                            self.log_len = 0
+                        else:
+                            f.writelines(lines)
+                self.log_len = len(lines)
         else:
             self.log_len = 0
-
-        # check if log exists (in the file system), and if so, clear it
-        if isinstance(log_file, str) and wipe_log_file_on_init:
-            with open(log_file, "w+") as f:
-                f.write("")
-                self.log_len = 0
 
     def log(self, *messages: T,
             override_log_file: str | None = None,
@@ -198,13 +190,14 @@ class LogNode:
             if not os.path.exists(target):
                 with self.open(target, "w") as f:
                     f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
-                    self.log_len = len(messages)
+                    self.log_len = 0
 
             else:
                 # log it
                 with self.open(target, "a") as f:
                     f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
-                    self.log_len += len(messages)
+
+            self.log_len += len(messages)
 
             # check if we need to crop the file
             if self.log_len > self.maxinf:
@@ -407,8 +400,13 @@ class LogNode:
 
         if not _bypass_await_finish:
             self.await_finish()
+            self._lock.acquire()
+
+        # looks stupid not using `with`, but it's needed for the bypass flag to work properly
 
         if len(element_filter) == 0:
+            if not _bypass_await_finish:
+                self._lock.release()
             return list(self.messages)
         else:
             # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
@@ -419,6 +417,8 @@ class LogNode:
                         filtered_messages.append(msg)
                 elif isinstance(msg, element_filter):
                     filtered_messages.append(msg)
+            if not _bypass_await_finish:
+                self._lock.release()
             return filtered_messages
 
     def combine(self, other: 'LogNode', merge_log_files: bool = True, _bypass_async: bool = False) -> None:
@@ -439,15 +439,16 @@ class LogNode:
             return
 
         # ensure the other lognode has finished processing if it's asynchronous
+        # note: no need to check if self is asynchronous, as we run within the worker thread if it is, nullifying the need to wait
         other.await_finish()
 
-        self.messages.extend(other.messages)
-
-        if merge_log_files:
-            self.clear_log(_bypass_async=True)
-            with open(self.log_file, "w") as f:
-                for i in self.messages:
-                    f.write(str(i) + '\n')
+        with other._lock:
+            self.messages.extend(other.messages)
+            if merge_log_files:
+                self.clear_log(_bypass_async=True)
+                with open(self.log_file, "w") as f:
+                    for i in self.messages:
+                        f.write(str(i) + '\n')
 
     def squash(self, message: LogMessage, squash_logfile: bool = True, _bypass_async: bool = False) -> None:
         """
@@ -577,10 +578,13 @@ class LogNode:
             self.command_queue.join()
 
     # internal methods
-
     def _worker(self):
         """the worker thread for asynchronous logging, don't touch this!"""
         while True:
+            # don't process stuff if locked!
+            if self._lock.locked():
+                time.sleep(0.001)
+                continue
             command = self.command_queue.get()
             try:
                 if command is None:
@@ -605,6 +609,8 @@ class LogNode:
             del state['worker_thread']
         if 'command_queue' in state:
             del state['command_queue']
+        if '_lock' in state:
+            del state['_lock']
         # convert list to deque for messages if not already
         if not isinstance(state['messages'], deque):
             state['messages'] = deque(state['messages'], maxlen=state['max'])
@@ -612,6 +618,7 @@ class LogNode:
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+        self._lock = threading.Lock()
         # recreate the worker thread and command queue if asynchronous
         if self.asynchronous:
             self.command_queue = Queue()
