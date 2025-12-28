@@ -60,7 +60,7 @@ class LogMessage:
         return f"[{self.date_formatted}] {self.level}: {self.message}"
 
     def __repr__(self):
-        return f"{self.level}: {self.message}"
+        return ': '.join([self.level, self.message])
 
     def __eq__(self, other):
         return self.uuid == other.uuid
@@ -74,5 +74,4 @@ class LogMessage:
 
         :return: The colored message.
         """
-
-        return f"{self.color}{self.__str__()}\033[0m"
+        return ''.join([self.color, str(self), "\033[0m"])

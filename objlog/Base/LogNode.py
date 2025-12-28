@@ -2,6 +2,7 @@
 from .LogMessage import LogMessage
 from ..LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 from ..constants import VERSION_MAJOR as LGND_VERSION
+from .internal import ObjLogInternalError
 
 from typing import TypeVar, Type, Union, Protocol
 
@@ -26,10 +27,6 @@ class Loggable(Protocol):
 
     def __init__(self, message: str):
         pass
-
-
-T = TypeVar('T', bound=Loggable)
-
 
 class LogNode:
     """
@@ -101,7 +98,7 @@ class LogNode:
         else:
             self.log_len = 0
 
-    def log(self, *messages: T,
+    def log(self, *messages: LogMessageType | Exception | BaseException,
             override_log_file: str | None = None,
             force_print: tuple[bool, bool] = (False, False),
             preserve_message_in_memory: bool = True,
@@ -582,9 +579,6 @@ class LogNode:
         """the worker thread for asynchronous logging, don't touch this!"""
         while True:
             # don't process stuff if locked!
-            if self._lock.locked():
-                time.sleep(0.001)
-                continue
             command = self.command_queue.get()
             try:
                 if command is None:
@@ -593,11 +587,14 @@ class LogNode:
                 # list of tuples (callable, args, kwargs)
                 # note: append _bypass_async=True to any function call to avoid infinite loop
                 func, args, kwargs = command
-                try:
-                    func(*args, **kwargs, _bypass_async=True)
-                except Exception as e:
-                    print(f"[{self.name}] Worker thread encountered an exception: {e}", file=sys.stderr)
-                    traceback.print_exc()
+                with self._lock:
+                    try:
+                        func(*args, **kwargs, _bypass_async=True)
+                    except Exception as e:
+                        self.log(ObjLogInternalError(f"Worker thread failed to process command {func.__name__} with args {args} and kwargs {kwargs}: {e}"), _bypass_async=True, force_print=(True, True))
+                        self.log(e, _bypass_async=True, force_print=(True, True))
+                        # show traceback
+                        self.log(ObjLogInternalError(traceback.format_exc()), _bypass_async=True, force_print=(True, True))
             finally:
                 self.command_queue.task_done()
 
@@ -642,7 +639,11 @@ class LogNode:
         if self.asynchronous:
             self.command_queue.put(None)
             self.command_queue.join()
-            self.worker_thread.join()
+            self.worker_thread.join(timeout=2.0)
+            if self.worker_thread.is_alive():
+                # log a warning that the worker thread didn't stop in time
+                # noinspection PyTypeChecker
+                self.log(ObjLogInternalError("LogNode worker thread did not stop in time during deletion."), _bypass_async=True) # must bypass async to avoid issues during deletion (worker thread has been stopped)
         # log the closing message
         if self.log_when_closed:
             # noinspection PyTypeChecker
@@ -657,4 +658,5 @@ class LogNode:
     def __iter__(self):
         # iterate over the messages
         self.await_finish()
-        return iter(self.messages)
+        with self._lock:
+            return iter(self.messages)
