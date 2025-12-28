@@ -307,6 +307,9 @@ log.enable()  # enable logging
 log.log(Info("This will be logged")) # logs the message and returns None (unless in verbose mode).
 ```
 
+## Asynchronous logging
+You can enable asynchronous logging by setting the `asynchronous` parameter to True when creating the LogNode.
+
 ## Conclusion
 
 That's it for the advanced guide. You should now have a good understanding of how to use ObjLog in more advanced ways.

@@ -66,14 +66,14 @@ class LogNode:
         self.print_filter = print_filter
         self.log_when_closed = log_when_closed
         self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
-        self.asynchronous = asynchronous
+        self._asynchronous = asynchronous
         self.log_len = 0
 
         self._lock = threading.Lock()
 
-        if self.asynchronous:
-            self.command_queue = Queue()
-            self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.command_queue = Queue()
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        if self._asynchronous:
             self.worker_thread.start()
 
 
@@ -162,8 +162,10 @@ class LogNode:
                     self.print_filter is None or isinstance(message, tuple(self.print_filter))):
                 if force_print[1] or self.print:
                     # print(f"[{self.name}] {message.colored()}")
-                    sys.stdout.write(f"[{self.name}] {message.colored()}\n")
+                    sys.stdout.write(f"[{self.name}] {message.colored()}\n") # MUCH FASTER!
             if verbose:
+                # note: verbose_out && current_verbose will always exist if verbose is True
+                # noinspection PyUnboundLocalVariable
                 verbose_out["logged"].append(current_verbose)
 
         if preserve_message_in_memory:
@@ -574,6 +576,56 @@ class LogNode:
         if self.asynchronous:
             self.command_queue.join()
 
+    def busy(self):
+        """
+        Check if the LogNode is busy processing commands.
+        Only applicable if the LogNode is asynchronous, otherwise always returns False.
+
+        :return: True if the LogNode is busy, False otherwise.
+        """
+        if self.asynchronous:
+            return not self.command_queue.empty()
+        return False
+
+    # properties
+    @property
+    def asynchronous(self) -> bool:
+        """
+        Whether the LogNode is asynchronous.
+
+        :return: True if the LogNode is asynchronous, False otherwise.
+        """
+        return bool(getattr(self, "_asynchronous", False))
+
+    @asynchronous.setter
+    def asynchronous(self, value: bool) -> None:
+        """
+        Set whether the LogNode is asynchronous.
+        WARNING: Changing this property will restart the worker thread if enabling asynchronous logging.
+
+        :param value: True to enable asynchronous logging, False to disable it.
+        :return: None
+        """
+        if value and not self.asynchronous:
+            # enable asynchronous logging
+            self._asynchronous = True
+            self.command_queue = Queue()
+            self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+            self.worker_thread.start()
+        elif not value and self.asynchronous:
+            # disable asynchronous logging
+            self.await_finish()
+            with self._lock:
+                self._asynchronous = False
+                # stop the worker thread
+                self.command_queue.put(None)
+                self.command_queue.join()
+                self.worker_thread.join(timeout=2.0)
+                if self.worker_thread.is_alive():
+                    # log a warning that the worker thread didn't stop in time
+                    # noinspection PyTypeChecker
+                    self.log(ObjLogInternalError("LogNode worker thread did not stop in time when disabling asynchronous logging."), _bypass_async=True) # must bypass async to avoid issues during deletion (worker thread has been stopped)
+
     # internal methods
     def _worker(self):
         """the worker thread for asynchronous logging, don't touch this!"""
@@ -637,6 +689,7 @@ class LogNode:
     def __del__(self):
         # ensure the worker thread is stopped & wrapped up
         if self.asynchronous:
+            self.await_finish()
             self.command_queue.put(None)
             self.command_queue.join()
             self.worker_thread.join(timeout=2.0)

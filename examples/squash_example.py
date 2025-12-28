@@ -4,12 +4,11 @@ from objlog import LogNode
 from objlog.LogMessages import Debug, Info
 
 # create a LogNode
-node = LogNode("squash_example", "squash_example.log")
+node = LogNode("squash_example", "squash_example.log", max_messages_in_memory=1000)
 
 # log thousands of messages
 
-for i in range(1000):
-    node.log(Info(f"message {i}"))
+node.log(*[Info(f"message {i}") for i in range(1000)])
 
 node.dump_messages_to_console()  # dump all messages to the console (will take a while)
 

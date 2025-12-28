@@ -732,6 +732,30 @@ class TestLogNode(unittest.TestCase):
         self.assertEqual(1, len(self.log))
         self.tearDown()
 
+    def test_async_toggling(self):
+        log = LogNode(name="Test", asynchronous=True)
+        log.log(Info("this is an info message"))
+        log.await_finish()
+        # check if worker thread is alive
+        self.assertTrue(log.worker_thread.is_alive())
+        log.asynchronous = False
+        log.log(Info("this is an info message"))
+        # check if worker thread is not alive
+        self.assertFalse(log.worker_thread.is_alive())
+        log.asynchronous = True
+        log.log(Info("this is an info message"))
+        # check if worker thread is alive
+        self.assertTrue(log.worker_thread.is_alive())
+        log.await_finish()
+        del log
+
+    def test_async_ensure_order_followed(self):
+        messages = gen_random_messages(100, extra_classes=[CustomMessage])
+        for message in messages:
+            self.log.log(message) # log one by one to ensure order!
+        self.assertTrue(len(self.log) == 100)
+        self.assertTrue(self.log.messages, messages)
+        self.tearDown()
 
 
 class TestLogMessage(unittest.TestCase):

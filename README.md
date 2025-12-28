@@ -332,6 +332,23 @@ output:
 ```shell
 ```
 
+### I want to use async logging!
+
+```python
+from objlog import LogNode
+from objlog.LogMessages import Info
+
+log = LogNode(name="Async Example", print_to_console=True, asynchronous=True)
+log.log(Info("this is an async info message! it's the exact same as normal logging, but non-blocking!"))
+
+# to wait for all messages to be logged before checking something, you can use `await_finish()`, however, this is not usually necessary.
+# functions that would need to wait for logging to finish (like get() or has()) will automatically wait for logging to finish before executing.
+# also, the LogNode will automatically wait for all messages to be logged before being destroyed (when the program ends, or when del is called on it)
+# any other functions that don't need to wait for logging to finish (like rename(), log()) will be added to the queue without blocking.
+# `await_finish()` will work regardless of whether the LogNode is asynchronous or not, but it won't do anything if the LogNode is not asynchronous.
+log.await_finish()
+```
+
 ## I want more examples!
 
 check out the [examples](examples) folder within this project, plenty of examples there!
