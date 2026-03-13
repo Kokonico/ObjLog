@@ -86,6 +86,7 @@ class LogNode:
             else:
                 with open(log_file, 'r') as f:
                     lines = f.readlines()
+                    self.log_len = len(lines)
                 if self.log_len > max_log_messages:
                     lines = lines[-max_log_messages:]
                     with open(log_file, "w+") as f:
@@ -507,9 +508,9 @@ class LogNode:
             return
 
         if update_in_logs and isinstance(self.log_file, str):
-            with open(self.log_file, "w+") as f:
-                # replace the name in the log file
+            with open(self.log_file, "r") as f:
                 lines = f.readlines()
+            with open(self.log_file, "w") as f:
                 for i in lines:
                     f.write(i.replace(f"[{self.name}]", f"[{new_name}]"))
         self.name = new_name
