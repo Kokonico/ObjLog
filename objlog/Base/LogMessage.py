@@ -63,10 +63,16 @@ class LogMessage:
         return ': '.join([self.level, self.message])
 
     def __eq__(self, other):
-        return self.uuid == other.uuid
+        if other is LogMessage:
+            return self.uuid == other.uuid
+        else:
+            return False
 
     def __ne__(self, other):
-        return self.uuid != other.uuid
+        if other is LogMessage:
+            return self.uuid != other.uuid
+        else:
+            return False
 
     def colored(self) -> str:
         """

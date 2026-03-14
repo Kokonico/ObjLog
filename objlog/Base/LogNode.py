@@ -404,22 +404,28 @@ class LogNode:
 
         # looks stupid not using `with`, but it's needed for the bypass flag to work properly
 
-        if len(element_filter) == 0:
-            if not _bypass_await_finish:
-                self._lock.release()
-            return list(self.messages)
-        else:
-            # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
-            filtered_messages = []
-            for msg in self.messages:
-                if isinstance(msg, PythonExceptionMessage):
-                    if isinstance(msg.exception, element_filter) or isinstance(msg, element_filter):
+        try:
+            if len(element_filter) == 0:
+                if not _bypass_await_finish:
+                    self._lock.release()
+                return list(self.messages)
+            else:
+                # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
+                filtered_messages = []
+                for msg in self.messages:
+                    if isinstance(msg, PythonExceptionMessage):
+                        if isinstance(msg.exception, element_filter) or isinstance(msg, element_filter):
+                            filtered_messages.append(msg)
+                    elif isinstance(msg, element_filter):
                         filtered_messages.append(msg)
-                elif isinstance(msg, element_filter):
-                    filtered_messages.append(msg)
+                if not _bypass_await_finish:
+                    self._lock.release()
+                return filtered_messages
+        except Exception as e:
+            # release lock
             if not _bypass_await_finish:
                 self._lock.release()
-            return filtered_messages
+            raise e
 
     def combine(self, other: 'LogNode', merge_log_files: bool = True, _bypass_async: bool = False) -> None:
         """
@@ -444,7 +450,7 @@ class LogNode:
 
         with other._lock:
             self.messages.extend(other.messages)
-            if merge_log_files:
+            if merge_log_files and self.log_file is not None:
                 self.clear_log(_bypass_async=True)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
@@ -466,7 +472,7 @@ class LogNode:
 
         self.messages.clear()
         self.messages.append(message)
-        if squash_logfile:
+        if squash_logfile and self.log_file is not None:
             self.clear_log()
             with open(self.log_file, "w") as f:
                 f.write(str(message) + '\n')
@@ -585,7 +591,7 @@ class LogNode:
         :return: True if the LogNode is busy, False otherwise.
         """
         if self.asynchronous:
-            return not self.command_queue.empty()
+            return not self.command_queue.qsize() == 0
         return False
 
     # properties
