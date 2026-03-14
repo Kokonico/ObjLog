@@ -85,7 +85,7 @@ from objlog import LogNode, LogMessage
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
 class CustomMessage(LogMessage):
-    color = "\033[32" # green
+    color = "\033[32m" # green
     level = "CUSTOM"
 
 log = LogNode(name="Custom Example", print_to_console=True)
@@ -156,7 +156,7 @@ log.log(Warn("this is a warning message"))
 log.log(Error("this is an error message"))
 log.log(Fatal("this is a fatal message"))
 
-log.dump_messages("example.log", elementfilter=[Warn, Error, Fatal])  # this will not print the messages to the console, but save them to a file if they are a warning, error, or fatal
+log.dump_messages("example.log", Warn, Error, Fatal)  # this will not print the messages to the console, but save them to a file if they are a warning, error, or fatal
 # the rest of the messages will not be saved to the file
 
 # you can do the same thing with dump_messages_to_console()
@@ -174,7 +174,7 @@ log.filter(Warn, Error, Fatal, filter_logfiles=True)  # this will remove all mes
 # it even works with custom message types!
 
 class CustomMessage(LogMessage):
-    color = "\033[32" # green
+    color = "\033[32m" # green
     level = "CUSTOM"
 
 log.log(CustomMessage("this is a custom message"))
@@ -313,7 +313,7 @@ limited.log:
 
 ### I want to log messages, but I don't want to print them to the console or a log file, and I don't want to store them in memory!
 
-1, that's useless why? and 2, you can do that!
+1. That's useless, but 2. you can do that!
 
 ```python
 from objlog import LogNode
@@ -343,10 +343,10 @@ log.log(Info("this is an async info message! it's the exact same as normal loggi
 
 # to wait for all messages to be logged before checking something, you can use `await_finish()`, however, this is not usually necessary.
 # functions that would need to wait for logging to finish (like get() or has()) will automatically wait for logging to finish before executing.
-# also, the LogNode will automatically wait for all messages to be logged before being destroyed (when the program ends, or when del is called on it)
 # any other functions that don't need to wait for logging to finish (like rename(), log()) will be added to the queue without blocking.
 # `await_finish()` will work regardless of whether the LogNode is asynchronous or not, but it won't do anything if the LogNode is not asynchronous.
 log.await_finish()
+# IMPORTANT: make sure to call `await_finish()` before closing the program, otherwise some messages/commands may be lost!
 ```
 
 ## I want more examples!

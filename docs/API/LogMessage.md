@@ -17,9 +17,9 @@
 - **Example**: `1617225013000000000`
 
 ### `unix`
-- **Type**: `integer
-- **Description**: The unix timestamp that the LogMessage was created.
-- **Example**: `1617225013`
+- **Type**: `integer`
+- **Description**: The unix timestamp that the LogMessage was created, in milliseconds.
+- **Example**: `1617225013000`
 
 ### `uuid`
 - **Type**: `string`
@@ -34,7 +34,7 @@
 ### `level`
 - **Type**: `string`
 - **Description**: The level of the log message.
-- **Example**: `INFO`, `ERROR`, `WARNING`, `DEBUG`
+- **Example**: `INFO`, `ERROR`, `WARN`, `DEBUG`
 
 ### `color`
 - **Type**: `string`
@@ -42,8 +42,8 @@
 - **Example**: `\033[1;32m`
 
 ### `exception`
-- **Type**: `Exception`
-- **Description**: Only present if the LogMessage is a Python
+- **Type**: `Exception`, `None`
+- **Description**: The original Python exception object. Only present (non-`None`) if the LogMessage is a `PythonExceptionMessage`. For all other LogMessage subclasses, this is `None`.
 
 ## Methods
 

@@ -27,4 +27,4 @@
     - **Type**: `str`
     - **Default**: ***Required***
     - **Description**: The path to the file to load the LogNode from.
-    - **Note**: The file must be a pickle file containing a LogNode object, if it is not a log node, an error will be raised.
+    - **Note**: The file must be a `.lgnd` pickle file containing a LogNode object. A `TypeError` is raised if the file does not contain a LogNode, and a `ValueError` is raised if the saved LogNode's major version is incompatible with the installed version of ObjLog.

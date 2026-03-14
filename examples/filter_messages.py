@@ -19,14 +19,14 @@ log.log(Fatal("fatal message"))
 
 # for example, to filter out all messages except for Debug messages, use the following code:
 
-log.filter([Debug])
+log.filter(Debug)
 
 # now, only Debug messages are in memory, but the log file still contains all messages
 # and new non-Debug messages will still be stored in memory
 
 # to filter the messages in the log file, set the filter_logfiles parameter to True
 
-log.filter([Debug], filter_logfiles=True)
+log.filter(Debug, filter_logfiles=True)
 
 # now, the log file only contains Debug messages.
 

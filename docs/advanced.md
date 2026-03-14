@@ -70,11 +70,11 @@ You can clear the messages that have been logged to the LogNode by using the `wi
 ```python
 log.log(Info("Hello, world!"))
 
-prints(log.get()) # prints: [Info("Hello, world!")]
+print(log.get()) # prints: [Info("Hello, world!")]
 
 log.wipe_messages()
 
-prints(log.get()) # prints: []
+print(log.get()) # prints: []
 ```
 
 keep in mind this will not clear any log files that are being logged to, to do that you can either set the parameter `wipe_logfiles` to True when calling the `wipe_messages` method, or you can call the `clear_log` method if you do not want to wipe the memory.
@@ -82,21 +82,21 @@ keep in mind this will not clear any log files that are being logged to, to do t
 ```python
 log.log(Info("Hello, world!"))
 
-prints(log.get()) # prints: [Info("Hello, world!")]
+print(log.get()) # prints: [Info("Hello, world!")]
 
 log.wipe_messages(wipe_logfiles=True)
 
-prints(log.get() # prints: []
+print(log.get()) # prints: []
 
 # or
 
 log.log(Info("Hello, world!"))
 
-prints(log.get()) # prints: [Info("Hello, world!")]
+print(log.get()) # prints: [Info("Hello, world!")]
 
 log.clear_log()
 
-prints(log.get()) # prints: [Info("Hello, world!")] as it did not wipe memory.
+print(log.get()) # prints: [Info("Hello, world!")] as it did not wipe memory.
 ```
 
 it also works with retrieving python exceptions of certain types (more on that later).
@@ -187,14 +187,14 @@ logging python exceptions is great, but what if you want to catch them when they
 you can do it in two ways, try/except, or by using the `@monitor` decorator.
 
 ```python
-from objlog import LogNode,
+from objlog import LogNode
 from objlog.utils import monitor
 
 log = LogNode("my logger")
 
 try:
     1 / 0
-except ImportError as e:
+except ZeroDivisionError as e:
     log.log(e) # logs the exception
 
 @monitor(log)
@@ -279,10 +279,12 @@ log.save("my_lognode")  # messages and lognode saved to the file 'my_lognode.lgn
 del log # lognode no longer exists in program, but is saved in file.
 ```
 
-you can then load the lognode back into the program by using the `load` method.
+you can then load the lognode back into the program by using the `load` function from the `objlog` package.
 
 ```python
-objlog.load("my_lognode.lgnd")  # loads the lognode back into the program.
+from objlog import load
+
+log = load("my_lognode.lgnd")  # loads the lognode back into the program.
 
 log.get() # returns: [Info("Hello, world!")]
 ```
@@ -292,8 +294,8 @@ using this method, you can save lognodes for later use, and even share the rich 
 ## Disabling logging temporarily
 You can disable logging temporarily by using the `enable()` and `disable()` methods of the LogNode
 or by changing the `enabled` attribute directly.
-This will change the behavior of the `log()` method to do nothing if `enabled` is True.
-To re-enable logging, simply set `enabled` back to False.
+This will change the behavior of the `log()` method to do nothing if `enabled` is False.
+To re-enable logging, simply set `enabled` back to True.
 - you can use this to disable logging when a verbose mode in your program is not enabled.
 
 ```python
@@ -308,7 +310,33 @@ log.log(Info("This will be logged")) # logs the message and returns None (unless
 ```
 
 ## Asynchronous logging
-You can enable asynchronous logging by setting the `asynchronous` parameter to True when creating the LogNode.
+You can enable asynchronous logging by setting the `asynchronous` parameter to `True` when creating the LogNode.
+In asynchronous mode, calls to `log()` and other write operations are offloaded to a background thread, making them non-blocking.
+
+```python
+from objlog import LogNode
+from objlog.LogMessages import Info
+
+log = LogNode("my logger", asynchronous=True)
+
+log.log(Info("this message is queued and logged in the background"))
+
+# functions that read from the LogNode (like get() or has()) will automatically wait for pending
+# operations to finish before returning.
+
+# you can also wait explicitly using await_finish():
+log.await_finish()
+
+# IMPORTANT: always call await_finish() before the program exits, or some queued messages may be lost.
+```
+
+You can also switch a LogNode between synchronous and asynchronous mode at runtime by setting the `asynchronous` property:
+
+```python
+log = LogNode("my logger")
+log.asynchronous = True   # start the background thread and switch to async mode
+log.asynchronous = False  # wait for the queue to drain, then stop the background thread
+```
 
 ## Conclusion
 

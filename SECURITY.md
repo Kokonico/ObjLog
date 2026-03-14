@@ -18,7 +18,7 @@ as they are not the responsibility of the project maintainers.
 
 | Version | Supported |
 |---------|-----------|
-| 3.x.x   | ✅         |
+| 3.1.x   | ✅         |
 | 2.x.x   | ❌         |
 | 1.x.x   | ❌         |
 | <1.x.x  | ❌         |

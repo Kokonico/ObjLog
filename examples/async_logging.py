@@ -1,5 +1,4 @@
 """async logging example using objlog"""
-import sys
 
 from objlog import LogNode
 from objlog.LogMessages import Debug, Info

@@ -1,12 +1,12 @@
 [project]
 name = "ObjLog"
-version = "3.0.5"
+version = "3.1.0"
 description = "Logging, Objectified."
 authors = [
     { name = "Kokonico", email = "kokonico@duck.com" }
 ]
 readme = "README.md"
-license = "Zlib"
+license = { text = "Zlib"}
 keywords = ["logging", "object", "objectified", "log", "logger", "loggers", "OOP", "python", "python3", "python3.10", "python3.11", "python3.12"]
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
