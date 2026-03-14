@@ -63,13 +63,13 @@ class LogMessage:
         return ': '.join([self.level, self.message])
 
     def __eq__(self, other):
-        if other is LogMessage:
+        if isinstance(other, LogMessage):
             return self.uuid == other.uuid
         else:
             return False
 
     def __ne__(self, other):
-        if other is LogMessage:
+        if isinstance(other, LogMessage):
             return self.uuid != other.uuid
         else:
             return False
