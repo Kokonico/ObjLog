@@ -5,9 +5,7 @@ from ..LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 from ..constants import VERSION_MAJOR as LGND_VERSION
 from .internal import ObjLogInternalError
 
-from typing import TypeVar, Type, Union, Protocol, Iterator
-
-LogMessageType = TypeVar("LogMessageType", bound=LogMessage)
+from typing import Protocol, Iterator
 
 import os
 from collections import deque
@@ -68,7 +66,7 @@ class LogNode:
         wipe_log_file_on_init: bool = False,
         enabled: bool = True,
         asynchronous: bool = False,
-    ):
+    ) -> None:
         self.enabled = enabled
         self.version = LGND_VERSION
         self.log_file = log_file
@@ -114,7 +112,7 @@ class LogNode:
 
     def log(
         self,
-        *messages: LogMessageType | Exception | BaseException,
+        *messages: LogMessage | BaseException,
         override_log_file: str | None = None,
         force_print: tuple[bool, bool] = (False, False),
         preserve_message_in_memory: bool = True,
@@ -292,7 +290,7 @@ class LogNode:
     def dump_messages(
         self,
         file: str,
-        *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+        *elementfilter: type[LogMessage | BaseException],
         wipe_messages_from_memory: bool = False,
     ) -> None:
         """
@@ -320,12 +318,13 @@ class LogNode:
 
     def filter(
         self,
-        *typefilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+        *typefilter: type[LogMessage | BaseException],
         filter_logfiles: bool = False,
         _bypass_async: bool = False,
     ) -> None:
         """
-        Filter messages saved in memory, optionally the logfiles too.
+        In-place filter messages saved in memory, optionally the logfiles too. Inclusive, only keeps the specified classes within the LogNode.
+        If you don't want to do this in-place, use `get()` instead.
 
         :param typefilter: A list of LogMessage types to filter the messages saved in memory.
         :param filter_logfiles: Whether to filter the log files too.
@@ -351,9 +350,7 @@ class LogNode:
 
     def dump_messages_to_console(
         self,
-        *elementfilter: Union[
-            Type[LogMessage], Type[Exception], Type[BaseException], Type[None]
-        ],
+        *elementfilter: type[LogMessage | BaseException] | None
     ) -> None:
         """
         Dump all logged messages to the console, also filtering them if needed.
@@ -466,8 +463,7 @@ class LogNode:
 
     def get(
         self,
-        *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]]
-        | tuple,
+        *element_filter: type[LogMessage | BaseException] | tuple,
         _bypass_await_finish: bool = False,
     ) -> list:
         """
@@ -580,7 +576,7 @@ class LogNode:
         return self.has(Error, Fatal, PythonExceptionMessage)
 
     def has(
-        self, *args: Union[Type[LogMessage], Type[BaseException]]
+        self, *args: type[LogMessage | BaseException]
     ) -> bool:
         """
         Check if the log node has any of the specified LogMessage types
@@ -685,7 +681,7 @@ class LogNode:
         if self.asynchronous:
             self.command_queue.join()
 
-    def busy(self):
+    def busy(self) -> bool:
         """
         Check if the LogNode is busy processing commands.
         Only applicable if the LogNode is asynchronous, otherwise always returns False.
@@ -775,7 +771,7 @@ class LogNode:
                 self.command_queue.task_done()
 
     # pickle support
-    def __getstate__(self):
+    def __getstate__(self) -> dict:
         state = self.__dict__.copy()
         # remove the worker thread and command queue from the state
         if "worker_thread" in state:
@@ -789,7 +785,7 @@ class LogNode:
             state["messages"] = deque(state["messages"], maxlen=state["max"])
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state) -> None:
         self.__dict__.update(state)
         self._lock = threading.Lock()
         # recreate the worker thread and command queue if asynchronous
@@ -798,7 +794,7 @@ class LogNode:
             self.worker_thread = threading.Thread(target=self._worker, daemon=True)
             self.worker_thread.start()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"LogNode {self.name} at output {self.log_file}"
             if isinstance(self.log_file, str)
@@ -809,15 +805,15 @@ class LogNode:
             )
         )
 
-    def __len__(self):
+    def __len__(self) -> int:
         self.await_finish()
         return len(self.messages)
 
-    def __contains__(self, item: LogMessage):
+    def __contains__(self, item: LogMessage) -> bool:
         self.await_finish()
         return item in self.messages
 
-    def __del__(self):
+    def __del__(self) -> None:
         # ensure the worker thread is stopped & wrapped up
         if self.asynchronous:
             self.await_finish()
@@ -841,7 +837,7 @@ class LogNode:
             )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
         # python will delete self automatically (thanks python)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> LogMessage:
         # gets an item from the messages
         self.await_finish()
         return self.messages[item]

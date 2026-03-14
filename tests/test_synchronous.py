@@ -91,6 +91,7 @@ class TestLogNode(unittest.TestCase):
 
     def test_log_type_validation(self):
         with self.assertRaises(TypeError):
+            #noinspection PyTypeChecker
             self.log.log("not a LogMessage")
 
     def test_preserve_message_in_memory_false(self):

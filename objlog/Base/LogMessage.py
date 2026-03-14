@@ -20,7 +20,7 @@ class LogMessage:
 
     __slots__ = ('time_ns', 'message', '_unix', '_uuid', '_date_formatted')  # optimize memory usage
 
-    def __init__(self, message):
+    def __init__(self, message) -> None:
         if self.color is None or self.level is None:
             raise TypeError("The color and level attributes must be set in the subclass.")
         self.time_ns = time_ns()
@@ -33,13 +33,13 @@ class LogMessage:
 
     # lazy loading!
     @property
-    def uuid(self):
+    def uuid(self) -> str:
         if self._uuid is None:
             self._uuid = '-'.join([str(self.time_ns), str(random.randint(0, 1000))])  # performance anywhere we can
         return self._uuid
 
     @property
-    def date_formatted(self):
+    def date_formatted(self) -> str:
         if self._date_formatted is None:
             self._date_formatted = ''.join([strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000)), ".", f"{self.unix % 1000:03d}"])
         return self._date_formatted
