@@ -68,12 +68,6 @@ class LogMessage:
         else:
             return False
 
-    def __ne__(self, other):
-        if isinstance(other, LogMessage):
-            return self.uuid != other.uuid
-        else:
-            return False
-
     def colored(self) -> str:
         """
         Returns a colored version of the message as a string.

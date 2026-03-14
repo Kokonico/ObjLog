@@ -3,7 +3,7 @@ from . import LogNode
 import traceback
 import pickle
 
-from .constants import VERSION_MAJOR, VERSION_STRING
+from .constants import VERSION_MAJOR
 
 def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):
     """
@@ -51,7 +51,7 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
                     print("\033[0m", end="")
                     exit(1)
                 elif raise_exceptions:
-                    raise e
+                    raise
 
         return wrapper
 

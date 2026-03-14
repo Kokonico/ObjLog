@@ -1,12 +1,13 @@
 """The LogNode class, the main class of the ObjLogger"""
+
 from .LogMessage import LogMessage
 from ..LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 from ..constants import VERSION_MAJOR as LGND_VERSION
 from .internal import ObjLogInternalError
 
-from typing import TypeVar, Type, Union, Protocol
+from typing import TypeVar, Type, Union, Protocol, Iterator
 
-LogMessageType = TypeVar('LogMessageType', bound=LogMessage)
+LogMessageType = TypeVar("LogMessageType", bound=LogMessage)
 
 import os
 from collections import deque
@@ -27,6 +28,7 @@ class Loggable(Protocol):
 
     def __init__(self, message: str):
         pass
+
 
 class LogNode:
     """
@@ -50,11 +52,23 @@ class LogNode:
     Any function that reads from the LogNode (like `get()`) will automatically wait for the LogNode to finish processing.
     """
 
-    open = open  # I removed this once before, and it broke log on quit, so putting it back
+    open = (
+        open  # I removed this once before, and it broke log on quit, so putting it back
+    )
 
-    def __init__(self, name: str, log_file: str | None = None, print_to_console: bool = False,
-                 print_filter: list | None = None, max_messages_in_memory: int = 500, max_log_messages: int = 1000,
-                 log_when_closed: bool = True, wipe_log_file_on_init: bool = False, enabled: bool = True, asynchronous: bool = False):
+    def __init__(
+        self,
+        name: str,
+        log_file: str | None = None,
+        print_to_console: bool = False,
+        print_filter: list | None = None,
+        max_messages_in_memory: int = 500,
+        max_log_messages: int = 1000,
+        log_when_closed: bool = True,
+        wipe_log_file_on_init: bool = False,
+        enabled: bool = True,
+        asynchronous: bool = False,
+    ):
         self.enabled = enabled
         self.version = LGND_VERSION
         self.log_file = log_file
@@ -76,7 +90,6 @@ class LogNode:
         if self._asynchronous:
             self.worker_thread.start()
 
-
         if log_file:
             # create the log file if it doesn't exist
             if not os.path.exists(log_file) or wipe_log_file_on_init:
@@ -84,7 +97,7 @@ class LogNode:
                     f.write("")
                 self.log_len = 0
             else:
-                with open(log_file, 'r') as f:
+                with open(log_file, "r") as f:
                     lines = f.readlines()
                     self.log_len = len(lines)
                 if self.log_len > max_log_messages:
@@ -99,12 +112,15 @@ class LogNode:
         else:
             self.log_len = 0
 
-    def log(self, *messages: LogMessageType | Exception | BaseException,
-            override_log_file: str | None = None,
-            force_print: tuple[bool, bool] = (False, False),
-            preserve_message_in_memory: bool = True,
-            verbose: bool = False, _bypass_async: bool = False
-            ) -> None | dict:
+    def log(
+        self,
+        *messages: LogMessageType | Exception | BaseException,
+        override_log_file: str | None = None,
+        force_print: tuple[bool, bool] = (False, False),
+        preserve_message_in_memory: bool = True,
+        verbose: bool = False,
+        _bypass_async: bool = False,
+    ) -> None | dict:
         """
         Logs a message to the LogNode. Does nothing if the LogNode is disabled.
 
@@ -120,39 +136,50 @@ class LogNode:
         if self.asynchronous and not _bypass_async and not verbose:
             # add the log command to the queue
             # _bypass_async is set within the worker thread to avoid infinite loop
-            self.command_queue.put((self.log, messages, {
-                "override_log_file": override_log_file,
-                "force_print": force_print,
-                "preserve_message_in_memory": preserve_message_in_memory,
-                "verbose": verbose,
-            }))
+            self.command_queue.put(
+                (
+                    self.log,
+                    messages,
+                    {
+                        "override_log_file": override_log_file,
+                        "force_print": force_print,
+                        "preserve_message_in_memory": preserve_message_in_memory,
+                        "verbose": verbose,
+                    },
+                )
+            )
             return None
 
         if not self.enabled:
             return None
 
+        # conversions
+        print_filter_tuple = tuple(self.print_filter) if self.print_filter else ()
+        messages = list(messages)
+
         if verbose:
-            verbose_out = {
-                "processtime_ns": 0,
-                "logged": []
-            }
+            verbose_out = {"processtime_ns": 0, "logged": []}
 
         if verbose:
             log_start = time.time_ns()
 
         # convert all exceptions to PythonExceptionMessage
-        for i in range(len(messages)):
-            if not isinstance(messages[i], LogMessage) and not isinstance(messages[i], Exception) and not isinstance(messages[i],
-                                                                                                             BaseException):
-                raise TypeError("message must be a LogMessage/Exception or its subclass")
-
-            if isinstance(messages[i], (BaseException, Exception)):
-                messages = list(messages)
-                messages[i] = PythonExceptionMessage(messages[i])
-
+        # TODO unoptimized much? lots of lookups!
         for i, message in enumerate(messages):
+            if not isinstance(message, (LogMessage, BaseException)):
+                raise TypeError(
+                    "message must be a LogMessage/Exception or its subclass"
+                )
+            elif isinstance(message, BaseException):
+                message = PythonExceptionMessage(message)
+                messages[i] = message
+
             if verbose:
-                current_verbose = {"message": message.message, "id_in_node": -1000, "type": message.level}
+                current_verbose = {
+                    "message": message.message,
+                    "id_in_node": -1000,
+                    "type": message.level,
+                }
 
                 if preserve_message_in_memory:
                     current_verbose["id_in_node"] = len(self.messages) + i + 1
@@ -160,10 +187,13 @@ class LogNode:
                     current_verbose["id_in_node"] = -1001
 
             if (self.print or force_print[0]) and (
-                    self.print_filter is None or isinstance(message, tuple(self.print_filter))):
+                self.print_filter is None or isinstance(message, print_filter_tuple)
+            ):
                 if force_print[1] or self.print:
                     # print(f"[{self.name}] {message.colored()}")
-                    sys.stdout.write(f"[{self.name}] {message.colored()}\n") # MUCH FASTER!
+                    sys.stdout.write(
+                        f"[{self.name}] {message.colored()}\n"
+                    )  # MUCH FASTER!
             if verbose:
                 # note: verbose_out && current_verbose will always exist if verbose is True
                 # noinspection PyUnboundLocalVariable
@@ -176,7 +206,7 @@ class LogNode:
             log_end = time.time_ns()
             # that warning is a false positive trust
             # noinspection PyUnboundLocalVariable
-            verbose_out["processtime_ns"] = (log_end - log_start)
+            verbose_out["processtime_ns"] = log_end - log_start
 
         target = self.log_file if not override_log_file else override_log_file
 
@@ -189,21 +219,33 @@ class LogNode:
             # ensure the file exists
             if not os.path.exists(target):
                 with self.open(target, "w") as f:
-                    f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
+                    f.write(
+                        "\n".join(
+                            [f"[{self.name}] {str(message)}" for message in messages]
+                        )
+                        + "\n"
+                    )
                     self.log_len = 0
 
             else:
                 # log it
                 with self.open(target, "a") as f:
-                    f.write("\n".join([f"[{self.name}] {str(message)}" for message in messages]) + "\n")
+                    f.write(
+                        "\n".join(
+                            [f"[{self.name}] {str(message)}" for message in messages]
+                        )
+                        + "\n"
+                    )
 
             self.log_len += len(messages)
+
+            #TODO could be optimized to not open whole file?
 
             # check if we need to crop the file
             if self.log_len > self.maxinf:
                 with self.open(target, "r+") as f:
                     lines = f.readlines()
-                    lines = lines[-self.maxinf:]
+                    lines = lines[-self.maxinf :]
                     f.seek(0)
                     f.truncate()
                     f.writelines(lines)
@@ -211,7 +253,12 @@ class LogNode:
 
         return verbose_out if verbose else None
 
-    def set_output_file(self, file: str | None, preserve_old_messages: bool = False, _bypass_async: bool = False) -> None:
+    def set_output_file(
+        self,
+        file: str | None,
+        preserve_old_messages: bool = False,
+        _bypass_async: bool = False,
+    ) -> None:
         """
         Set log output file.
         If preserve_old_messages is True, the old messages will be logged to the new file.
@@ -227,15 +274,27 @@ class LogNode:
         # check for async logging
         if self.asynchronous and not _bypass_async:
             # add to the command queue
-            self.command_queue.put((self.set_output_file, (file, preserve_old_messages), {}))
+            self.command_queue.put(
+                (self.set_output_file, (file, preserve_old_messages), {})
+            )
             return
 
         self.log_file = file
         if preserve_old_messages and isinstance(file, str):
-            self.log(*self.messages, preserve_message_in_memory=False, override_log_file=file, force_print=(True, False), _bypass_async=True)
+            self.log(
+                *self.messages,
+                preserve_message_in_memory=False,
+                override_log_file=file,
+                force_print=(True, False),
+                _bypass_async=True,
+            )
 
-    def dump_messages(self, file: str, *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
-                      wipe_messages_from_memory: bool = False) -> None:
+    def dump_messages(
+        self,
+        file: str,
+        *elementfilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+        wipe_messages_from_memory: bool = False,
+    ) -> None:
         """
         Dump all logged messages to a file, also filtering them if needed.
         Will wait until the LogNode is not busy if asynchronous logging is enabled.
@@ -252,15 +311,19 @@ class LogNode:
             with open(file, "a") as f:
                 for i in self.messages:
                     if isinstance(i, elementfilter):
-                        f.write(str(i) + '\n')
+                        f.write(str(i) + "\n")
         else:
             with open(file, "a") as f:
-                f.write('\n'.join(map(str, self.messages)))
+                f.write("\n".join(map(str, self.messages)))
         if wipe_messages_from_memory:
             self.wipe_messages()
 
-    def filter(self, *typefilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
-               filter_logfiles: bool = False, _bypass_async: bool = False) -> None:
+    def filter(
+        self,
+        *typefilter: Union[Type[LogMessage], Type[Exception], Type[BaseException]],
+        filter_logfiles: bool = False,
+        _bypass_async: bool = False,
+    ) -> None:
         """
         Filter messages saved in memory, optionally the logfiles too.
 
@@ -272,21 +335,26 @@ class LogNode:
 
         if self.asynchronous and not _bypass_async:
             # add to the command queue
-            self.command_queue.put((self.filter, typefilter, {
-                "filter_logfiles": filter_logfiles
-            }))
+            self.command_queue.put(
+                (self.filter, typefilter, {"filter_logfiles": filter_logfiles})
+            )
             return
 
-        self.messages = deque(self.get(*typefilter, _bypass_await_finish=True), maxlen=self.max)
+        self.messages = deque(
+            self.get(*typefilter, _bypass_await_finish=True), maxlen=self.max
+        )
         if filter_logfiles:
             if isinstance(self.log_file, str):
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(str(i) + '\n')
+                        f.write(str(i) + "\n")
 
-    def dump_messages_to_console(self, *elementfilter: Union[
-        Type[LogMessage], Type[Exception], Type[BaseException], Type[None]]
-                                 ) -> None:
+    def dump_messages_to_console(
+        self,
+        *elementfilter: Union[
+            Type[LogMessage], Type[Exception], Type[BaseException], Type[None]
+        ],
+    ) -> None:
         """
         Dump all logged messages to the console, also filtering them if needed.
         Blocks until LogNode is no longer busy if asynchronous logging is enabled.
@@ -305,7 +373,9 @@ class LogNode:
             elif tuple(elementfilter) == ():
                 print(i.colored())
 
-    def wipe_messages(self, wipe_logfiles: bool = False, _bypass_async: bool = False) -> None:
+    def wipe_messages(
+        self, wipe_logfiles: bool = False, _bypass_async: bool = False
+    ) -> None:
         """
         Wipe all messages from memory, can free up a lot of memory if you have a lot of messages,
          but you won't be able to dump the previous messages to a file.
@@ -313,13 +383,13 @@ class LogNode:
         :param wipe_logfiles: Whether to wipe the log files too.
         :param _bypass_async: Internal use only, bypasses async logging system if enabled.
         :return: None
-         """
+        """
 
         if self.asynchronous and not _bypass_async:
             # add to the command queue
-            self.command_queue.put((self.wipe_messages, (), {
-                "wipe_logfiles": wipe_logfiles
-            }))
+            self.command_queue.put(
+                (self.wipe_messages, (), {"wipe_logfiles": wipe_logfiles})
+            )
             return
 
         self.messages = deque(maxlen=self.max)
@@ -344,7 +414,9 @@ class LogNode:
                 f.write("")
                 self.log_len = 0
 
-    def set_max_messages_in_memory(self, max_messages: int, _bypass_async: bool = False) -> None:
+    def set_max_messages_in_memory(
+        self, max_messages: int, _bypass_async: bool = False
+    ) -> None:
         """
         Set the maximum number of messages to be saved in memory.
         WARNING: This will delete the oldest messages if the new maximum is smaller than the current number of messages.
@@ -355,13 +427,17 @@ class LogNode:
         """
         if self.asynchronous and not _bypass_async:
             # add to the command queue
-            self.command_queue.put((self.set_max_messages_in_memory, (max_messages,), {}))
+            self.command_queue.put(
+                (self.set_max_messages_in_memory, (max_messages,), {})
+            )
             return
 
         self.max = max_messages
         self.messages = deque(self.messages, maxlen=self.max)
 
-    def set_max_messages_in_log(self, max_file_size: int, _bypass_async: bool = False) -> None:
+    def set_max_messages_in_log(
+        self, max_file_size: int, _bypass_async: bool = False
+    ) -> None:
         """
         Set the maximum message limit of the log file.
         WARNING: This will delete the oldest messages if the new maximum is smaller than the current number of messages.
@@ -382,13 +458,18 @@ class LogNode:
             with open(self.log_file, "r+") as f:
                 if self.log_len >= self.maxinf:
                     lines = f.readlines()
-                    lines = lines[-self.maxinf:]
+                    lines = lines[-self.maxinf :]
                     f.seek(0)
                     f.truncate()
                     f.writelines(lines)
                     self.log_len = len(lines)
 
-    def get(self, *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]] | tuple, _bypass_await_finish: bool = False) -> list:
+    def get(
+        self,
+        *element_filter: Union[Type[LogMessage], Type[Exception], Type[BaseException]]
+        | tuple,
+        _bypass_await_finish: bool = False,
+    ) -> list:
         """
         Get all messages saved in memory, optionally filtered.
         Will block until the LogNode is not busy if asynchronous logging is enabled.
@@ -414,7 +495,9 @@ class LogNode:
                 filtered_messages = []
                 for msg in self.messages:
                     if isinstance(msg, PythonExceptionMessage):
-                        if isinstance(msg.exception, element_filter) or isinstance(msg, element_filter):
+                        if isinstance(msg.exception, element_filter) or isinstance(
+                            msg, element_filter
+                        ):
                             filtered_messages.append(msg)
                     elif isinstance(msg, element_filter):
                         filtered_messages.append(msg)
@@ -427,7 +510,12 @@ class LogNode:
                 self._lock.release()
             raise e
 
-    def combine(self, other: 'LogNode', merge_log_files: bool = True, _bypass_async: bool = False) -> None:
+    def combine(
+        self,
+        other: "LogNode",
+        merge_log_files: bool = True,
+        _bypass_async: bool = False,
+    ) -> None:
         """
         Combine two LogNodes, optionally merging their log files.
         Both LogNodes logged messages will be saved in the first LogNode.
@@ -454,9 +542,14 @@ class LogNode:
                 self.clear_log(_bypass_async=True)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(str(i) + '\n')
+                        f.write(str(i) + "\n")
 
-    def squash(self, message: LogMessage, squash_logfile: bool = True, _bypass_async: bool = False) -> None:
+    def squash(
+        self,
+        message: LogMessage,
+        squash_logfile: bool = True,
+        _bypass_async: bool = False,
+    ) -> None:
         """
         Squash the lognode, i.e., replace all messages with a single message.
 
@@ -475,7 +568,7 @@ class LogNode:
         if squash_logfile and self.log_file is not None:
             self.clear_log()
             with open(self.log_file, "w") as f:
-                f.write(str(message) + '\n')
+                f.write(str(message) + "\n")
 
     def has_errors(self) -> bool:
         """
@@ -486,7 +579,9 @@ class LogNode:
         """
         return self.has(Error, Fatal, PythonExceptionMessage)
 
-    def has(self, *args: Union[Type[LogMessage], Type[Exception], Type[BaseException]]) -> bool:
+    def has(
+        self, *args: Union[Type[LogMessage], Type[BaseException]]
+    ) -> bool:
         """
         Check if the log node has any of the specified LogMessage types
         Will block until the LogNode is not busy if asynchronous logging is enabled.
@@ -495,10 +590,17 @@ class LogNode:
         :return: True if the log node has any of the specified LogMessage types, False otherwise
         """
         self.await_finish()
-        # ignore the warning, it's a false positive
-        return len(self.get(*args)) > 0
+        for msg in self.messages:
+            if isinstance(msg, PythonExceptionMessage):
+                if isinstance(msg.exception, args) or isinstance(msg, args):
+                    return True
+            elif isinstance(msg, args):
+                return True
+        return False
 
-    def rename(self, new_name: str, update_in_logs: bool = False, _bypass_async: bool = False) -> None:
+    def rename(
+        self, new_name: str, update_in_logs: bool = False, _bypass_async: bool = False
+    ) -> None:
         """
         Rename the LogNode.
 
@@ -591,7 +693,7 @@ class LogNode:
         :return: True if the LogNode is busy, False otherwise.
         """
         if self.asynchronous:
-            return not self.command_queue.qsize() == 0
+            return self.command_queue.unfinished_tasks > 0
         return False
 
     # properties
@@ -631,7 +733,12 @@ class LogNode:
                 if self.worker_thread.is_alive():
                     # log a warning that the worker thread didn't stop in time
                     # noinspection PyTypeChecker
-                    self.log(ObjLogInternalError("LogNode worker thread did not stop in time when disabling asynchronous logging."), _bypass_async=True) # must bypass async to avoid issues during deletion (worker thread has been stopped)
+                    self.log(
+                        ObjLogInternalError(
+                            "LogNode worker thread did not stop in time when disabling asynchronous logging."
+                        ),
+                        _bypass_async=True,
+                    )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
 
     # internal methods
     def _worker(self):
@@ -650,10 +757,20 @@ class LogNode:
                     try:
                         func(*args, **kwargs, _bypass_async=True)
                     except Exception as e:
-                        self.log(ObjLogInternalError(f"Worker thread failed to process command {func.__name__} with args {args} and kwargs {kwargs}: {e}"), _bypass_async=True, force_print=(True, True))
+                        self.log(
+                            ObjLogInternalError(
+                                f"Worker thread failed to process command {func.__name__} with args {args} and kwargs {kwargs}: {e}"
+                            ),
+                            _bypass_async=True,
+                            force_print=(True, True),
+                        )
                         self.log(e, _bypass_async=True, force_print=(True, True))
                         # show traceback
-                        self.log(ObjLogInternalError(traceback.format_exc()), _bypass_async=True, force_print=(True, True))
+                        self.log(
+                            ObjLogInternalError(traceback.format_exc()),
+                            _bypass_async=True,
+                            force_print=(True, True),
+                        )
             finally:
                 self.command_queue.task_done()
 
@@ -661,15 +778,15 @@ class LogNode:
     def __getstate__(self):
         state = self.__dict__.copy()
         # remove the worker thread and command queue from the state
-        if 'worker_thread' in state:
-            del state['worker_thread']
-        if 'command_queue' in state:
-            del state['command_queue']
-        if '_lock' in state:
-            del state['_lock']
+        if "worker_thread" in state:
+            del state["worker_thread"]
+        if "command_queue" in state:
+            del state["command_queue"]
+        if "_lock" in state:
+            del state["_lock"]
         # convert list to deque for messages if not already
-        if not isinstance(state['messages'], deque):
-            state['messages'] = deque(state['messages'], maxlen=state['max'])
+        if not isinstance(state["messages"], deque):
+            state["messages"] = deque(state["messages"], maxlen=state["max"])
         return state
 
     def __setstate__(self, state):
@@ -682,8 +799,15 @@ class LogNode:
             self.worker_thread.start()
 
     def __repr__(self):
-        return f"LogNode {self.name} at output {self.log_file}" if isinstance(self.log_file, str) else \
-            f"LogNode {self.name} at output console" if self.print else f"LogNode {self.name} at output None"
+        return (
+            f"LogNode {self.name} at output {self.log_file}"
+            if isinstance(self.log_file, str)
+            else (
+                f"LogNode {self.name} at output console"
+                if self.print
+                else f"LogNode {self.name} at output None"
+            )
+        )
 
     def __len__(self):
         self.await_finish()
@@ -703,11 +827,18 @@ class LogNode:
             if self.worker_thread.is_alive():
                 # log a warning that the worker thread didn't stop in time
                 # noinspection PyTypeChecker
-                self.log(ObjLogInternalError("LogNode worker thread did not stop in time during deletion."), _bypass_async=True) # must bypass async to avoid issues during deletion (worker thread has been stopped)
+                self.log(
+                    ObjLogInternalError(
+                        "LogNode worker thread did not stop in time during deletion."
+                    ),
+                    _bypass_async=True,
+                )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
         # log the closing message
         if self.log_when_closed:
             # noinspection PyTypeChecker
-            self.log(Debug("LogNode closed."), _bypass_async=True) # must bypass async to avoid issues during deletion (worker thread has been stopped)
+            self.log(
+                Debug("LogNode closed."), _bypass_async=True
+            )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
         # python will delete self automatically (thanks python)
 
     def __getitem__(self, item):
@@ -715,8 +846,7 @@ class LogNode:
         self.await_finish()
         return self.messages[item]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[LogMessage]:
         # iterate over the messages
         self.await_finish()
-        with self._lock:
-            return iter(self.messages)
+        return iter(list(self.messages))
