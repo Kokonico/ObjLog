@@ -77,6 +77,7 @@ class LogNode:
         self.maxinf = max_log_messages
         self.print_filter = print_filter
         self.log_when_closed = log_when_closed
+        # self.uuid is deprecated
         self.uuid = time.time_ns() // random.randint(1, 10000) + random.randint(-25, 25)
         self._asynchronous = asynchronous
         self.log_len = 0

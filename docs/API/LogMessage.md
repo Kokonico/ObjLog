@@ -22,6 +22,7 @@
 - **Example**: `1617225013000`
 
 ### `uuid`
+- <span style="color:orange">**Deprecated!**</span> Will be removed in 4.0.0, if you need a unique identifier for the LogNode, use python's built-in `id()` function or assign your own unique identifier to the LogNode using a custom attribute.
 - **Type**: `string`
 - **Description**: The unique identifier for the LogMessage.
 - **Example**: `1729141302148986000-187`

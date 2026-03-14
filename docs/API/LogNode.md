@@ -110,6 +110,7 @@ Defined when creating a new LogNode.
 - **Note**: Extremely not recommended to change manually, modify only using the methods provided.
 
 ### `uuid`
+- <span style="color:orange">**Deprecated!**</span> Will be removed in 4.0.0, if you need a unique identifier for the LogNode, use python's built-in `id()` function or assign your own unique identifier to the LogNode using a custom attribute.
 - **Type**: `string`
 - **Description**: The unique identifier of the LogNode.
 - **Example**: `'1729141009132775000-82'`
