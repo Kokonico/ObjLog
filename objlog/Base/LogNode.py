@@ -12,6 +12,7 @@ from collections import deque
 import pickle
 import random
 import time
+
 # import asyncio
 import threading
 import sys
@@ -238,7 +239,7 @@ class LogNode:
 
             self.log_len += len(messages)
 
-            #TODO could be optimized to not open whole file?
+            # TODO could be optimized to not open whole file?
 
             # check if we need to crop the file
             if self.log_len > self.maxinf:
@@ -350,8 +351,7 @@ class LogNode:
                         f.write(str(i) + "\n")
 
     def dump_messages_to_console(
-        self,
-        *elementfilter: type[LogMessage | BaseException] | None
+        self, *elementfilter: type[LogMessage | BaseException] | None
     ) -> None:
         """
         Dump all logged messages to the console, also filtering them if needed.
@@ -576,9 +576,7 @@ class LogNode:
         """
         return self.has(Error, Fatal, PythonExceptionMessage)
 
-    def has(
-        self, *args: type[LogMessage | BaseException]
-    ) -> bool:
+    def has(self, *args: type[LogMessage | BaseException]) -> bool:
         """
         Check if the log node has any of the specified LogMessage types
         Will block until the LogNode is not busy if asynchronous logging is enabled.

@@ -13,7 +13,9 @@ node.log(*[Info(f"message {i}") for i in range(1000)])
 node.dump_messages_to_console()  # dump all messages to the console (will take a while)
 
 # squash the log file
-node.squash(Debug("squashed log file"))  # now instead of 1000 messages, there's only 1 (the squash message)
+node.squash(
+    Debug("squashed log file")
+)  # now instead of 1000 messages, there's only 1 (the squash message)
 
 print("=" * 100)
 

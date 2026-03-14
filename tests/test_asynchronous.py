@@ -31,7 +31,12 @@ class TestAsyncLogNode(unittest.TestCase):
         for file_name in os.listdir(LOG_FOLDER):
             if file_name != ".gitkeep":
                 os.remove(os.path.join(LOG_FOLDER, file_name))
-        self.log = LogNode("Async", log_file=os.path.join(LOG_FOLDER, "AsyncTest.log"), asynchronous=True, log_when_closed=False)
+        self.log = LogNode(
+            "Async",
+            log_file=os.path.join(LOG_FOLDER, "AsyncTest.log"),
+            asynchronous=True,
+            log_when_closed=False,
+        )
 
     def tearDown(self):
         self.log.await_finish()

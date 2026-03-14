@@ -39,9 +39,19 @@ class TestLogNode(unittest.TestCase):
                 os.remove(os.path.join(LOG_FOLDER, file_name))
 
         # log nodes.
-        self.log = LogNode("Test", log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"), log_when_closed=False)
-        self.log2 = LogNode("Test2", log_file=os.path.join(LOG_FOLDER, "LogNodeTest2.log"), log_when_closed=False)
-        self.log_at_console = LogNode("Console", print_to_console=True, log_when_closed=False)
+        self.log = LogNode(
+            "Test",
+            log_file=os.path.join(LOG_FOLDER, "LogNodeTest.log"),
+            log_when_closed=False,
+        )
+        self.log2 = LogNode(
+            "Test2",
+            log_file=os.path.join(LOG_FOLDER, "LogNodeTest2.log"),
+            log_when_closed=False,
+        )
+        self.log_at_console = LogNode(
+            "Console", print_to_console=True, log_when_closed=False
+        )
 
     def tearDown(self):
         # clean everything up
@@ -91,7 +101,7 @@ class TestLogNode(unittest.TestCase):
 
     def test_log_type_validation(self):
         with self.assertRaises(TypeError):
-            #noinspection PyTypeChecker
+            # noinspection PyTypeChecker
             self.log.log("not a LogMessage")
 
     def test_preserve_message_in_memory_false(self):
@@ -101,11 +111,18 @@ class TestLogNode(unittest.TestCase):
             self.assertEqual(1, len(f.readlines()))
 
     def test_force_print_and_print_filter(self):
-        filtered_log = LogNode("Filtered", print_to_console=True, print_filter=[Error], log_when_closed=False)
+        filtered_log = LogNode(
+            "Filtered",
+            print_to_console=True,
+            print_filter=[Error],
+            log_when_closed=False,
+        )
         try:
             out = io.StringIO()
             with redirect_stdout(out):
-                filtered_log.log(Info("skip"), Error("print me"), force_print=(True, True))
+                filtered_log.log(
+                    Info("skip"), Error("print me"), force_print=(True, True)
+                )
             self.assertIn("print me", out.getvalue())
             self.assertNotIn("skip", out.getvalue())
         finally:
@@ -125,7 +142,9 @@ class TestLogNode(unittest.TestCase):
         self.log.filter(CustomMessage, Debug)
         filtered = self.log.get()
         self.assertEqual(2, len(filtered))
-        self.assertTrue(all(isinstance(msg, (CustomMessage, Debug)) for msg in filtered))
+        self.assertTrue(
+            all(isinstance(msg, (CustomMessage, Debug)) for msg in filtered)
+        )
 
     def test_dump_messages_variants(self):
         self.log.log(Debug("a"), CustomMessage("b"), Error("c"))
@@ -136,7 +155,9 @@ class TestLogNode(unittest.TestCase):
         self.assertEqual(1, len(lines))
         self.assertIn("CUSTOM", lines[0])
 
-        self.log.dump_messages(os.path.join(LOG_FOLDER, "wipe.log"), wipe_messages_from_memory=True)
+        self.log.dump_messages(
+            os.path.join(LOG_FOLDER, "wipe.log"), wipe_messages_from_memory=True
+        )
         self.assertEqual(0, len(self.log))
 
     def test_dump_messages_filtered_multiple_types(self):
@@ -190,8 +211,13 @@ class TestLogNode(unittest.TestCase):
             self.assertEqual(3, len(f.readlines()))
 
     def test_max_limits_and_truncation(self):
-        log = LogNode("Cap", max_messages_in_memory=3, max_log_messages=3,
-                      log_file=os.path.join(LOG_FOLDER, "cap.log"), log_when_closed=False)
+        log = LogNode(
+            "Cap",
+            max_messages_in_memory=3,
+            max_log_messages=3,
+            log_file=os.path.join(LOG_FOLDER, "cap.log"),
+            log_when_closed=False,
+        )
         try:
             log.log(*gen_random_messages(6))
             self.assertEqual(3, len(log))
@@ -220,7 +246,9 @@ class TestLogNode(unittest.TestCase):
 
         with open(path, "w") as f:
             f.writelines(["old\n"])
-        log2 = LogNode("Init", log_file=path, wipe_log_file_on_init=True, log_when_closed=False)
+        log2 = LogNode(
+            "Init", log_file=path, wipe_log_file_on_init=True, log_when_closed=False
+        )
         try:
             with open(path) as f:
                 self.assertEqual(0, len(f.readlines()))
@@ -270,7 +298,12 @@ class TestLogNode(unittest.TestCase):
         self.assertIsInstance(filtered[0].exception, ImportError)
 
     def test_get_filtered_python_exceptions_multiple_types(self):
-        self.log.log(ImportError("bad import"), ZeroDivisionError("div by 0"), CustomMessage("custom"), Info("info"))
+        self.log.log(
+            ImportError("bad import"),
+            ZeroDivisionError("div by 0"),
+            CustomMessage("custom"),
+            Info("info"),
+        )
         filtered = self.log.get(ImportError, ZeroDivisionError, CustomMessage)
         self.assertEqual(3, len(filtered))
         self.assertTrue(any(isinstance(msg, CustomMessage) for msg in filtered))
@@ -295,7 +328,9 @@ class TestLogNode(unittest.TestCase):
             self.log.log(exc)
         converted = self.log.get(PythonExceptionMessage)
         self.assertEqual(len(exceptions), len(converted))
-        self.assertTrue(all(isinstance(msg.exception, BaseException) for msg in converted))
+        self.assertTrue(
+            all(isinstance(msg.exception, BaseException) for msg in converted)
+        )
 
     def test_enabled_flag_constructor_and_toggle(self):
         log = LogNode("Disabled", enabled=False, log_when_closed=False)
@@ -351,7 +386,12 @@ class TestLogNode(unittest.TestCase):
         self.assertIn("processtime_ns", result)
         self.assertIn("logged", result)
         self.assertEqual(4, len(result["logged"]))
-        self.assertTrue(all("message" in i and "id_in_node" in i and "type" in i for i in result["logged"]))
+        self.assertTrue(
+            all(
+                "message" in i and "id_in_node" in i and "type" in i
+                for i in result["logged"]
+            )
+        )
 
     def test_monitor_decorator_behaviors(self):
         @utils.monitor(self.log)
@@ -407,7 +447,9 @@ class TestLogMessage(unittest.TestCase):
 
     def test_colored_and_string_representations(self):
         message = CustomMessage("hello")
-        dt = datetime.datetime.fromtimestamp(message.unix / 1000).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+        dt = datetime.datetime.fromtimestamp(message.unix / 1000).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )[:-3]
         self.assertEqual(f"[{dt}] CUSTOM: hello", str(message))
         self.assertEqual("CUSTOM: hello", repr(message))
         self.assertTrue(message.colored().startswith("\033[0m["))

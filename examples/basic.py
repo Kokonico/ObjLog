@@ -1,4 +1,5 @@
 """A basic example of using ObjLog"""
+
 from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 

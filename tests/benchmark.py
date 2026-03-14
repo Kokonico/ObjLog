@@ -1,4 +1,5 @@
 """benchmarking for objlog"""
+
 import os
 
 import objlog
@@ -33,6 +34,7 @@ os.remove("benchmark.log") if os.path.exists("benchmark.log") else None
 
 # test messages in 1 second
 import time
+
 start_time = time.time()
 count = 0
 

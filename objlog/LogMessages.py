@@ -1,4 +1,5 @@
 """the default log messages"""
+
 from .Base import LogMessage, internal
 
 
@@ -6,6 +7,7 @@ class Debug(LogMessage):
     """
     The default debug message, with blue color.
     """
+
     level = "DEBUG"
     color = "\033[94m"
 
@@ -14,6 +16,7 @@ class Info(LogMessage):
     """
     The default info message, with green color.
     """
+
     level = "INFO"
     color = "\033[92m"
 
@@ -22,6 +25,7 @@ class Warn(LogMessage):
     """
     The default warn message, with yellow color.
     """
+
     level = "WARN"
     color = "\033[93m"
 
@@ -30,6 +34,7 @@ class Error(LogMessage):
     """
     The default error message, with red color.
     """
+
     level = "ERROR"
     color = "\033[91m"
 
@@ -38,6 +43,7 @@ class Fatal(LogMessage):
     """
     The default fatal message, with pink color.
     """
+
     level = "FATAL"
     color = "\033[95m"
 
@@ -49,6 +55,7 @@ class PythonExceptionMessage(LogMessage):
 
     :param exception: The exception to log
     """
+
     exception = internal.NoExceptionSpecified
     level = f"PYTHON EXCEPTION (UNSPECIFIED)"
     color = "\033[91m"  # red color

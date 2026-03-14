@@ -3,7 +3,11 @@
 from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
-log = LogNode(name="Filter Messages Example", print_to_console=True, log_file="filter_messages.log")
+log = LogNode(
+    name="Filter Messages Example",
+    print_to_console=True,
+    log_file="filter_messages.log",
+)
 
 log.log(Debug("debug message"))
 log.log(Info("info message"))

@@ -19,8 +19,10 @@ log.log(Fatal("fatal message"))
 
 # - color: color of the log message, in standard python color coding, (ex: "\033[93m" for yellow)
 
+
 class CustomMessage(LogMessage):
     """a custom message class"""
+
     level = "CUSTOM"
     color = "\033[96m"
 

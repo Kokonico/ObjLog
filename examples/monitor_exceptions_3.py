@@ -13,6 +13,7 @@ log = LogNode(name="Error Catching Example")
 
 # so this will print the error and its message, and will provide a stack trace
 
+
 @utils.monitor(log, exit_on_exception=True)
 def type_error():
     # noinspection PyTypeChecker
