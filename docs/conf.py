@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'ObjLog'
-copyright = '2024, Kokonico'
+copyright = '2026, Kokonico'
 author = 'Kokonico'
 release = '3.1.0'
 
