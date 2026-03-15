@@ -5,7 +5,7 @@ from ..LogMessages import Debug, Error, Fatal, PythonExceptionMessage
 from ..constants import VERSION_MAJOR as LGND_VERSION
 from .internal import ObjLogInternalError
 
-from typing import Protocol, Iterator
+from typing import Iterator
 
 import os
 from collections import deque
@@ -18,15 +18,6 @@ import threading
 import sys
 import traceback
 from queue import Queue
-
-
-class Loggable(Protocol):
-    """
-    just for type hinting, don't use this class
-    """
-
-    def __init__(self, message: str):
-        pass
 
 
 class LogNode:

@@ -1,8 +1,7 @@
 """a base message to be logged, WARNING: this class should not be used directly, use a subclass instead"""
 
 import random
-import time
-from time import time_ns, strftime
+from time import time_ns, strftime, localtime
 
 
 class LogMessage:
@@ -56,7 +55,7 @@ class LogMessage:
         if self._date_formatted is None:
             self._date_formatted = "".join(
                 [
-                    strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.unix / 1000)),
+                    strftime("%Y-%m-%d %H:%M:%S", localtime(self.unix / 1000)),
                     ".",
                     f"{self.unix % 1000:03d}",
                 ]
@@ -74,13 +73,13 @@ class LogMessage:
             self._unix = self.time_ns // 1_000_000  # convert to milliseconds
         return self._unix
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"[{self.date_formatted}] {self.level}: {self.message}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return ": ".join([self.level, self.message])
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, LogMessage):
             return self.uuid == other.uuid
         else:
