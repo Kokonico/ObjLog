@@ -26,7 +26,7 @@ class LogNode:
     It can log messages to a file, to the console, or both.
 
     :param name: The name of the LogNode.
-    :param log_file: The file to log to, if None, the LogNode will not log to a file.
+    :param log_file: The file to log to, if None, the LogNode will not log to a file. If subdirectories to the log file don't exist, they will be created.
     :param print_to_console: Whether to print messages to the console, if False, the LogNode will not print messages.
     :param print_filter: A list of LogMessage types to filter the messages to be printed to the console.
     :param max_messages_in_memory: The maximum number of messages to be saved in memory, defaults to 500.
@@ -84,6 +84,7 @@ class LogNode:
         if log_file:
             # create the log file if it doesn't exist
             if not os.path.exists(log_file) or wipe_log_file_on_init:
+                os.makedirs(os.path.dirname(log_file), exist_ok=True)
                 with open(log_file, "w") as f:
                     f.write("")
                 self.log_len = 0
@@ -159,7 +160,7 @@ class LogNode:
         for i, message in enumerate(messages):
             if not isinstance(message, (LogMessage, BaseException)):
                 raise TypeError(
-                    "message must be a LogMessage/Exception or its subclass"
+                    "message must be a LogMessage/BaseException or its subclass"
                 )
             elif isinstance(message, BaseException):
                 message = PythonExceptionMessage(message)
@@ -180,7 +181,7 @@ class LogNode:
             if (self.print or force_print[0]) and (
                 self.print_filter is None or isinstance(message, print_filter_tuple)
             ):
-                if force_print[1] or self.print:
+                if (force_print[0] and force_print[1]) or (not force_print[0] and self.print):
                     # print(f"[{self.name}] {message.colored()}")
                     sys.stdout.write(
                         f"[{self.name}] {message.colored()}\n"
@@ -272,6 +273,7 @@ class LogNode:
 
         self.log_file = file
         if preserve_old_messages and isinstance(file, str):
+            self.log_len = 0
             self.log(
                 *self.messages,
                 preserve_message_in_memory=False,
@@ -301,11 +303,14 @@ class LogNode:
         if len(elementfilter) > 0:
             with open(file, "a") as f:
                 for i in self.messages:
-                    if isinstance(i, elementfilter):
-                        f.write(str(i) + "\n")
+                    if isinstance(i, PythonExceptionMessage):
+                        if isinstance(i.exception, elementfilter):
+                            f.write(f'[{self.name}] {str(i)}\n')
+                    elif isinstance(i, elementfilter):
+                        f.write(f'[{self.name}] {str(i)}\n')
         else:
             with open(file, "a") as f:
-                f.write("\n".join(map(str, self.messages)))
+                f.write("\n".join(map(str, self.messages)) + '\n')
         if wipe_messages_from_memory:
             self.wipe_messages()
 
@@ -337,9 +342,10 @@ class LogNode:
         )
         if filter_logfiles:
             if isinstance(self.log_file, str):
+                self.log_len = len(self.messages)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(str(i) + "\n")
+                        f.write(f'[{self.name}] {str(i)}\n')
 
     def dump_messages_to_console(
         self, *elementfilter: type[LogMessage | BaseException] | None
@@ -355,12 +361,11 @@ class LogNode:
         self.await_finish()
 
         for i in self.messages:
-            if elementfilter is None or elementfilter == (None,):
-                print(i.colored())
-            elif isinstance(i, tuple(elementfilter)):
-                print(i.colored())
-            elif tuple(elementfilter) == ():
-                print(i.colored())
+            if isinstance(i, PythonExceptionMessage):
+                if elementfilter is None or isinstance(i.exception, elementfilter):
+                    print(f'[{self.name}] {i.colored()}')
+            elif elementfilter is None or isinstance(i, elementfilter):
+                print(f'[{self.name}] {i.colored()}')
 
     def wipe_messages(
         self, wipe_logfiles: bool = False, _bypass_async: bool = False
@@ -528,9 +533,10 @@ class LogNode:
             self.messages.extend(other.messages)
             if merge_log_files and self.log_file is not None:
                 self.clear_log(_bypass_async=True)
+                self.log_len = len(self.messages)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(str(i) + "\n")
+                        f.write(f'[{self.name}] {str(i)}\n')
 
     def squash(
         self,
@@ -554,9 +560,10 @@ class LogNode:
         self.messages.clear()
         self.messages.append(message)
         if squash_logfile and self.log_file is not None:
-            self.clear_log()
+            self.clear_log(_bypass_async=True)
+            self.log_len = len(self.messages)
             with open(self.log_file, "w") as f:
-                f.write(str(message) + "\n")
+                f.write(f'[{self.name}] {str(message)}\n')
 
     def has_errors(self) -> bool:
         """
