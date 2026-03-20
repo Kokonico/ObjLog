@@ -184,7 +184,9 @@ class LogNode:
             if (self.print or force_print[0]) and (
                 self.print_filter is None or isinstance(message, print_filter_tuple)
             ):
-                if (force_print[0] and force_print[1]) or (not force_print[0] and self.print):
+                if (force_print[0] and force_print[1]) or (
+                    not force_print[0] and self.print
+                ):
                     # print(f"[{self.name}] {message.colored()}")
                     sys.stdout.write(
                         f"[{self.name}] {message.formatted}\n"
@@ -308,12 +310,12 @@ class LogNode:
                 for i in self.messages:
                     if isinstance(i, PythonExceptionMessage):
                         if isinstance(i.exception, elementfilter):
-                            f.write(f'[{self.name}] {str(i)}\n')
+                            f.write(f"[{self.name}] {str(i)}\n")
                     elif isinstance(i, elementfilter):
-                        f.write(f'[{self.name}] {str(i)}\n')
+                        f.write(f"[{self.name}] {str(i)}\n")
         else:
             with open(file, "a") as f:
-                f.write("\n".join(map(str, self.messages)) + '\n')
+                f.write("\n".join(map(str, self.messages)) + "\n")
         if wipe_messages_from_memory:
             self.wipe_messages()
 
@@ -348,7 +350,7 @@ class LogNode:
                 self.log_len = len(self.messages)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(f'[{self.name}] {str(i)}\n')
+                        f.write(f"[{self.name}] {str(i)}\n")
 
     def dump_messages_to_console(
         self, *elementfilter: type[LogMessage | BaseException] | None
@@ -366,9 +368,9 @@ class LogNode:
         for i in self.messages:
             if isinstance(i, PythonExceptionMessage):
                 if elementfilter is None or isinstance(i.exception, elementfilter):
-                    print(f'[{self.name}] {i.formatted}')
+                    print(f"[{self.name}] {i.formatted}")
             elif elementfilter is None or isinstance(i, elementfilter):
-                print(f'[{self.name}] {i.formatted}')
+                print(f"[{self.name}] {i.formatted}")
 
     def wipe_messages(
         self, wipe_logfiles: bool = False, _bypass_async: bool = False
@@ -529,7 +531,7 @@ class LogNode:
                 self.log_len = len(self.messages)
                 with open(self.log_file, "w") as f:
                     for i in self.messages:
-                        f.write(f'[{self.name}] {str(i)}\n')
+                        f.write(f"[{self.name}] {str(i)}\n")
 
     def squash(
         self,
@@ -556,7 +558,7 @@ class LogNode:
             self.clear_log(_bypass_async=True)
             self.log_len = len(self.messages)
             with open(self.log_file, "w") as f:
-                f.write(f'[{self.name}] {str(message)}\n')
+                f.write(f"[{self.name}] {str(message)}\n")
 
     def has_errors(self) -> bool:
         """
