@@ -22,7 +22,9 @@ logger.dump_messages_to_console()
 
 # change the limit
 
-logger.set_max_messages_in_memory(3)  # this will drop debug message 2 and 3, but keep 4 and 5
+logger.set_max_messages_in_memory(
+    3
+)  # this will drop debug message 2 and 3, but keep 4 and 5
 
 # this can be used to prevent memory leaks in long-running applications, as the logger without a limit will grow
 # larger and larger.

@@ -1,11 +1,15 @@
 """miscellaneous utility functions for your convenience"""
+
 from . import LogNode
 import traceback
 import pickle
 
-from .constants import VERSION_MAJOR, VERSION_STRING
+from .constants import VERSION_MAJOR
 
-def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False):
+
+def monitor(
+    log_node: LogNode, exit_on_exception: bool = False, raise_exceptions: bool = False
+):
     """
     A decorator to monitor a function and log any python exceptions that occur.
 
@@ -42,7 +46,9 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
                     # red color escape code
                     print("\033[91m", end="")
                     if log_node.print is False and log_node.log_file is not None:
-                        print(f"An exception occurred: {e}, please check the log file for more information.")
+                        print(
+                            f"An exception occurred: {e}, please check the log file for more information."
+                        )
                     # if log node prints to the console, no need to print the message again
                     # if lognode does not print to the console or save to a file, print the stack trace to the console
                     if log_node.print is False and log_node.log_file is None:
@@ -51,7 +57,8 @@ def monitor(log_node: LogNode, exit_on_exception: bool = False, raise_exceptions
                     print("\033[0m", end="")
                     exit(1)
                 elif raise_exceptions:
-                    raise e
+                    raise
+                return None
 
         return wrapper
 
@@ -71,8 +78,6 @@ def load(file: str) -> LogNode:
             raise TypeError("The object loaded from the file is not a LogNode.")
         if node.version != VERSION_MAJOR:
             raise ValueError(
-                f"The LogNode version ({node.version}) is not compatible with the current major version ({VERSION_MAJOR}).")
-        # Call post-load hook to set defaults for new attributes
-        if hasattr(node, "_post_load"):
-            node._post_load()
+                f"The LogNode version ({node.version}) is not compatible with the current major version ({VERSION_MAJOR})."
+            )
         return node

@@ -15,6 +15,7 @@ log = LogNode(name="Error Catching Example", log_file="error.log")
 
 # the location of the error will be logged, but the stack trace will not be printed
 
+
 @utils.monitor(log, exit_on_exception=True)
 def type_error():
     # noinspection PyTypeChecker

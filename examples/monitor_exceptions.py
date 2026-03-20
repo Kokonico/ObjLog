@@ -17,6 +17,7 @@ log.log(Error("this is an error message"))
 
 # use the monitor decorator to log any exceptions that occur
 
+
 # it will log the exception and fail silently
 @monitor(log)
 def divide_by_zero():
@@ -30,6 +31,7 @@ divide_by_zero()
 # to not fail silently, set raise_exceptions to True
 
 # it will log the exception and raise it
+
 
 @monitor(log, raise_exceptions=True)
 def syntax_error():

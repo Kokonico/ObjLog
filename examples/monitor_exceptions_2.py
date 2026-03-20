@@ -35,6 +35,7 @@ log.log(Error("this is an error message"))
 # and
 # @monitor(log, exit_on_exception=True, raise_exceptions=False)
 
+
 @utils.monitor(log, exit_on_exception=True)
 def divide_by_zero():
     return 1 / 0

@@ -16,7 +16,11 @@ log.log(Fatal("This is a fatal error message"))
 
 del log
 
-log = LogNode(name="Print to Console Example", print_to_console=True, print_filter=[Debug, Info, Warn])
+log = LogNode(
+    name="Print to Console Example",
+    print_to_console=True,
+    print_filter=[Debug, Info, Warn],
+)
 
 log.log(Debug("This is a debug message"))  # this message will be printed
 log.log(Info("This is an info message"))  # this message will be printed
@@ -24,4 +28,6 @@ log.log(Warn("This is a warning message"))  # this message will be printed
 log.log(Error("This is an error message"))  # this message will not be printed
 log.log(Fatal("This is a fatal error message"))  # this message will not be printed
 
-log.dump_messages("log.log")  # this will include the error and fatal messages as well as the debug, info, and warn messages
+log.dump_messages(
+    "log.log"
+)  # this will include the error and fatal messages as well as the debug, info, and warn messages

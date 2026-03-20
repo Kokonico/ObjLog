@@ -75,6 +75,14 @@ Defined when creating a new LogNode.
 - **Example**: `True`
 - **Note**: Can be changed at any time by setting the `enabled` attribute of the LogNode to `True` or `False`, or by using the `enable()` and `disable()` methods.
 
+### `asynchronous`
+
+- **Type**: `bool`
+- **default**: `False`
+- **Description**: Whether to run the LogNode asynchronously, offloading logging work to a background thread. In async mode, calls to `log()` and other write operations are non-blocking. Functions that read from the LogNode (like `get()` or `has()`) will automatically wait for pending operations to finish.
+- **Example**: `True`
+- **Note**: Can also be changed at runtime by setting the `asynchronous` property. Always call `await_finish()` before the program exits to ensure all queued messages are processed.
+
 ## Attributes
 
 ### `print`
@@ -102,6 +110,7 @@ Defined when creating a new LogNode.
 - **Note**: Extremely not recommended to change manually, modify only using the methods provided.
 
 ### `uuid`
+- <span style="color:orange">**Deprecated!**</span> Will be removed in 4.0.0, if you need a unique identifier for the LogNode, use python's built-in `id()` function or assign your own unique identifier to the LogNode using a custom attribute.
 - **Type**: `string`
 - **Description**: The unique identifier of the LogNode.
 - **Example**: `'1729141009132775000-82'`
@@ -157,9 +166,8 @@ Defined when creating a new LogNode.
   - #### `force_print`
     - **Type**: `tuple(bool, bool)`
     - **Default**: `(False, False)`
-    - **Description**: A tuple of two booleans. The first boolean is whether to force print to the console, the second
-      boolean is the to print or not.
-    - **Example**: `(True, False)` (force don't print to console)
+    - **Description**: A tuple of two booleans. The first boolean is whether to override the console print setting at all; the second boolean is the value to use for printing (i.e., `True` to force print, `False` to force suppress).
+    - **Example**: `(True, False)` (force suppress printing to console)
 
     - #### `preserve_message_in_memory`
     - **Type**: `bool`
@@ -322,10 +330,10 @@ Defined when creating a new LogNode.
   - **Returns**: `None`
   - **Parameters**:
     - #### `message`
-      - **Type**: `str`
+      - **Type**: `LogMessage`
       - **Default**: ***REQUIRED***
-      - **Description**: The message to squash the log node into.
-      - **Example**: `This is a squashed message`
+      - **Description**: The LogMessage to replace all messages with.
+      - **Example**: `Debug("squashed log")`
     - #### `squash_logfile`
       - **Type**: `bool`
       - **Default**: `True`
@@ -375,7 +383,7 @@ Defined when creating a new LogNode.
       - **Default**: ***REQUIRED***
       - **Description**: The path to the file to save the log node to.
       - **Example**: `my_log_node`
-      - **Note**: Supports relative and absolute paths, also add `.lgnd` to the end of the file name.
+      - **Note**: Supports relative and absolute paths. The `.lgnd` extension is appended automatically; do not include it in the filename.
 
 ### `enable`  
   - **Description**: Enables the log node.
@@ -388,6 +396,16 @@ Defined when creating a new LogNode.
   - **Returns**: `None`
   - **Parameters**: `None`
   - **Note**: If the log node is already disabled, this method does nothing. This is shorthand for `lognode.enabled = False`.
+
+### `await_finish`
+  - **Description**: Waits for the LogNode to finish processing all queued commands. Only applicable if the LogNode is asynchronous; does nothing otherwise.
+  - **Returns**: `None`
+  - **Parameters**: `None`
+
+### `busy`
+  - **Description**: Checks if the LogNode is currently processing queued commands. Only applicable if the LogNode is asynchronous; always returns `False` otherwise.
+  - **Returns**: `bool`
+  - **Parameters**: `None`
 
 ### dunders
 

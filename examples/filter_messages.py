@@ -3,7 +3,11 @@
 from objlog import LogNode
 from objlog.LogMessages import Debug, Info, Warn, Error, Fatal
 
-log = LogNode(name="Filter Messages Example", print_to_console=True, log_file="filter_messages.log")
+log = LogNode(
+    name="Filter Messages Example",
+    print_to_console=True,
+    log_file="filter_messages.log",
+)
 
 log.log(Debug("debug message"))
 log.log(Info("info message"))
@@ -19,14 +23,14 @@ log.log(Fatal("fatal message"))
 
 # for example, to filter out all messages except for Debug messages, use the following code:
 
-log.filter([Debug])
+log.filter(Debug)
 
 # now, only Debug messages are in memory, but the log file still contains all messages
 # and new non-Debug messages will still be stored in memory
 
 # to filter the messages in the log file, set the filter_logfiles parameter to True
 
-log.filter([Debug], filter_logfiles=True)
+log.filter(Debug, filter_logfiles=True)
 
 # now, the log file only contains Debug messages.
 
