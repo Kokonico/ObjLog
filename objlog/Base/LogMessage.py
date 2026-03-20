@@ -89,6 +89,8 @@ class LogMessage:
         """
         Returns a colored version of the message as a string.
 
+        !DEPRECATED! Will be converted from a method to a property in 4.0.0
+
         :return: The colored message.
         """
         return "".join([self.color, str(self), "\033[0m"])

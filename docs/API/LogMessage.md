@@ -49,6 +49,7 @@
 ## Methods
 
 ### `colored`
+- <span style="color:orange">**Deprecated!**</span> Will be converted to a property (`formatted`) in 4.0.0.
 - **Description**: Returns the message as a string with ANSI color codes.
 - **Returns**: `string`
 
