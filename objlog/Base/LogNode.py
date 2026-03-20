@@ -159,7 +159,7 @@ class LogNode:
             log_start = time.time_ns()
 
         # convert all exceptions to PythonExceptionMessage
-        # TODO unoptimized much? lots of lookups!
+        # TODO: some of the heavier lifting is here, any optimizations here would be nice :)
         for i, message in enumerate(messages):
             if not isinstance(message, (LogMessage, BaseException)):
                 raise TypeError(
@@ -234,7 +234,7 @@ class LogNode:
 
             self.log_len += len(messages)
 
-            # TODO could be optimized to not open whole file?
+            # FIXME: opens entire file to crop, could potentially be more efficient. Not urgent but worth looking into.
 
             # check if we need to crop the file
             if self.log_len > self.maxinf:
@@ -805,6 +805,8 @@ class LogNode:
 
     def __del__(self) -> None:
         # ensure the worker thread is stopped & wrapped up
+        # FIXME: minor edge case with exceptions in del, shouldn't be an issue but could happen.
+        # will defer to later version
         if self.asynchronous:
             self.await_finish()
             self.command_queue.put(None)
