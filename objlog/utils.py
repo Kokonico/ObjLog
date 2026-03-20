@@ -58,6 +58,7 @@ def monitor(
                     exit(1)
                 elif raise_exceptions:
                     raise
+                return None
 
         return wrapper
 

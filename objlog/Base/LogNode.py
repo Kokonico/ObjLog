@@ -13,7 +13,6 @@ import pickle
 import random
 import time
 
-# import asyncio
 import threading
 import sys
 import traceback
@@ -184,7 +183,7 @@ class LogNode:
                 if (force_print[0] and force_print[1]) or (not force_print[0] and self.print):
                     # print(f"[{self.name}] {message.colored()}")
                     sys.stdout.write(
-                        f"[{self.name}] {message.colored()}\n"
+                        f"[{self.name}] {message.formatted}\n"
                     )  # MUCH FASTER!
             if verbose:
                 # note: verbose_out && current_verbose will always exist if verbose is True
@@ -363,9 +362,9 @@ class LogNode:
         for i in self.messages:
             if isinstance(i, PythonExceptionMessage):
                 if elementfilter is None or isinstance(i.exception, elementfilter):
-                    print(f'[{self.name}] {i.colored()}')
+                    print(f'[{self.name}] {i.formatted}')
             elif elementfilter is None or isinstance(i, elementfilter):
-                print(f'[{self.name}] {i.colored()}')
+                print(f'[{self.name}] {i.formatted}')
 
     def wipe_messages(
         self, wipe_logfiles: bool = False, _bypass_async: bool = False

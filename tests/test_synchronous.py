@@ -445,14 +445,14 @@ class TestLogMessage(unittest.TestCase):
         self.assertIsInstance(CustomMessage("x"), LogMessage)
         self.assertIsInstance(PythonExceptionMessage(Exception("x")), LogMessage)
 
-    def test_colored_and_string_representations(self):
+    def test_formatted_and_string_representations(self):
         message = CustomMessage("hello")
         dt = datetime.datetime.fromtimestamp(message.unix / 1000).strftime(
             "%Y-%m-%d %H:%M:%S.%f"
         )[:-3]
         self.assertEqual(f"[{dt}] CUSTOM: hello", str(message))
         self.assertEqual("CUSTOM: hello", repr(message))
-        self.assertTrue(message.colored().startswith("\033[0m["))
+        self.assertTrue(message.formatted.startswith("\033[0m["))
 
     def test_logmessage_identity(self):
         self.assertNotEqual(Debug("x"), Debug("x"))

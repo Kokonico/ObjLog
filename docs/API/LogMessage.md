@@ -46,11 +46,17 @@
 - **Type**: `Exception`, `None`
 - **Description**: The original Python exception object. Only present (non-`None`) if the LogMessage is a `PythonExceptionMessage`. For all other LogMessage subclasses, this is `None`.
 
+### `formatted`
+- **Type**: `string`
+- **Description**: The message as a string with its timestamp, level, and ANSI color codes. (identical to `colored()`) This is the recommended way to get a formatted string representation of the LogMessage.
+- **Example**: `\x1b[92m[2026-03-20 00:24:00.261] INFO: Test!\x1b[0m`
+- **Note**: Identical to `colored()`, but as a property instead of a method. `colored()` is deprecated and will be removed in 4.0.0.
+
 ## Methods
 
 ### `colored`
-- <span style="color:orange">**Deprecated!**</span> Will be converted to a property (`formatted`) in 4.0.0.
-- **Description**: Returns the message as a string with ANSI color codes.
+- <span style="color:orange">**Deprecated!**</span> Use the `formatted` property instead.
+- **Description**: Returns the message with its timestamp, level, and ANSI color codes as a string. Identical to `formatted`.
 - **Returns**: `string`
 
 ### Dunders

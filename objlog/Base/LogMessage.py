@@ -21,10 +21,12 @@ class LogMessage:
     __slots__ = (
         "time_ns",
         "message",
+        "_message",
         "_unix",
         "_uuid",
         "_date_formatted",
-    )  # optimize memory usage
+        "_formatted",
+    )
 
     def __init__(self, message) -> None:
         if self.color is None or self.level is None:
@@ -35,11 +37,14 @@ class LogMessage:
         self.message = (
             str(message) if not isinstance(message, str) else message
         )  # only convert to str if not already a str (performance)
+        self._message = self.message  # backup for `fancy`'s lazy loading
         self._unix = None
         # create uuid
         self._uuid = None
         # note: using ''.join is faster than f-strings or concatenation in a loop
         self._date_formatted = None
+
+        self._formatted = None
 
     # lazy loading!
     @property
@@ -49,6 +54,17 @@ class LogMessage:
                 [str(self.time_ns), str(random.randint(0, 1000))]
             )  # performance anywhere we can
         return self._uuid
+
+    @property
+    def formatted(self) -> str:
+        """
+        A fancy version of the message with ANSI
+        :return:
+        """
+        if self._formatted is None or self._message != self.message:
+            self._message = self.message
+            return "".join([self.color, str(self), "\033[0m"])
+        return self._formatted
 
     @property
     def date_formatted(self) -> str:
@@ -89,7 +105,7 @@ class LogMessage:
         """
         Returns a colored version of the message as a string.
 
-        !DEPRECATED! Will be converted from a method to a property in 4.0.0
+        !DEPRECATED! Use `fancy` instead, it's identical.
 
         :return: The colored message.
         """
