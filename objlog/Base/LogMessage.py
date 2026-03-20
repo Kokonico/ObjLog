@@ -58,8 +58,8 @@ class LogMessage:
     @property
     def formatted(self) -> str:
         """
-        A fancy version of the message with ANSI
-        :return:
+        A fancy version of the message with ANSI and the date.
+        :return: Formatted message.
         """
         if self._formatted is None or self._message != self.message:
             self._message = self.message
@@ -105,7 +105,7 @@ class LogMessage:
         """
         Returns a colored version of the message as a string.
 
-        !DEPRECATED! Use `fancy` instead, it's identical.
+        !DEPRECATED! Use `formatted` instead, it's identical.
 
         :return: The colored message.
         """

@@ -6,6 +6,7 @@ from ..constants import VERSION_MAJOR as LGND_VERSION
 from .internal import ObjLogInternalError
 
 from typing import Iterator
+from contextlib import nullcontext
 
 import os
 from collections import deque
@@ -13,6 +14,9 @@ import pickle
 import random
 import time
 
+# note: "async" in objlog is actually just threading
+# this is because we can't just async all the log() calls (or anything that effects files/lists) at once, there'd be too many race conditions!
+# So we just run an alternate thread that gives the illusion of async, while still logging everything one after another.
 import threading
 import sys
 import traceback
@@ -473,17 +477,14 @@ class LogNode:
 
         if not _bypass_await_finish:
             self.await_finish()
-            self._lock.acquire()
 
-        # looks stupid not using `with`, but it's needed for the bypass flag to work properly
+        # use lock if not bypassing await_finish, otherwise god help you because I sure won't
+        lock_ctx = self._lock if not _bypass_await_finish else nullcontext()
 
-        try:
+        with lock_ctx:
             if len(element_filter) == 0:
-                if not _bypass_await_finish:
-                    self._lock.release()
                 return list(self.messages)
             else:
-                # return list(filter(lambda x: isinstance(x, element_filter), self.messages))
                 filtered_messages = []
                 for msg in self.messages:
                     if isinstance(msg, PythonExceptionMessage):
@@ -493,14 +494,7 @@ class LogNode:
                             filtered_messages.append(msg)
                     elif isinstance(msg, element_filter):
                         filtered_messages.append(msg)
-                if not _bypass_await_finish:
-                    self._lock.release()
                 return filtered_messages
-        except Exception as e:
-            # release lock
-            if not _bypass_await_finish:
-                self._lock.release()
-            raise e
 
     def combine(
         self,
