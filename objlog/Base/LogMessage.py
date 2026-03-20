@@ -49,6 +49,10 @@ class LogMessage:
     # lazy loading!
     @property
     def uuid(self) -> str:
+        """
+        Deprecated! Use python's `id()` if you need a unique identifier for the message, it's much faster and more reliable.
+        :return: the uuid of the message.
+        """
         if self._uuid is None:
             self._uuid = "-".join(
                 [str(self.time_ns), str(random.randint(0, 1000))]
