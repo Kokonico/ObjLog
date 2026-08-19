@@ -8,6 +8,7 @@ from .internal import ObjLogInternalError
 from typing import Iterator
 from contextlib import nullcontext
 
+import atexit
 import os
 from collections import deque
 import pickle
@@ -83,6 +84,8 @@ class LogNode:
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
         if self._asynchronous:
             self.worker_thread.start()
+            self._shutdown_hook = self._shutdown
+            atexit.register(self._shutdown_hook)
 
         if log_file:
             # create the log file if it doesn't exist
@@ -762,6 +765,15 @@ class LogNode:
             finally:
                 self.command_queue.task_done()
 
+    def _shutdown(self) -> None:
+        """Flush and stop the worker thread. Called via atexit for reliable shutdown."""
+        if not self.asynchronous or getattr(self, "_stopped", False):
+            return
+        self.command_queue.put(None)
+        self.command_queue.join()
+        self.worker_thread.join(timeout=2.0)
+        self._stopped = True
+
     # pickle support
     def __getstate__(self) -> dict:
         state = self.__dict__.copy()
@@ -807,29 +819,16 @@ class LogNode:
 
     def __del__(self) -> None:
         # ensure the worker thread is stopped & wrapped up
-        # FIXME: minor edge case with exceptions in del, shouldn't be an issue but could happen.
-        # will defer to later version
         if self.asynchronous:
-            self.await_finish()
-            self.command_queue.put(None)
-            self.command_queue.join()
-            self.worker_thread.join(timeout=2.0)
-            if self.worker_thread.is_alive():
-                # log a warning that the worker thread didn't stop in time
-                # noinspection PyTypeChecker
-                self.log(
-                    ObjLogInternalError(
-                        "LogNode worker thread did not stop in time during deletion."
-                    ),
-                    _bypass_async=True,
-                )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
+            self._shutdown()
+        if getattr(self, "_shutdown_hook", None) is not None:
+            atexit.unregister(self._shutdown_hook)
         # log the closing message
         if self.log_when_closed:
             # noinspection PyTypeChecker
             self.log(
                 Debug("LogNode closed."), _bypass_async=True
-            )  # must bypass async to avoid issues during deletion (worker thread has been stopped)
-        # python will delete self automatically (thanks python)
+            )
 
     def __getitem__(self, item) -> LogMessage:
         # gets an item from the messages

@@ -50,10 +50,10 @@ log.log(
     )
 )
 
-log.await_finish()  # AWAIT FINISH AGAIN TO ENSURE ALL MESSAGES ARE WRITTEN BEFORE EXITING THE PROGRAM!!!
-# OBJLOG DOES NOT GUARANTEE ALL MESSAGES ARE PROPERLY HANDLED UNTIL AWAIT_FINISH IS CALLED!!!
+log.await_finish()  # await finish is optional, but nice to have.
+# NOTE: ALL VERSIONS OF OBJLOG BEFORE 3.1.1 __REQUIRE `await_finish()` TO BE CALLED BEFORE THE PROGRAM EXITS, OTHERWISE MESSAGES WILL BE LEAKED!
 
-# now, it'll take quite a bit of time for the background thread to print all the queued message.
+# now, it'll take quite a bit of time for the background thread to print all the queued messages.
 # it's way faster to queue the messages than to write them to disk, so we logged way more messages in async mode.
 # On an intel i9-11900KF, it takes ~2 seconds to catch up
 # logging to a file will significantly slow down the logging speed, so if you want to maximize logging speed, consider disabling file logging or logging to a faster medium (e.g., an in-memory filesystem or a ramdisk)

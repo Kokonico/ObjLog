@@ -9,7 +9,7 @@
 project = "ObjLog"
 copyright = "2026, Kokonico"
 author = "Kokonico"
-release = "3.1.0"
+release = "3.1.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

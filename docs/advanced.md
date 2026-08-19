@@ -327,7 +327,8 @@ log.log(Info("this message is queued and logged in the background"))
 # you can also wait explicitly using await_finish():
 log.await_finish()
 
-# IMPORTANT: always call await_finish() before the program exits, or some queued messages may be lost.
+# IMPORTANT: when using objlog < 3.1.1, always call await_finish() before the program exits, or some queued messages may be lost.
+# 3.1.1 and later automatically ensure all queued messages are logged before the program exits, but it is still a good practice to call await_finish() before exiting to signify intent.
 ```
 
 You can also switch a LogNode between synchronous and asynchronous mode at runtime by setting the `asynchronous` property:

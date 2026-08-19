@@ -1,2 +1,0 @@
-3.0
-Async Logging (as an option probably, not default. the tests HATE it as they share the same log file)
