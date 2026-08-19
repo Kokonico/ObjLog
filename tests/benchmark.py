@@ -4,8 +4,12 @@ import os
 
 import objlog
 
-log = objlog.LogNode("benchmark", asynchronous=False)
+log = objlog.LogNode("benchmark", asynchronous=False, print_to_console=True)
 
+print(log.log(objlog.LogMessages.Info("Warming up..."), verbose=True))
+print("=" * 20)
+
+log.print = False
 
 v = log.log(objlog.LogMessages.Info("benchmark test"), verbose=True)
 
@@ -29,6 +33,7 @@ v = log.log(objlog.LogMessages.Info("benchmark test"), verbose=True)
 print(v)
 
 os.remove("benchmark.log") if os.path.exists("benchmark.log") else None
+log.wipe_messages()
 # log.set_output_file(None)
 # log.print = True
 
